@@ -29,7 +29,14 @@ local function make_file_node(name)
 end
 
 function M.open()
-  local popup = Popup({ ... })
+  local popup = Popup({
+    enter = true,
+    focusable = true,
+    border = { style = "rounded", text = { top = " P4 Explorer ", top_align = "center" } },
+    position = "50%",
+    size = { width = 80, height = 25 },
+    buf_options = { modifiable = true, readonly = false },
+  })
   local changelists = vim.tbl_flatten({
     p4.get_changelists_by_status("pending"),
     p4.get_changelists_by_status("submitted"),
@@ -55,7 +62,30 @@ function M.open()
   popup:mount()
   tree:render(popup.bufnr)
 
-  -- 快捷鍵：開啟檔案 / 展開 changelist / 換 client / refresh
+  vim.keymap.set("n", "<CR>", function()
+    local node = tree:get_node()
+    if node and node.data.type == "file" then
+      vim.cmd("edit " .. node.data.name)
+    elseif node then
+      tree:toggle(node:get_id())
+      tree:render(popup.bufnr)
+    end
+  end, { buffer = popup.bufnr })
+
+  vim.keymap.set("n", "r", function()
+    popup:unmount()
+    M.open()
+  end, { buffer = popup.bufnr })
+
+  vim.keymap.set("n", "c", function()
+    popup:unmount()
+    client.show_client_selector(function()
+      M.open()
+    end)
+  end, { buffer = popup.bufnr })
+
+  popup:on(event.BufLeave, function() popup:unmount() end)
+
 end
 
 return M
