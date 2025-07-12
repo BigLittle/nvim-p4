@@ -49,7 +49,7 @@ function M.select_client(callback)
         if len > max_width then max_width = len end
     end
     max_width = math.min(max_width + 4, 80)
-    local max_height = math.min(#clients, 10)
+    local max_height = math.min(#clients, 9)
 
     local popup = Popup({
         position = "50%",
