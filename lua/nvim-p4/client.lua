@@ -41,7 +41,7 @@ function M.select_client(callback)
 
     local items = {}
     for _, name in ipairs(clients) do
-        table.insert(items, Menu.item(" " .. icon .. name, { value = name, index = _ }))
+        table.insert(items, Menu.item(icon .. name, { value = name }))
     end
 
     local max_width = 0
@@ -55,29 +55,32 @@ function M.select_client(callback)
     local menu = Menu({
         position = "50%",
         size = { width = max_width, height = max_height },
-        border = { style = "rounded", text = { top = " Select a Perforce Client ", top_align = "center" }, },
-        win_options = { winhighlight = "Normal:Normal,FloatBorder:Normal", },
+        border = { 
+            style = "rounded",
+            padding = { top = 1, bottom = 1, left = 2, right = 2 },
+            text = { top = " Select a Perforce Client ", top_align = "center" }
+        },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        },
     }, {
         lines = items,
-
-        on_change = function(_, index)
-            for i, item in ipairs(items) do
-                local hl = (i == index) and "Visual" or "Normal"
-                item.text = NuiText(item.text:content(), hl)
-            end
-            menu:update()
-        end,
-
-        keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
+        keymap = { 
+            submit = { "<CR>" },
+            close = { "q", "<Esc>" },
+        },
         on_submit = function(item)
             M.set_client(item.value)
-        callback(item.value)
+            callback(item.value)
+        end,
+        ol_select = function(item)
+            print("Selected Perforce client: " .. item.value)
         end,
     })
 
-
     menu:mount()
 
+    vim.api.nvim_set_hl(0, "nuiMenuCursor", { fg = 'None', bg = 'None' })
 
 
 
