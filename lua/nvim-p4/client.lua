@@ -43,9 +43,6 @@ function M.select_client(callback)
         index_to_client[i] = name
     end
 
-    table.insert(display_names, "")
-    table.insert(display_names, "[j/k] to navigate, [Enter] to select, [q or Esc] to quit")
-
     local max_width = 0
     for _, name in ipairs(display_names) do
         local len = vim.fn.strdisplaywidth(name)
@@ -68,10 +65,10 @@ function M.select_client(callback)
     popup:mount()
     vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, display_names)
 
-    vim.api.nvim_win_set_option(popup.winid, "cursorline", true)
-    -- vim.cmd("highlight! link CursorLine Visual")
-    vim.api.nvim_win_set_option(popup.winid, "scrolloff", math.floor(#clients / 2))
-    vim.api.nvim_win_set_cursor(popup.winid, { 1, 2 })
+    vim.api.nvim_buf_set_option(popup.bufnr, "cursorline", true)
+    vim.api.nvim_buf_set_commands(popup.bufnr, {"highlight", "CursorLine", { link = "Visual" } })
+    vim.api.nvim_buf_set_option(popup.bufnr, "scrolloff", math.floor(#clients / 2))
+    vim.api.nvim_buf_set_cursor(popup.bufnr, { 1, 2 })
 
     vim.keymap.set("n", "<CR>", function()
         local row = vim.api.nvim_win_get_cursor(0)[1]
