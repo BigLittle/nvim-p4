@@ -38,9 +38,10 @@ function M.select_client(callback)
         return
     end
     local icon = " "
-    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
+    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
-    vim.cmd("highlight! NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
+    local guicursor = vim.opt.guicursor:get()
+    vim.opt.guicursor = "a:ver0"
 
     local items = {}
     for _, name in ipairs(clients) do
@@ -72,17 +73,22 @@ function M.select_client(callback)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 2)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 2, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "NuiMenuCursor", item.index, 0, -1)
         end,
 
         -- Set the selected client
         on_submit = function(item)
             M.set_client(item.value)
             callback(item.value)
+            vim.opt.guicursor = guicursor  -- Restore the original cursor settings
         end,
     })
 
     menu:mount()
-    menu:on(event.BufLeave, function() menu:unmount() end)  -- Unmount the menu when leaving the buffer.
+    
+    -- Unmount the menu when leaving the buffer.
+    menu:on(event.BufLeave, function()
+        vim.opt.guicursor = guicursor  -- Restore the original cursor settings
+        menu:unmount() 
+    end)
 end
 return M
