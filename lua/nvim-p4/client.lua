@@ -41,7 +41,7 @@ function M.select_client(callback)
 
     local items = {}
     for _, name in ipairs(clients) do
-        table.insert(items, Menu.item(icon .. name, { value = name }))
+        table.insert(items, Menu.item(icon .. name, { value = name, index = _ }))
     end
 
     local max_width = 0
@@ -82,8 +82,9 @@ function M.select_client(callback)
             M.set_client(item.value)
             callback(item.value)
         end,
-        ol_select = function(item)
+        on_select = function(item)
             print("Selected Perforce client: " .. item.value)
+            print("Selected Perforce client: " .. item.index)
         end,
     })
 
