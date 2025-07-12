@@ -1,6 +1,4 @@
-local Popup = require("nui.popup")
 local Menu = require("nui.menu")
-local NuiText = require("nui.text")
 local event = require("nui.utils.autocmd").event
 local M = { current_client = nil }
 
@@ -38,10 +36,9 @@ function M.select_client(callback)
         return
     end
     local icon = "  "
+    vim.cmd("highlight! P4ClientHead guifg=#365a98 guibg=#365a98 gui=bold")
     vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
-    vim.cmd("highlight! P4ClientHead guifg=#365a98 guibg=#365a98 gui=bold")
-    local guicursor = vim.opt.guicursor:get()
 
     local items = {}
     for _, name in ipairs(clients) do
@@ -80,12 +77,12 @@ function M.select_client(callback)
         on_submit = function(item)
             M.set_client(item.value)
             callback(item.value)
-            vim.opt.guicursor = guicursor
         end,
     })
 
     menu:mount()
-    -- vim.opt.guicursor = "a:ver1"
+
+    -- Disable horizontal navigation keys
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
