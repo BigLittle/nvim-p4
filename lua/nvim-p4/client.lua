@@ -42,17 +42,17 @@ function M.select_client(callback)
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
 
     local guicursor = vim.opt.guicursor:get()
-    vim.opt.guicursor = "a:ver1"
+    vim.opt.guicursor = "a:ver1-P4ClienName"
 
 
     local cursor_hl = vim.api.nvim_get_hl(0, { name = "Cursor", link = false })
     local lcursor_hl = vim.api.nvim_get_hl(0, { name = "lCursor", link = false })
-    vim.api.nvim_set_hl(0, "Cursor", { fg = 'None', bg = 'None', reverse = true, blend = 100 })
-    vim.api.nvim_set_hl(0, "lCursor", { fg = 'None', bg = 'None', reverse = true, blend = 100 })
+    vim.api.nvim_set_hl(0, "Cursor", { fg = '#365a98', bg = 'None'})
+    vim.api.nvim_set_hl(0, "lCursor", { fg = '#365a98', bg = 'None'})
 
     local items = {}
     for _, name in ipairs(clients) do
-        table.insert(items, Menu.item(icon .. name, { value = name, index = _ - 1}))
+        table.insert(items, Menu.item(icon .. name .. " ", { value = name, index = _ - 1}))
     end
 
     local max_width = 0
@@ -61,7 +61,7 @@ function M.select_client(callback)
         local len = vim.fn.strdisplaywidth(name)
         if len > max_width then max_width = len end
     end
-    max_width = math.max(max_width + 2, 24)
+    max_width = math.max(max_width + 5, 24)
     
     local menu = Menu({
         position = "50%",
