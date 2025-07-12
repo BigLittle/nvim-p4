@@ -42,8 +42,6 @@ function M.select_client(callback)
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
 
     local guicursor = vim.opt.guicursor:get()
-
-
     local cursor_hl = vim.api.nvim_get_hl(0, { name = "Cursor", link = false })
     local lcursor_hl = vim.api.nvim_get_hl(0, { name = "lCursor", link = false })
 
@@ -75,7 +73,7 @@ function M.select_client(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 3)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 1, 3)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 3, -1)
         end,
 
@@ -92,6 +90,7 @@ function M.select_client(callback)
     menu:mount()
     vim.api.nvim_set_hl(0, "Cursor", { fg = '#365a98', bg = '#365a98' })
     vim.api.nvim_set_hl(0, "lCursor", { fg = '#365a98', bg = '#365a98' })
+    vim.opt.guicursor = "a:ver1"
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
