@@ -45,15 +45,13 @@ function M.select_client(callback)
     end
 
     local max_width = 0
+    local max_height = math.min(#clients, 20)
     for _, name in ipairs(clients) do
         local len = vim.fn.strdisplaywidth(name)
         if len > max_width then max_width = len end
     end
-    max_width = math.min(max_width + 4, 80)
-    local max_height = math.min(#clients, 9)
+    max_width = math.min(max_width + 4, 50)
 
-    vim.cmd("highlight P4ClientIcon guifg=#ffaa00 gui=bold")
-    vim.cmd("highlight NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
 
     local menu = Menu({
         position = "50%",
@@ -82,7 +80,7 @@ function M.select_client(callback)
             M.set_client(item.value)
             callback(item.value)
         end,
-        on_select = function(item)
+        on_change = function(item, menu)
             print("Selected Perforce client: " .. item.value)
             print("Selected Perforce client: " .. item.index)
         end,
@@ -95,11 +93,8 @@ function M.select_client(callback)
     for i = 0, #clients - 1 do
         vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", i, 0, 2)
     end
-    ---vim.api.nvim_set_hl(0, "nuiMenuCursor", { fg = 'None', bg = 'None' })
-
-
-
-
+    vim.cmd("highlight! NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
+    vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "NuiMenuCursor", 0, 0, -1)
 
 
 
