@@ -38,6 +38,8 @@ function M.select_client(callback)
         return
     end
     local icon = " "
+    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
+    vim.cmd("highlight! NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
 
     local items = {}
     for _, name in ipairs(clients) do
@@ -50,9 +52,8 @@ function M.select_client(callback)
         local len = vim.fn.strdisplaywidth(name)
         if len > max_width then max_width = len end
     end
-    max_width = math.min(max_width + 4, 50)
-
-
+    max_width = math.max(max_width + 4, 50)
+    
     local menu = Menu({
         position = "50%",
         size = { width = max_width, height = max_height },
@@ -66,9 +67,9 @@ function M.select_client(callback)
                 bottom_align = "center",
             }
         },
-        win_options = {
-            -- winhighlight = "Normal:Normal,P4ClientIcon:Normal",
-            winhighlight = "Error:Error,Error:Error",
+        -- win_options = {
+        --     -- winhighlight = "Normal:Normal,P4ClientIcon:Normal",
+        --     winhighlight = "Error:Error,Error:Error",
         },
     }, {
         lines = items,
@@ -81,20 +82,16 @@ function M.select_client(callback)
             callback(item.value)
         end,
         on_change = function(item, menu)
-            print("Selected Perforce client: " .. item.value)
-            print("Selected Perforce client: " .. item.index)
+            -- Highlight the selected item
+            vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 2)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "NuiMenuCursor", item.index, 0, -1)
         end,
     })
 
     menu:mount()
     menu:on(event.BufLeave, function() menu:unmount() end)  -- Unmount the menu when leaving the buffer.
 
-    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
-    for i = 0, #clients - 1 do
-        vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", i, 0, 2)
-    end
-    vim.cmd("highlight! NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
-    vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "NuiMenuCursor", 0, 0, -1)
 
 
 
