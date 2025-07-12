@@ -38,12 +38,12 @@ function M.select_client(callback)
         return
     end
     local icon = " "
-    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
-    vim.cmd("highlight! NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
+    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
+    vim.cmd("highlight! NuiMenuCursor guifg=NONE guibg=#365a98 gui=bold")
 
     local items = {}
     for _, name in ipairs(clients) do
-        table.insert(items, Menu.item(icon .. name, { value = name, index = _ }))
+        table.insert(items, Menu.item(icon .. name, { value = name, index = _ - 1}))
     end
 
     local max_width = 0
@@ -52,7 +52,7 @@ function M.select_client(callback)
         local len = vim.fn.strdisplaywidth(name)
         if len > max_width then max_width = len end
     end
-    max_width = math.max(max_width + 4, 50)
+    max_width = math.max(max_width + 4, 40)
     
     local menu = Menu({
         position = "50%",
@@ -60,102 +60,27 @@ function M.select_client(callback)
         border = { 
             style = "rounded",
             padding = { top = 1, bottom = 1, left = 2, right = 2 },
-            text = { 
-                top = " Select a Perforce Client ",
-                top_align = "center",
-                bottom = " Press [Enter] to select, [Esc] to close ",
-                bottom_align = "center",
-            }
+            text = { top = "[ Perforce Clients ]", top_align = "center", }
         },
-        -- win_options = {
-        --     -- winhighlight = "Normal:Normal,P4ClientIcon:Normal",
-        --     winhighlight = "Error:Error,Error:Error",
-        --},
     }, {
         lines = items,
-        keymap = { 
-            submit = { "<CR>" },
-            close = { "q", "<Esc>" },
-        },
-        on_submit = function(item)
-            M.set_client(item.value)
-            callback(item.value)
-        end,
+        keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
+        
+        -- Highlight the selected item
         on_change = function(item, menu)
-            -- Highlight the selected item
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 2)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "NuiMenuCursor", item.index, 0, -1)
+        end,
+
+        -- Set the selected client
+        on_submit = function(item)
+            M.set_client(item.value)
+            callback(item.value)
         end,
     })
 
     menu:mount()
     menu:on(event.BufLeave, function() menu:unmount() end)  -- Unmount the menu when leaving the buffer.
-
-
-
-
-
-
-    -- local display_names = {}
-    -- local index_to_client = {}
-    -- for i, name in ipairs(clients) do
-    --     display_names[i] = icon .. name
-    --     index_to_client[i] = name
-    -- end
-    --
-    -- local max_width = 0
-    -- for _, name in ipairs(display_names) do
-    --     local len = vim.fn.strdisplaywidth(name)
-    --     if len > max_width then max_width = len end
-    -- end
-    -- max_width = math.min(max_width + 4, 80)
-    -- local max_height = math.min(#clients, 9)
-    --
-    -- local popup = Popup({
-    --     position = "50%",
-    --     size = { width = max_width, height = max_height },
-    --     border = {
-    --         style = "rounded",
-    --         text = { top = " Select Perforce Client ", top_align = "center" },
-    --     },
-    --     buf_options = { modifiable = true, readonly = false },
-    --     enter = true,
-    -- })
-    --
-    -- popup:mount()
-    -- vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, display_names)
-    --
-    -- vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
-    -- for i = 0, #clients - 1 do
-    --     vim.api.nvim_buf_add_highlight(popup.bufnr, -1, "P4ClientIcon", i, 0, 2)
-    -- end
-    --
-    -- vim.api.nvim_win_set_option(popup.winid, "scrolloff", math.floor (#clients / 2))
-    -- vim.api.nvim_win_set_cursor(popup.winid, { 1, 2 })
-    --
-    -- -- vim.api.nvim_buf_set_option(popup.bufnr, "cursorline", true)
-    -- -- vim.api.nvim_buf_set_commands(popup.bufnr, {"highlight", "CursorLine", { link = "Visual" } })
-    --
-    -- vim.keymap.set("n", "<CR>", function()
-    --     local row = vim.api.nvim_win_get_cursor(0)[1]
-    --     local selected = index_to_client[row]
-    --     if selected then
-    --         M.set_client(selected)
-    --         popup:unmount()
-    --         callback(selected)
-    --     end
-    -- end, { buffer = popup.bufnr })
-    --
-    -- vim.keymap.set("n", "q", function()
-    --     popup:unmount()
-    -- end, { buffer = popup.bufnr, nowait = true })
-    --
-    -- vim.keymap.set("n", "<Esc>", function()
-    --     popup:unmount()
-    -- end, { buffer = popup.bufnr, nowait = true })
-    --
-    -- popup:on(event.BufLeave, function() popup:unmount() end)
 end
-
 return M
