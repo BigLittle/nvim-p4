@@ -65,10 +65,10 @@ function M.select_client(callback)
     popup:mount()
     vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, display_names)
 
-    vim.api.nvim_win_set_option(popup.winid, "cursorline", true)
-    vim.cmd("highlight! link CursorLine Visual")
-    vim.api.nvim_win_set_option(popup.winid, "scrolloff", math.floor(#clients / 2))
-    vim.api.nvim_win_set_cursor(popup.winid, { 1, 2 })
+    vim.api.nvim_win_set_option(popup.bufnr, "cursorline", true)
+    -- vim.cmd("highlight! link CursorLine Visual")
+    vim.api.nvim_win_set_option(popup.bufnr, "scrolloff", math.floor(#clients / 2))
+    vim.api.nvim_win_set_cursor(popup.bufnr, { 1, 2 })
 
     vim.keymap.set("n", "<CR>", function()
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -79,6 +79,14 @@ function M.select_client(callback)
             callback(selected)
         end
     end, { buffer = popup.bufnr })
+
+    vim.keymap.set("n", "q", function()
+        popup:unmount()
+    end, { buffer = popup.bufnr, nowait = true })
+
+    vim.keymap.set("n", "<Esc>", function()
+        popup:unmount()
+    end, { buffer = popup.bufnr, nowait = true })
 
     popup:on(event.BufLeave, function() popup:unmount() end)
 end
