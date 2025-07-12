@@ -41,10 +41,7 @@ function M.select_client(callback)
     vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
     vim.cmd("highlight! P4ClientHead guifg=#365a98 guibg=#365a98 gui=bold")
-
     local guicursor = vim.opt.guicursor:get()
-    local cursor_hl = vim.api.nvim_get_hl(0, { name = "Cursor", link = false })
-    local lcursor_hl = vim.api.nvim_get_hl(0, { name = "lCursor", link = false })
 
     local items = {}
     for _, name in ipairs(clients) do
@@ -58,7 +55,7 @@ function M.select_client(callback)
         if len > max_width then max_width = len end
     end
     max_width = math.max(max_width + 4, 24)
-    
+
     local menu = Menu({
         position = "50%",
         size = { width = max_width, height = max_height },
@@ -70,7 +67,7 @@ function M.select_client(callback)
     }, {
         lines = items,
         keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
-        
+
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
@@ -84,15 +81,11 @@ function M.select_client(callback)
             M.set_client(item.value)
             callback(item.value)
             vim.opt.guicursor = guicursor
-            vim.api.nvim_set_hl(0, "Cursor", cursor_hl)
-            vim.api.nvim_set_hl(0, "lCursor", lcursor_hl)
         end,
     })
 
     menu:mount()
-    --vim.api.nvim_set_hl(0, "Cursor", { fg = '#365a98', bg = '#365a98' })
-    --vim.api.nvim_set_hl(0, "lCursor", { fg = '#365a98', bg = '#365a98' })
-    vim.opt.guicursor = "a:ver1"
+    -- vim.opt.guicursor = "a:ver1"
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
@@ -101,8 +94,6 @@ function M.select_client(callback)
     -- Unmount the menu when leaving the buffer.
     menu:on(event.BufLeave, function()
         vim.opt.guicursor = guicursor
-        vim.api.nvim_set_hl(0, "Cursor", cursor_hl)
-        vim.api.nvim_set_hl(0, "lCursor", lcursor_hl)
         menu:unmount()
     end)
 end
