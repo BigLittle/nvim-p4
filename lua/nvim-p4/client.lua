@@ -90,7 +90,7 @@ function M.select_client(callback)
     })
 
     menu:mount()
-    vim.api.nvim_set_hl(0, "Cursor", { fg = '#365a98', bg = 'None'})
+    vim.api.nvim_set_hl(0, "Cursor", { fg = '#365a98', bg = 'None', reverse = false })
     vim.api.nvim_set_hl(0, "lCursor", { fg = '#365a98', bg = 'None'})
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
