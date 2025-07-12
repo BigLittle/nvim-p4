@@ -42,8 +42,8 @@ function M.select_client(callback)
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
     local cursor_hl = vim.api.nvim_get_hl(0, { name = "Cursor", link = false })
     local lcursor_hl = vim.api.nvim_get_hl(0, { name = "lCursor", link = false })
-    vim.api.nvim_set_hl(0, "Cursor", { fg = 'None', bg = 'None', blend=100 })
-    vim.api.nvim_set_hl(0, "lCursor", { fg = 'None', bg = 'None', blend=100 })
+    vim.api.nvim_set_hl(0, "Cursor", { fg = 'None', bg = 'None', reverse = false, blend = 100 })
+    vim.api.nvim_set_hl(0, "lCursor", { fg = 'None', bg = 'None', reverse = false, blend = 100 })
 
     local items = {}
     for _, name in ipairs(clients) do
@@ -63,7 +63,6 @@ function M.select_client(callback)
         size = { width = max_width, height = max_height },
         border = { 
             style = "rounded",
-            padding = { top = 1, bottom = 1, left = 2, right = 2 },
             text = { top = "[ Perforce Clients ]", top_align = "center", }
         },
     }, {
@@ -74,7 +73,7 @@ function M.select_client(callback)
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 2)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 3, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 2, -1)
         end,
 
         -- Set the selected client
