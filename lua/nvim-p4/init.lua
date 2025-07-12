@@ -12,3 +12,9 @@ vim.api.nvim_create_user_command('P4V', function()
         -- require("nvim-p4.changelists").open()
     end
 end, { desc = "Open P4V Explorer" })
+
+vim.api.nvim_create_user_command('P4Client', function()
+    client.select_client(function(selected)
+        print("Selected Perforce client: " .. selected)
+    end)
+end, { desc = "Select Perforce Client" })
