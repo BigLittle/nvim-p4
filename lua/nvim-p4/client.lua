@@ -37,9 +37,14 @@ function M.select_client(callback)
         print("No Perforce clients found.")
         return
     end
-    local icon = " "
+    local icon = "  "
     vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
+
+    local guicursor = vim.opt.guicursor:get()
+    vim.opt.guicursor = "a:ver1"
+
+
     local cursor_hl = vim.api.nvim_get_hl(0, { name = "Cursor", link = false })
     local lcursor_hl = vim.api.nvim_get_hl(0, { name = "lCursor", link = false })
     vim.api.nvim_set_hl(0, "Cursor", { fg = 'None', bg = 'None', reverse = true, blend = 100 })
@@ -56,14 +61,15 @@ function M.select_client(callback)
         local len = vim.fn.strdisplaywidth(name)
         if len > max_width then max_width = len end
     end
-    max_width = math.max(max_width + 4, 24)
+    max_width = math.max(max_width + 2, 24)
     
     local menu = Menu({
         position = "50%",
         size = { width = max_width, height = max_height },
-        border = { 
+        border = {
             style = "rounded",
-            text = { top = "[ Perforce Clients ]", top_align = "center", }
+            text = { top = "[ Perforce Clients ]", top_align = "center", },
+            padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
     }, {
         lines = items,
@@ -72,23 +78,29 @@ function M.select_client(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 2)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 2, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 0, 3)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 3, -1)
         end,
 
         -- Set the selected client
         on_submit = function(item)
             M.set_client(item.value)
             callback(item.value)
+            vim.opt.guicursor = guicursor
             vim.api.nvim_set_hl(0, "Cursor", cursor_hl)
             vim.api.nvim_set_hl(0, "lCursor", lcursor_hl)
         end,
     })
 
     menu:mount()
-    
+    vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
+
     -- Unmount the menu when leaving the buffer.
     menu:on(event.BufLeave, function()
+        vim.opt.guicursor = guicursor
         vim.api.nvim_set_hl(0, "Cursor", cursor_hl)
         vim.api.nvim_set_hl(0, "lCursor", lcursor_hl)
         menu:unmount()
