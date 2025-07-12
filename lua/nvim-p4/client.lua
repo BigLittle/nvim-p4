@@ -14,7 +14,7 @@ function M.get_all_clients()
     local out = io.popen("p4 clients --me"):read("*a")
     local clients = {}
     for line in out:gmatch("[^\n]+") do
-        local client_name = line:match("Client name: (.+)")
+        local client_name = line:match("Client (.+)")
         if client_name then table.insert(clients, client_name) end
     end
     return clients
