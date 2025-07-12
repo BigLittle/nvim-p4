@@ -31,9 +31,28 @@ end
 
 function M.select_client(callback)
     local clients = M.get_all_clients()
+    if #clients == 0 then
+        print("No Perforce clients found.")
+        return
+    end
+    local icon = " " -- Icon for the popup
+    local display_names = {}
+    local index_to_client = {}
+    for i, name in ipairs(clients) do
+        display_names[i] = icon .. name
+        index_to_client[i] = name
+    end
+
+    local max_width = 0
+    for _, name in ipairs(display_names) do
+        local len = vim.fn.strdisplaywidth(name)
+        if len > max_width then max_width = len end
+    end
+    max_width = math.min(max_width + 4, 80)
+
     local popup = Popup({
         position = "50%",
-        size = { width = 40, height = #clients + 2 },
+        size = { width = max_width, height = #clients },
         border = {
             style = "rounded",
             text = { top = " Select Perforce Client ", top_align = "center" },
@@ -41,12 +60,16 @@ function M.select_client(callback)
         buf_options = { modifiable = true, readonly = false },
         enter = true,
     })
+
+    vim.api.nvim_win_set_option(popup.winid, "cursorline", true)
+    vim.cmd("highlight! link CursorLine Visual")
+
     popup:mount()
-    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, clients)
+    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, display_names)
 
     vim.keymap.set("n", "<CR>", function()
         local row = vim.api.nvim_win_get_cursor(0)[1]
-        local selected = clients[row]
+        local selected = index_to_client[row]
         if selected then
             M.set_client(selected)
             popup:unmount()
