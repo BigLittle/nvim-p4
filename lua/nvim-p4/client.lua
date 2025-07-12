@@ -49,10 +49,11 @@ function M.select_client(callback)
         if len > max_width then max_width = len end
     end
     max_width = math.min(max_width + 4, 80)
+    local max_height = math.min(#clients, 10)
 
     local popup = Popup({
         position = "50%",
-        size = { width = max_width, height = #clients },
+        size = { width = max_width, height = max_height },
         border = {
             style = "rounded",
             text = { top = " Select Perforce Client ", top_align = "center" },
@@ -64,6 +65,7 @@ function M.select_client(callback)
     popup:mount()
     vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, display_names)
 
+    vim.api.nvim_win_set_curposor(popup.winid, { 1, 2 })
     vim.api.nvim_win_set_option(popup.winid, "cursorline", true)
     vim.cmd("highlight! link CursorLine Visual")
 
