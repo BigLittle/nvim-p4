@@ -41,7 +41,7 @@ function M.select_client(callback)
 
     local items = {}
     for _, name in ipairs(clients) do
-        table.insert(items, Menu.item(icon .. name, { value = name }))
+        table.insert(items, Menu.item(" " .. icon .. name, { value = name, index = _ }))
     end
 
     local max_width = 0
@@ -53,14 +53,15 @@ function M.select_client(callback)
     local max_height = math.min(#clients, 9)
 
     local menu = Menu({
-        position = { row = 1, col = 0 },
+        position = "50%",
         size = { width = max_width, height = max_height },
         border = { style = "rounded", text = { top = " Select a Perforce Client ", top_align = "center" }, },
         win_options = { winhighlight = "Normal:Normal,FloatBorder:Normal", },
     }, {
         lines = items,
+
         on_change = function(_, index)
-            for i, item in ipairs(menu_items) do
+            for i, item in ipairs(items) do
                 local hl = (i == index) and "Visual" or "Normal"
                 item.text = NuiText(item.text:content(), hl)
             end
