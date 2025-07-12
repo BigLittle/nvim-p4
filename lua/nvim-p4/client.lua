@@ -41,7 +41,7 @@ function M.select_client(callback)
     vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
     vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
     local guicursor = vim.opt.guicursor:get()
-    vim.opt.guicursor = "a:ver0"
+    vim.opt.guicursor = "a:ver1"
 
     local items = {}
     for _, name in ipairs(clients) do
@@ -88,7 +88,7 @@ function M.select_client(callback)
     -- Unmount the menu when leaving the buffer.
     menu:on(event.BufLeave, function()
         vim.opt.guicursor = guicursor  -- Restore the original cursor settings
-        menu:unmount() 
+        menu:unmount()
     end)
 end
 return M
