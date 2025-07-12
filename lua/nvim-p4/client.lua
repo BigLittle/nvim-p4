@@ -52,6 +52,9 @@ function M.select_client(callback)
     max_width = math.min(max_width + 4, 80)
     local max_height = math.min(#clients, 9)
 
+    vim.cmd("highlight P4ClientIcon guifg=#ffaa00 gui=bold")
+    vim.cmd("highlight NuiMenuCursor guifg=NONE guibg=NONE gui=bold")
+
     local menu = Menu({
         position = "50%",
         size = { width = max_width, height = max_height },
@@ -61,7 +64,7 @@ function M.select_client(callback)
             text = { top = " Select a Perforce Client ", top_align = "center" }
         },
         win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+            winhighlight = "Normal:Normal,P4ClientIcon:Normal",
         },
     }, {
         lines = items,
@@ -82,7 +85,7 @@ function M.select_client(callback)
 
     vim.api.nvim_set_hl(0, "nuiMenuCursor", { fg = 'None', bg = 'None' })
 
-
+    menu:on(event.BufLeave, function() menu:unmount() end)  -- Unmount the menu when leaving the buffer.
 
 
 
