@@ -61,10 +61,16 @@ function M.select_client(callback)
         border = { 
             style = "rounded",
             padding = { top = 1, bottom = 1, left = 2, right = 2 },
-            text = { top = " Select a Perforce Client ", top_align = "center" }
+            text = { 
+                top = " Select a Perforce Client ",
+                top_align = "center",
+                bottom = " Press [Enter] to select, [Esc] to close ",
+                bottom_align = "center",
+            }
         },
         win_options = {
-            winhighlight = "Normal:Normal,P4ClientIcon:Normal",
+            -- winhighlight = "Normal:Normal,P4ClientIcon:Normal",
+            winhighlight = "Error:Error,Error:Error",
         },
     }, {
         lines = items,
@@ -82,10 +88,14 @@ function M.select_client(callback)
     })
 
     menu:mount()
-
-    vim.api.nvim_set_hl(0, "nuiMenuCursor", { fg = 'None', bg = 'None' })
-
     menu:on(event.BufLeave, function() menu:unmount() end)  -- Unmount the menu when leaving the buffer.
+
+    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 gui=bold")
+    for i = 0, #clients - 1 do
+        vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", i, 0, 2)
+    end
+    ---vim.api.nvim_set_hl(0, "nuiMenuCursor", { fg = 'None', bg = 'None' })
+
 
 
 
