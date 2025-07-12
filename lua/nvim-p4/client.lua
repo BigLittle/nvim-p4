@@ -1,5 +1,6 @@
 local Popup = require("nui.popup")
 local Menu = require("nui.menu")
+local NuiText = require("nui.text")
 local event = require("nui.utils.autocmd").event
 local M = { current_client = nil }
 
@@ -52,12 +53,20 @@ function M.select_client(callback)
     local max_height = math.min(#clients, 9)
 
     local menu = Menu({
-        position = "50%",
+        position = { row = 1, col = 0 },
         size = { width = max_width, height = max_height },
         border = { style = "rounded", text = { top = " Select a Perforce Client ", top_align = "center" }, },
-        win_options = { cursorline = true },
+        win_options = { winhighlight = "Normal:Normal,FloatBorder:Normal", },
     }, {
         lines = items,
+        on_change = function(_, index)
+            for i, item in ipairs(menu_items) do
+                local hl = (i == index) and "Visual" or "Normal"
+                item.text = NuiText(item.text:content(), hl)
+            end
+            menu:update()
+        end,
+
         keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
         on_submit = function(item)
             M.set_client(item.value)
