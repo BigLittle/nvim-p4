@@ -70,7 +70,7 @@ function M.select_client(callback)
         -- win_options = {
         --     -- winhighlight = "Normal:Normal,P4ClientIcon:Normal",
         --     winhighlight = "Error:Error,Error:Error",
-        },
+        --},
     }, {
         lines = items,
         keymap = { 
