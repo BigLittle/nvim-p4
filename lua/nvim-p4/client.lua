@@ -90,7 +90,6 @@ function M.select_client(callback)
 
     -- Unmount the menu when leaving the buffer.
     menu:on(event.BufLeave, function()
-        vim.opt.guicursor = guicursor
         menu:unmount()
     end)
 end
