@@ -7,8 +7,6 @@ function M.bootstrap()
     local client_name = out:match("P4CLIENT=(%S+)")
     if client_name then
         M.current_client = client_name
-    else
-        M.current_client = "default"
     end
 end
 
