@@ -1,13 +1,11 @@
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
-local M = { current_client = nil }
+local M = { name = nil }
 
 function M.bootstrap()
     local out = io.popen("p4 set"):read("*a")
     local client_name = out:match("P4CLIENT=(%S+)")
-    if client_name then
-        M.current_client = client_name
-    end
+    if client_name then M.name = client_name end
 end
 
 function M.get_all_clients()
@@ -20,12 +18,8 @@ function M.get_all_clients()
     return clients
 end
 
-function M.get_current_client()
-    return M.current_client
-end
-
 function M.set_client(client_name)
-    M.current_client = client_name
+    M.name = client_name
     os.execute("p4 set P4CLIENT=" .. client_name)
 end
 
@@ -89,8 +83,6 @@ function M.select_client(callback)
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
 
     -- Unmount the menu when leaving the buffer.
-    menu:on(event.BufLeave, function()
-        menu:unmount()
-    end)
+    menu:on(event.BufLeave, function() menu:unmount() end)
 end
 return M
