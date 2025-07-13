@@ -32,6 +32,7 @@ function M.get_opened_files(changelist_number)
         local file = {}
         local result = split(line)
         if #result < 6 then return {} end
+        file["id"] = result[1] -- use for tree node id
         file["depot_file"] = result[1]:match("(%S+)#")
         file["rev"] = result[1]:match("#(%d+)")
         file["action"] = result[3]
@@ -150,7 +151,7 @@ function M.open()
             return line
         end,
     })
-    tree.nvim_p4_select_count = 0
+
     tree:render()
 
     vim.keymap.set("n", "<F5>", function()
