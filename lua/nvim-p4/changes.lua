@@ -4,7 +4,7 @@ local Tree = require("nui.tree")
 local Line = require("nui.line")
 local client = require("nvim-p4.client")
 
-local M = {}
+local M = { select_node_id = nil }
 
 local function split(input)
   local t = {}
@@ -113,7 +113,7 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                if node.id == self.nvim_p4_select_node_id then
+                if node.id == M.select_node_id then
                     line:append(node.text, "CursorLine")
                 else
                     line:append(node.text, "Normal")
@@ -130,7 +130,7 @@ function M.open()
                 else
                     line:append("󰷈 ")
                 end
-                if  node.id == self.nvim_p4_select_node_id then
+                if  node.id == M.select_node_id then
                     line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "CursorLine")
                 else
                     line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
@@ -139,7 +139,7 @@ function M.open()
             return line
         end,
     })
-    tree.nvim_p4_select_node_id = nil
+    tree.nvim_p4_select_count = 0
     tree:render()
 
     vim.keymap.set("n", "<F5>", function()
@@ -184,7 +184,7 @@ function M.open()
     end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "j", function()
-        tree.nvim_p4_select_node_id = tree:get_node():get_id()
+        M.select_node_id = tree:get_node():get_id()
         tree:render()
     end, { buffer = popup.bufnr, nowait = true })
 
