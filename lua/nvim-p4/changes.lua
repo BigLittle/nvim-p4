@@ -82,10 +82,18 @@ function M.open()
 
     local nodes = {}
     for _, num in ipairs(changelist_numbers) do
-        local title = Line()
         local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
-        title:append("󰄬 " .. num .. " - " .. desc:gsub("%s+", " "), "Identifier")
+        local cl_data = {}
+        cl_data["id"] = num
+        cl_data["text"] = "󰔶 " .. num .. "   " .. desc:gsub("%s+", " ")  
+        
+        print(vim.inspect(cl_data))
 
+
+        -- local title = Line()
+        -- title:append("󰄬 " .. num .. " - " .. desc:gsub("%s+", " "), "Identifier")
+        --
+        -- print(title.)
         -- local node = make_changelist_node(cl.id, cl.status)
         -- for _, file in ipairs(get_opened_files(changelist_numbers)) do
 
@@ -93,6 +101,10 @@ function M.open()
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
             local icon = " "--"󰈔""󰷈"" "
+            local child_data = {}
+            child_data["id"] = file.depot_file
+            child_data["text"] = icon .. file.depot_file .. "#" .. file.rev.. " " .. "<" .. file.type .. ">"
+
             -- local ext = file.type
             -- if ext == "lua" then icon = ""   
             -- elseif ext == "png" or ext == "jpg" then icon = ""
@@ -104,12 +116,13 @@ function M.open()
             -- elseif  
             -- end
 
-            local file_line = Line()
-            file_line:append(icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
-            table.insert(children, Tree.Node(file_line))
+            -- local file_line = Line()
+            -- file_line:append(icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
+
+            table.insert(children, Tree.Node(child_data))
         end
-        table.insert(nodes, Tree.Node(title, children))
-        print(vim.inspect(nodes.data))
+        table.insert(nodes, Tree.Node(cl_data, children))
+        print(vim.inspect(nodes))
 
 
 --            node:append(make_file_node(file))
