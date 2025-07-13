@@ -109,6 +109,7 @@ function M.open()
             table.insert(children, Tree.Node(file_line))
         end
         table.insert(nodes, Tree.Node(title, children))
+        print(vim.inspect(nodes.data))
 
 
 --            node:append(make_file_node(file))
