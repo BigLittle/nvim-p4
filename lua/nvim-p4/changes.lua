@@ -126,6 +126,21 @@ function M.open()
     local tree = Tree({
         bufnr = popup.bufnr,
         nodes = nodes,
+        prepare_node = function(node)
+            local line = NuiLine()
+
+            line:append(string.rep("  ", node:get_depth() - 1))
+
+            if node:has_children() then
+                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+            else
+                line:append("  ")
+            end
+
+            line:append(node.text)
+
+            return line
+        end,
     })
     tree:render()
 
