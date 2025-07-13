@@ -129,11 +129,32 @@ function M.open()
             tree:render()
         else
             -- Open the file in a new buffer
-            local out = io.popen("p4 where "..node.depot_file):read("*a")
+            local out = split(io.popen("p4 where "..node.depot_file):read("*a"))
+            print(vim.inspect(out))
             local local_file = out[#out]
             vim.cmd("edit " .. local_file)
             popup:unmount()
         end
+    end, { buffer = popup.bufnr, nowait = true })
+
+    vim.keymap.set("n", "O", function()
+        local node = tree:get_node()
+        if not node then return end
+        if not node:has_children() then return end
+        local children = tree:get_nodes(node:get_id())
+        local cmd = "edit "
+        for _, child in ipairs(children) do
+            local out = split(io.popen("p4 where " .. child.depot_file):read("*a"))
+            if out and #out > 0 then
+                local local_file = out[#out]
+                cmd = cmd .. local_file .. " "
+            else
+                print("Local file of " .. child.depot_file .. " not found.")
+            end
+        end
+        print("Executing command: " .. cmd)
+        vim.cmd(cmd)
+        popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
