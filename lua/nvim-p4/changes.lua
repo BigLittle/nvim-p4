@@ -58,7 +58,14 @@ function M.update_select_node_id(tree, bufnr)
     local rc = vim.api.nvim_win_get_cursor(0)
     if rc[1] == max_row then return end
     vim.api.nvim_win_set_cursor(0, { rc[1] + 1, rc[2] })
-    M.select_node_id = tree:get_node():get_id()
+    local node = tree:get_node()
+    print(vim.inspect(node))
+
+
+
+
+
+
     tree:render()
 end
 
@@ -123,12 +130,7 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                if node.id == M.select_node_id then
-                    print("Selected node: " .. node.id)
-                    line:append(node.text, "CursorLine")
-                else
-                    line:append(node.text, "Normal")
-                end
+                line:append(node.text, "Normal")
             else
                 line:append("   ")
                 local ft = node.depot_file:match("^.+(%.[^%.]+)$")
@@ -141,12 +143,7 @@ function M.open()
                 else
                     line:append("󰷈 ")
                 end
-                if node.id == M.select_node_id then
-                    print("Selected node: " .. node.id)
-                    line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "CursorLine")
-                else
-                    line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
-                end
+                line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
             return line
         end,
