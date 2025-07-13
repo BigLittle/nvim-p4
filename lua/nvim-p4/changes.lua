@@ -26,11 +26,12 @@ function M.open_local_file(depot_file)
 end
 
 function M.get_opened_files(changelist_number)
-    local out = io.popen("p4 opened -c " .. changelist_number):read("*a")
+    local out = io.popen("p4 opened -c " .. changelist_number .. " -C ".. client.name):read("*a")
     local files = {}
     for line in out:gmatch("[^\n]+") do
         local file = {}
         local result = split(line)
+        if #result < 6 then return {} end
         file["depot_file"] = result[1]:match("(%S+)#")
         file["rev"] = result[1]:match("#(%d+)")
         file["action"] = result[3]
@@ -79,7 +80,7 @@ function M.open()
             table.insert(children, Tree.Node(file))
         end
         local node = Tree.Node(cl_data, children)
-        -- node:expand() -- Expand the node by default
+        node:expand() -- Expand the node by default
         table.insert(nodes, node)
     end
 
