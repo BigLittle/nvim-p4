@@ -141,27 +141,27 @@ function M.open()
     vim.keymap.set("n", "o", function()
         local node = tree:get_node()
         if not node then return end
-        if node.changlist then
-            if node.empty then return end
-            if node:is_expanded() then
-                node:collapse()
-            else
-                node:expand()
-            end
-            tree:render()
+        if not node.changlist then return end
+        if node.empty then return end
+        if node:is_expanded() then
+            node:collapse()
         else
-            M.open_local_file(node.depot_file)
-            popup:unmount()
+            node:expand()
         end
+        tree:render()
     end, { buffer = popup.bufnr, nowait = true })
 
-    vim.keymap.set("n", "O", function()
+    vim.keymap.set("n", "e", function()
         local node = tree:get_node()
         if not node then return end
-        if not node:has_children() then return end
-        local children = tree:get_nodes(node:get_id())
-        for _, child in ipairs(children) do
-            M.open_local_file(child.depot_file)
+        if node.changlist then
+            if node.empty then return end
+            local children = tree:get_nodes(node:get_id())
+            for _, child in ipairs(children) do
+                M.open_local_file(child.depot_file)
+            end
+        else
+            M.open_local_file(node.depot_file)
         end
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
