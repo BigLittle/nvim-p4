@@ -69,7 +69,11 @@ function M.open()
     local popup = Popup({
         enter = true,
         focusable = true,
-        border = { style = "rounded", text = { top = "[ Pending Changelists in  " .. client.name .. " ]", top_align = "center" } },
+        border = {
+            style = "rounded",
+            text = { top = "[ Pending Changelists in  " .. client.name .. " ]", top_align = "center" },
+            padding = { top = 0, bottom = 0, left = 0, right = 1 },
+        },
         position = "50%",
         size = { width = 80, height = 25 },
         buf_options = { modifiable = true, readonly = false },
@@ -81,7 +85,7 @@ function M.open()
         local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
         local cl_data = {}
         cl_data["id"] = num
-        cl_data["text"] = "󰔶 " .. num .. "   " .. desc:gsub("%s+", " ")  
+        cl_data["text"] = "󰔶 " .. num .. "   " .. desc:gsub("%s+", " ")
 
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
@@ -101,9 +105,6 @@ function M.open()
             -- elseif  
             -- end
 
-            -- local file_line = Line()
-            -- file_line:append(icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
-
             table.insert(children, Tree.Node(child_data))
         end
         table.insert(nodes, Tree.Node(cl_data, children))
@@ -119,9 +120,9 @@ function M.open()
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
             if node:has_children() then
-                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                line:append(node:is_expanded() and "  " or "  ", "ErrorMsg") -- SpecialChar")
             else
-                line:append("  ")
+                line:append("   ")
             end
             line:append(node.text)
 
@@ -143,9 +144,7 @@ function M.open()
     end, { buffer = popup.bufnr })
 
     -- Set up key mappings for the popup buffer
-    vim.keymap.set("n", "<CR>", function()
---        local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
---        local node = tree:get_node(row)
+    vim.keymap.set("n", "o", function()
         local node = tree:get_node()
         if not node then return end
 
