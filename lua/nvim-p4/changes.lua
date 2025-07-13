@@ -91,7 +91,7 @@ function M.open()
     end
 
     popup:mount()
-    vim.api.nvim_set_hl("nvim_p4_changes", "CursorLine", { bg = "#365a98", fg = "None" })
+    vim.api.nvim_set_hl(popup.ns_id, "CursorLine", { bg = "#365a98", fg = "None" })
 
     local tree = Tree({
         bufnr = popup.bufnr,
