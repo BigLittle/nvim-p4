@@ -1,7 +1,6 @@
 local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
 local Tree = require("nui.tree")
-local TreeNode = Tree.Node
 local Line = require("nui.line")
 -- local devicons = require("nvim-web-devicons")
 -- local p4 = require("nvim-p4.p4")
@@ -106,9 +105,9 @@ function M.open()
 
             local file_line = Line()
             file_line:append(" " .. icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
-            table.insert(children, TreeNode(file_line))
+            table.insert(children, Tree.Node(file_line))
         end
-        table.insert(nodes, TreeNode(title, children))
+        table.insert(nodes, Tree.Node(title, children))
 
 
 --            node:append(make_file_node(file))
@@ -124,12 +123,9 @@ function M.open()
     local icon = "  "
     vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, { icon .. client.name, string.rep("─", 78) })
 
-    local tree = Tree(popup.bufnr, {
+    local tree = Tree({
+        bufnr = popup.bufnr,
         nodes = nodes,
-        winid = popup.winid,
-        render_node = function(node)
-            return node:render()
-        end,
     })
     tree:render()
 
