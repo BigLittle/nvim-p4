@@ -75,7 +75,7 @@ function M.open()
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
         },
         position = "50%",
-        size = { width = 80, height = 25 },
+        size = { width = 100, height = 25 },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false }
     })
@@ -85,14 +85,14 @@ function M.open()
         local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
         local cl_data = {}
         cl_data["id"] = num
-        cl_data["text"] = "󰔶 " .. num .. "   " .. desc:gsub("%s+", " ")
+        cl_data["text"] = num .. "   " .. desc:gsub("%s+", " ")
 
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
-            local icon = " "--"󰈔""󰷈"" "
-            local child_data = {}
-            child_data["id"] = file.depot_file
-            child_data["text"] = icon .. file.depot_file .. "#" .. file.rev.. " " .. "<" .. file.type .. ">"
+            -- local icon = " "--"󰈔""󰷈"" "
+            -- local child_data = {}
+            -- child_data["id"] = file.depot_file
+            -- child_data["text"] = icon .. file.depot_file .. "#" .. file.rev.. " " .. "<" .. file.type .. ">"
 
             -- local ext = file.type
             -- if ext == "lua" then icon = ""   
@@ -105,9 +105,11 @@ function M.open()
             -- elseif  
             -- end
 
-            table.insert(children, Tree.Node(child_data))
+            table.insert(children, Tree.Node(file))
         end
-        table.insert(nodes, Tree.Node(cl_data, children))
+        local node = Tree.Node(cl_data, children)
+        node.expand() -- Expand the node by default
+        table.insert(nodes, node)
     end
 
     popup:mount()
@@ -116,16 +118,17 @@ function M.open()
         bufnr = popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
-            node:expand()
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
             if node:has_children() then
-                line:append(node:is_expanded() and "  " or "  ", "ErrorMsg") -- SpecialChar")
+                line:append(" ")
+                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                line:append("󰔶 ", "ErrorMsg")
+                line:append(node.text)
             else
-                line:append("   ")
+                line:append("    ")
+                line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
-            line:append(node.text)
-
             return line
         end,
     })
@@ -155,21 +158,7 @@ function M.open()
             print("node is collapsed, expanding it")
             node:expand()
         end
-        vim.api.nvim_buf_clear_namespace(popup.bufnr, -1, 0, -1)
         tree:render()
-
-
-
-        -- if node and node:has_children() then
-        --     if node:is_expanded() then
-        --         print("node is expanded, collapsing it")
-        --         node:collapse()
-        --     else
-        --         print("node is collapsed, expanding it")
-        --         node:expand()
-        --     end
-        --     tree:render()
-        -- end
     end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
