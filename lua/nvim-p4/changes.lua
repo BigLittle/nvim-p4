@@ -61,7 +61,12 @@ function M.open()
         focusable = true,
         border = {
             style = "rounded",
-            text = { top = "[ Pending Changelists in  " .. client.name .. " ]", top_align = "center" },
+            text = { 
+                top = "[ Pending Changelists ]",
+                top_align = "center",
+                bottom = "  "..client.name.." ",
+                bottom_align = "left",
+            },
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
         },
         position = "50%",
@@ -108,7 +113,11 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                line:append(node.text)
+                if node.id == self.nvim_p4_select_node_id then
+                    line:append(node.text, "CursorLine")
+                else
+                    line:append(node.text, "Normal")
+                end
             else
                 line:append("   ")
                 local ft = node.depot_file:match("^.+(%.[^%.]+)$")
@@ -121,11 +130,16 @@ function M.open()
                 else
                     line:append("󰷈 ")
                 end
-                line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
+                if  node.id == self.nvim_p4_select_node_id then
+                    line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "CursorLine")
+                else
+                    line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
+                end
             end
             return line
         end,
     })
+    tree.nvim_p4_select_node_id = nil
     tree:render()
 
     vim.keymap.set("n", "<F5>", function()
@@ -167,6 +181,11 @@ function M.open()
             M.open_local_file(node.depot_file)
         end
         popup:unmount()
+    end, { buffer = popup.bufnr, nowait = true })
+
+    vim.keymap.set("n", "j", function()
+        tree.nvim_p4_select_node_id = tree:get_node():get_id()
+        tree:render()
     end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
