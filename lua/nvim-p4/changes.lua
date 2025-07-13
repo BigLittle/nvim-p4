@@ -66,7 +66,6 @@ function M.update_select_node_id(tree, bufnr)
     print(vim.inspect(last_text))
     last_text:set(last_text._content, "CursorLine")
 
-
     tree:render()
 end
 
@@ -79,11 +78,11 @@ function M.open()
         focusable = true,
         border = {
             style = "rounded",
-            text = { 
+            text = {
                 top = "[ Pending Changelists ]",
                 top_align = "center",
                 bottom = "  "..client.name.." ",
-                bottom_align = "left",
+                bottom_align = "center",
             },
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
         },
@@ -152,7 +151,7 @@ function M.open()
     })
 
     tree:render()
-    M.update_select_node_id(tree, popup.bufnr)
+    -- M.update_select_node_id(tree, popup.bufnr)
 
     vim.keymap.set("n", "<F5>", function()
         popup:unmount()
@@ -195,7 +194,7 @@ function M.open()
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
-    vim.keymap.set("n", "j", function() M.update_select_node_id(tree, popup.bufnr) end, { buffer = popup.bufnr, nowait = true })
+    -- vim.keymap.set("n", "j", function() M.update_select_node_id(tree, popup.bufnr) end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
