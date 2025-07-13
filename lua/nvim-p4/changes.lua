@@ -69,13 +69,13 @@ function M.open()
     local popup = Popup({
         enter = true,
         focusable = true,
-        border = { style = "rounded", text = { top = "[ Pending Changelists in %{hl:ErrorMsg}%{hl:} " .. client.name .. " ]", top_align = "center" } },
+        border = { style = "rounded", text = { top = "[ Pending Changelists in  " .. client.name .. " ]", top_align = "center" } },
         position = "50%",
         size = { width = 80, height = 25 },
         buf_options = { modifiable = true, readonly = false },
+        win_options = { wrap = false }
     })
 
-    local icon = "  "
     local nodes = {}
     for _, num in ipairs(changelist_numbers) do
         local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
@@ -144,18 +144,32 @@ function M.open()
 
     -- Set up key mappings for the popup buffer
     vim.keymap.set("n", "<CR>", function()
-        local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
-        print("Get Row: " .. row)
-        local node = tree:get_node(row)
-        print("Get Node: " .. vim.inspect(node))
-        if node and node:has_children() then
-            if node:is_expanded() then
-                node:collapse()
-            else
-                node:expand()
-            end
-            tree:render()
+--        local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
+--        local node = tree:get_node(row)
+        local node = tree:get_node()
+        if not node then return end
+
+        if node:is_expanded() then
+            print("node is expanded, collapsing it")
+            node:collapse()
+        else
+            print("node is collapsed, expanding it")
+            node:expand()
         end
+        tree:render()
+
+
+
+        -- if node and node:has_children() then
+        --     if node:is_expanded() then
+        --         print("node is expanded, collapsing it")
+        --         node:collapse()
+        --     else
+        --         print("node is collapsed, expanding it")
+        --         node:expand()
+        --     end
+        --     tree:render()
+        -- end
     end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
