@@ -1,7 +1,8 @@
 local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
--- local Tree = require("nui.tree")
--- local Line = require("nui.line")
+local Tree = require("nui.tree")
+local TreeNode = Tree.Node
+local Line = require("nui.line")
 -- local devicons = require("nvim-web-devicons")
 -- local p4 = require("nvim-p4.p4")
 local client = require("nvim-p4.client")
@@ -29,30 +30,28 @@ local M = {}
 --   })
 -- end
 
-
-
+local function split(input)
+  local t = {}
+  for word in input:gmatch("%S+") do
+    t[#t+1] = word
+  end
+  return t
+end
 
 function M.get_opened_files(changelist_number)
-  local out = io.popen("p4 opened -c " .. changelist_number):read("*a")
-  print(out)
-  local files = {}
-  -- The parsing is different for the default changelist
-  if changelist_number == "default" then
+    local out = io.popen("p4 opened -c " .. changelist_number):read("*a")
+    local files = {}
     for line in out:gmatch("[^\n]+") do
-      local file = line:match("%s+(%S+)")
-      if file then
+        local file = {}
+        local result = split(line)
+        file["depot_file"] = result[1]:match("(%S+)#")
+        file["rev"] = result[1]:match("#(%d+)")
+        file["action"] = result[3]
+        file["chnum"] = changelist_number
+        file["type"] = result[6]:match("%((.-)%)")
         table.insert(files, file)
-      end
     end
-  else
-    for line in out:gmatch("[^\n]+") do
-      local file = line:match("%s+(%S+)")
-      if file then
-        table.insert(files, file)
-      end
-    end
-  end
-  return files
+    return files
 end
 
 function M.get_changelist_numbers()
@@ -66,30 +65,56 @@ function M.get_changelist_numbers()
 end
 
 function M.open()
-  local changelist_numbers = M.get_changelist_numbers()
-  print(vim.inspect(changelist_numbers))
+    local changelist_numbers = M.get_changelist_numbers()
+    print(vim.inspect(changelist_numbers))
 
-  local popup = Popup({
-    enter = true,
-    focusable = true,
-    border = { style = "rounded", text = { top = "[ Changelists in " .. client.name .. " ]", top_align = "center" } },
-    position = "50%",
-    size = { width = 80, height = 25 },
-    buf_options = { modifiable = false, readonly = true },
-  })
-  -- local changelists = vim.tbl_flatten({
-  --   p4.get_changelists_by_status("pending"),
-  --   p4.get_changelists_by_status("submitted"),
-  -- })
+    local popup = Popup({
+        enter = true,
+        focusable = true,
+        border = { style = "rounded", text = { top = "[ Pending Changelists ]", top_align = "center" } },
+        position = "50%",
+        size = { width = 80, height = 25 },
+        buf_options = { modifiable = false, readonly = true },
+    })
+    -- local changelists = vim.tbl_flatten({
+    --   p4.get_changelists_by_status("pending"),
+    --   p4.get_changelists_by_status("submitted"),
+    -- })
 
-  -- local nodes = {}
-  -- for _, cl in ipairs(changelists) do
-  --   local node = make_changelist_node(cl.id, cl.status)
-  --   for _, file in ipairs(p4.get_opened_files(cl.id)) do
-  --     node:append(make_file_node(file))
-  --   end
-  --   table.insert(nodes, node)
-  -- end
+    local nodes = {}
+    for _, num in ipairs(changelist_numbers) do
+        local title = Line()
+        local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
+        title:append("󰄬 " .. num .. " - " .. desc:gsub("%s+", " "), "Identifier")
+
+        -- local node = make_changelist_node(cl.id, cl.status)
+        -- for _, file in ipairs(get_opened_files(changelist_numbers)) do
+
+
+        local children = {}
+        for _, file in ipairs(M.get_opened_files(num)) do
+            local icon = "󰈔"
+            -- local ext = file.type
+            -- if ext == "lua" then icon = ""
+            -- elseif ext == "png" or ext == "jpg" then icon = ""
+            -- elseif ext == "svg" then icon = "󰜡"
+            -- elseif ext == "json" then icon = ""
+            -- elseif ext == "md" then icon = "󰍔"
+            -- elseif ext == "ts" then icon = ""
+            -- elseif ext == "vim" then icon = ""
+            -- end
+
+            local file_line = Line()
+            file_line:append(" " .. icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
+            table.insert(children, TreeNode(file_line))
+        end
+        table.insert(nodes, TreeNode(title, children))
+
+
+--            node:append(make_file_node(file))
+--        end
+        -- table.insert(nodes, node)
+    end
 
   -- local tree = Tree(nodes, {
   --   prepare_node = function(node)
@@ -99,7 +124,8 @@ function M.open()
   --   end,
   -- })
 
-  popup:mount()
+    popup:mount()
+    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, { "Client: " .. client.name, string.rep("─", 78) })
   -- tree:render(popup.bufnr)
 
   -- vim.keymap.set("n", "<CR>", function()
@@ -111,7 +137,8 @@ function M.open()
   --     tree:render(popup.bufnr)
   --   end
   -- end, { buffer = popup.bufnr })
-  --
+
+
   -- vim.keymap.set("n", "r", function()
   --   popup:unmount()
   --   M.open()
@@ -124,8 +151,17 @@ function M.open()
   --   end)
   -- end, { buffer = popup.bufnr })
 
-  popup:on(event.BufLeave, function() popup:unmount() end)
+    -- Set up key mappings for the popup buffer
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Esc>", function() popup:unmount() end, { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "q", function() popup:unmount() end, { noremap = true, silent = true })
 
+    -- Disable horizontal navigation keys
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
+
+    -- Unmount the popup when leaving the buffer
+    popup:on(event.BufLeave, function() popup:unmount() end)
 end
-
 return M
