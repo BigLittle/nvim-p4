@@ -70,7 +70,7 @@ function M.select_client(callback)
         -- Set the selected client
         on_submit = function(item)
             M.set_client(item.value)
-            callback(item.value)
+            callback()
         end,
     })
 
