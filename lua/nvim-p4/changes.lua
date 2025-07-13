@@ -54,6 +54,8 @@ end
 
 function M.open()
     local changelist_numbers = M.get_changelist_numbers()
+    local cursorline_hl = vim.api.nvim_get_hl(0, "CursorLine")
+    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#365a98", fg = "None" })
 
     local popup = Popup({
         enter = true,
