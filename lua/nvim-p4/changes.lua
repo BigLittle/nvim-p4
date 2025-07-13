@@ -64,6 +64,7 @@ function M.update_select_node_id(tree, bufnr)
     local texts = line._texts
     local last_text = texts[#texts]
     print(vim.inspect(last_text))
+    last_text:set(last_text._content, "CursorLine")
 
 
     tree:render()
