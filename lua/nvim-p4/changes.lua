@@ -2,32 +2,9 @@ local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
 local Tree = require("nui.tree")
 local Line = require("nui.line")
--- local devicons = require("nvim-web-devicons")
--- local p4 = require("nvim-p4.p4")
 local client = require("nvim-p4.client")
 
 local M = {}
-
--- local function make_changelist_node(cl, status)
---   local icons = {
---     pending = { "", "DiagnosticWarn" },
---     submitted = { "", "DiagnosticOk" },
---     unknown = { "", "DiagnosticError" },
---   }
---   local icon, hl = unpack(icons[status] or icons.unknown)
---   return Tree.Node({ type = "changelist", cl = cl }, {
---     text = icon .. " CL " .. cl,
---     hl = hl,
---   })
--- end
---
--- local function make_file_node(name)
---   local icon, hl = devicons.get_icon(name, name:match("^.+(%..+)$"), { default = true })
---   return Tree.Node({ type = "file", name = name }, {
---     text = "  " .. (icon or "") .. " " .. name,
---     hl = hl or "Normal"
---   })
--- end
 
 local function split(input)
   local t = {}
@@ -86,25 +63,8 @@ function M.open()
         local cl_data = {}
         cl_data["id"] = num
         cl_data["text"] = num .. "   " .. desc:gsub("%s+", " ")
-
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
-            -- local icon = " "--"󰈔""󰷈"" "
-            -- local child_data = {}
-            -- child_data["id"] = file.depot_file
-            -- child_data["text"] = icon .. file.depot_file .. "#" .. file.rev.. " " .. "<" .. file.type .. ">"
-
-            -- local ext = file.type
-            -- if ext == "lua" then icon = ""   
-            -- elseif ext == "png" or ext == "jpg" then icon = ""
-            -- elseif ext == "svg" then icon = "󰜡"
-            -- elseif ext == "json" then icon = ""
-            -- elseif ext == "md" then icon = "󰍔"
-            -- elseif ext == "ts" then icon = ""
-            -- elseif ext == "vim" then icon = ""
-            -- elseif  
-            -- end
-
             table.insert(children, Tree.Node(file))
         end
         local node = Tree.Node(cl_data, children)
@@ -132,8 +92,10 @@ function M.open()
                     line:append(" ", "MiniIconsAzure")
                 elseif ft == ".py" then
                     line:append(" ", "MiniIconsYellow")
+                elseif ft == ".lua" then
+                    line:append(" ", "MiniIconsAzure")
                 else
-                    line:append(" ")
+                    line:append("󰷈 ")
                 end
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
@@ -158,13 +120,22 @@ function M.open()
     vim.keymap.set("n", "o", function()
         local node = tree:get_node()
         if not node then return end
-        if node:is_expanded() then
-            node:collapse()
+        if node:has_children() then
+            if node:is_expanded() then
+                node:collapse()
+            else
+                node:expand()
+            end
+            tree:render()
         else
-            node:expand()
+            -- Open the file in a new buffer
+            local out = io.popen("p4 where "..node.depot_file):read("*a")
+            local local_file = out[#out]
+            vim.cmd("edit " .. local_file)
+            popup:unmount()
         end
-        tree:render()
     end, { buffer = popup.bufnr, nowait = true })
+
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
 

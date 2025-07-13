@@ -1,11 +1,11 @@
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
-local M = { name = nil }
+local M = { name = nil, root = nil }
 
 function M.bootstrap()
     local out = io.popen("p4 set"):read("*a")
     local client_name = out:match("P4CLIENT=(%S+)")
-    if client_name then M.name = client_name end
+    if client_name then M.set_client(client_name) end
 end
 
 function M.get_all_clients()
@@ -21,6 +21,9 @@ end
 function M.set_client(client_name)
     M.name = client_name
     os.execute("p4 set P4CLIENT=" .. client_name)
+    local out = io.popen("p4 info"):read("*a")
+    local client_root = out:match("Client root: (%S+)")
+    if client_root then M.root = client_root end
 end
 
 function M.select_client(callback)
