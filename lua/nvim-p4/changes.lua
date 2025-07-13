@@ -135,13 +135,13 @@ function M.open()
             else
                 line:append("  ")
             end
-
+            print(vim.inspect(node.data))
             line:append(node.text)
 
             return line
         end,
     })
-    tree:render()
+   -- tree:render(3)
 
   -- vim.keymap.set("n", "<CR>", function()
   --   local node = tree:get_node()
