@@ -155,6 +155,7 @@ function M.open()
             print("node is collapsed, expanding it")
             node:expand()
         end
+        vim.api.nvim_buf_clear_namespace(popup.bufnr, -1, 0, -1)
         tree:render()
 
 
