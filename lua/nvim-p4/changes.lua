@@ -65,38 +65,23 @@ end
 
 function M.open()
     local changelist_numbers = M.get_changelist_numbers()
-    print(vim.inspect(changelist_numbers))
 
     local popup = Popup({
         enter = true,
         focusable = true,
-        border = { style = "rounded", text = { top = "[ Pending Changelists ]", top_align = "center" } },
+        border = { style = "rounded", text = { top = "[ Pending Changelists in %{hl:ErrorMsg}%{hl:} " .. client.name .. " ]", top_align = "center" } },
         position = "50%",
         size = { width = 80, height = 25 },
         buf_options = { modifiable = true, readonly = false },
     })
-    -- local changelists = vim.tbl_flatten({
-    --   p4.get_changelists_by_status("pending"),
-    --   p4.get_changelists_by_status("submitted"),
-    -- })
 
+    local icon = "  "
     local nodes = {}
     for _, num in ipairs(changelist_numbers) do
         local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
         local cl_data = {}
         cl_data["id"] = num
         cl_data["text"] = "󰔶 " .. num .. "   " .. desc:gsub("%s+", " ")  
-        
-        print(vim.inspect(cl_data))
-
-
-        -- local title = Line()
-        -- title:append("󰄬 " .. num .. " - " .. desc:gsub("%s+", " "), "Identifier")
-        --
-        -- print(title.)
-        -- local node = make_changelist_node(cl.id, cl.status)
-        -- for _, file in ipairs(get_opened_files(changelist_numbers)) do
-
 
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
@@ -122,21 +107,9 @@ function M.open()
             table.insert(children, Tree.Node(child_data))
         end
         table.insert(nodes, Tree.Node(cl_data, children))
-        print(vim.inspect(nodes))
-
-
---            node:append(make_file_node(file))
---        end
-        -- table.insert(nodes, node)
     end
 
-
-
-
-
     popup:mount()
-    local icon = "  "
-    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, { icon .. client.name, string.rep("─", 78) })
 
     local tree = Tree({
         bufnr = popup.bufnr,
@@ -155,7 +128,7 @@ function M.open()
             return line
         end,
     })
-    tree:render(3)
+    tree:render()
 
   -- vim.keymap.set("n", "<CR>", function()
   --   local node = tree:get_node()
@@ -182,8 +155,7 @@ function M.open()
 
     -- Set up key mappings for the popup buffer
     vim.keymap.set("n", "<CR>", function()
-        local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
-        local node = tree:get_node(row)
+        local node = tree:get_node()
         if node and node:has_children() then
             if node:is_expanded() then
                 node:collapse()
