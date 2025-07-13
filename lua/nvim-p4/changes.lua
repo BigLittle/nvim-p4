@@ -108,7 +108,7 @@ function M.open()
             table.insert(children, Tree.Node(file))
         end
         local node = Tree.Node(cl_data, children)
-        node:expand() -- Expand the node by default
+        -- node:expand() -- Expand the node by default
         table.insert(nodes, node)
     end
 
@@ -126,7 +126,15 @@ function M.open()
                 line:append("󰔶 ", "ErrorMsg")
                 line:append(node.text)
             else
-                line:append("    ")
+                line:append("   ")
+                local ft = node.depot_file:match("^.+(%.[^%.]+)$")
+                if ft == ".cpp" or ft == ".hpp" then
+                    line:append(" ", "#5599ff")
+                elseif ft == ".py" then
+                    line:append(" ", "#ffd43b")
+                else
+                    line:append(" ")
+                end
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
             return line
@@ -138,7 +146,7 @@ function M.open()
         popup:unmount()
         M.open()
     end, { buffer = popup.bufnr })
-  
+
     vim.keymap.set("n", "c", function()
         popup:unmount()
         client.select_client(function()
@@ -150,12 +158,9 @@ function M.open()
     vim.keymap.set("n", "o", function()
         local node = tree:get_node()
         if not node then return end
-
         if node:is_expanded() then
-            print("node is expanded, collapsing it")
             node:collapse()
         else
-            print("node is collapsed, expanding it")
             node:expand()
         end
         tree:render()
