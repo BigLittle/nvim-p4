@@ -76,8 +76,11 @@ function M.open()
         cl_data["id"] = num
         cl_data["text"] = num .. "   " .. desc:gsub("%s+", " ")
         cl_data["changlist"] = true
+        cl_data["empty"] = false
+        local opened_files = M.get_opened_files(num)
+        if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
         local children = {}
-        for _, file in ipairs(M.get_opened_files(num)) do
+        for _, file in ipairs(opened_files) do
             table.insert(children, Tree.Node(file))
         end
         local node = Tree.Node(cl_data, children)
@@ -95,8 +98,13 @@ function M.open()
             line:append(string.rep("  ", node:get_depth() - 1))
             if node.changlist then
                 line:append(" ")
-                line:append(node:is_expanded() and " " or " ", "SpecialChar")
-                line:append("󰔶 ", "ErrorMsg")
+                if node.empty then
+                    line:append("  ")
+                    line:append("󰔶 ", "MiniIconsCyan")
+                else
+                    line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                    line:append("󰔶 ", "ErrorMsg")
+                end
                 line:append(node.text)
             else
                 line:append("   ")
@@ -133,7 +141,8 @@ function M.open()
     vim.keymap.set("n", "o", function()
         local node = tree:get_node()
         if not node then return end
-        if node:has_children() then
+        if node.changlist then
+            if node.empty then return end
             if node:is_expanded() then
                 node:collapse()
             else
