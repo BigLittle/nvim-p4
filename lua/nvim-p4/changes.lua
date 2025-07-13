@@ -14,6 +14,17 @@ local function split(input)
   return t
 end
 
+function M.open_local_file(depot_file)
+    local out = split(io.popen("p4 where " .. depot_file):read("*a"))
+    local local_file = out[#out]
+    if vim.fn.filereadable(local_file) == 0 then
+        print("Local file for " .. depot_file .. " does not exist.")
+        return
+    else
+        vim.cmd("edit " .. local_file)
+    end
+end
+
 function M.get_opened_files(changelist_number)
     local out = io.popen("p4 opened -c " .. changelist_number):read("*a")
     local files = {}
@@ -128,11 +139,7 @@ function M.open()
             end
             tree:render()
         else
-            -- Open the file in a new buffer
-            local out = split(io.popen("p4 where "..node.depot_file):read("*a"))
-            print(vim.inspect(out))
-            local local_file = out[#out]
-            vim.cmd("edit " .. local_file)
+            M.open_local_file(node.depot_file)
             popup:unmount()
         end
     end, { buffer = popup.bufnr, nowait = true })
@@ -142,18 +149,9 @@ function M.open()
         if not node then return end
         if not node:has_children() then return end
         local children = tree:get_nodes(node:get_id())
-        local cmd = "edit "
         for _, child in ipairs(children) do
-            local out = split(io.popen("p4 where " .. child.depot_file):read("*a"))
-            if out and #out > 0 then
-                local local_file = out[#out]
-                cmd = cmd .. local_file .. " "
-            else
-                print("Local file of " .. child.depot_file .. " not found.")
-            end
+            M.open_local_file(child.depot_file)
         end
-        print("Executing command: " .. cmd)
-        vim.cmd(cmd)
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
