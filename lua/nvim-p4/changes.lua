@@ -56,8 +56,8 @@ function M.update_select_node_id(tree)
     local win = 0
     local rc = vim.api.nvim_win_get_cursor(win)
     print(vim.inspect(rc))
-    -- vim.api.nvim_win_set_cursor(win, { rc[1] + 1, rc[2] })
-    -- M.select_node_id = tree:get_node():get_id()
+    vim.api.nvim_win_set_cursor(win, { rc[1] + 1, rc[2] })
+    M.select_node_id = tree:get_node():get_id()
     tree:render()
 end
 
