@@ -154,7 +154,7 @@ function M.open()
 
     -- Set up key mappings for the popup buffer
     vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Esc>", popup:unmount(), { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "q", function() popup:unmount() end, { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "q", popup:unmount(), { noremap = true, silent = true })
 
     -- Disable horizontal navigation keys
     vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
