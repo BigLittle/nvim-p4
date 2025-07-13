@@ -55,7 +55,6 @@ end
 function M.open()
     local changelist_numbers = M.get_changelist_numbers()
     local cursorline_hl = vim.api.nvim_get_hl_by_name("CursorLine", true)
-    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#365a98", fg = "None" })
 
     local popup = Popup({
         enter = true,
@@ -69,6 +68,7 @@ function M.open()
         size = { width = 100, height = 25 },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false }
+        ns_id = "nvim_p4_changes",
     })
 
     local nodes = {}
@@ -91,6 +91,7 @@ function M.open()
     end
 
     popup:mount()
+    vim.api.nvim_set_hl("nvim_p4_changes", "CursorLine", { bg = "#365a98", fg = "None" })
 
     local tree = Tree({
         bufnr = popup.bufnr,
