@@ -108,7 +108,7 @@ function M.open()
             table.insert(children, Tree.Node(file))
         end
         local node = Tree.Node(cl_data, children)
-        node.expand() -- Expand the node by default
+        node:expand() -- Expand the node by default
         table.insert(nodes, node)
     end
 
