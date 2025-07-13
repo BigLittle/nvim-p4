@@ -192,7 +192,7 @@ function M.open()
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
-    vim.keymap.set("n", "j", M.update_select_node_id(tree), { buffer = popup.bufnr, nowait = true })
+    vim.keymap.set("n", "j", function() M.update_select_node_id(tree) end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
