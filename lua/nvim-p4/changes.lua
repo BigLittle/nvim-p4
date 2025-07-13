@@ -92,19 +92,20 @@ function M.open()
 
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
-            local icon = "󰈔"
+            local icon = " "--"󰈔""󰷈"" "
             -- local ext = file.type
-            -- if ext == "lua" then icon = ""
+            -- if ext == "lua" then icon = ""   
             -- elseif ext == "png" or ext == "jpg" then icon = ""
             -- elseif ext == "svg" then icon = "󰜡"
             -- elseif ext == "json" then icon = ""
             -- elseif ext == "md" then icon = "󰍔"
             -- elseif ext == "ts" then icon = ""
             -- elseif ext == "vim" then icon = ""
+            -- elseif  
             -- end
 
             local file_line = Line()
-            file_line:append(" " .. icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
+            file_line:append(icon .. " " .. file.depot_file .. "#" .. file.rev, "Normal")
             table.insert(children, Tree.Node(file_line))
         end
         table.insert(nodes, Tree.Node(title, children))
@@ -127,10 +128,8 @@ function M.open()
         bufnr = popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
-            local line = NuiLine()
-
+            local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
-
             if node:has_children() then
                 line:append(node:is_expanded() and " " or " ", "SpecialChar")
             else
