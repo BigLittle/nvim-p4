@@ -52,10 +52,10 @@ function M.get_changelist_numbers()
   return changelist_numbers
 end
 
-function M.update_select_node_id(tree)
-    local win = 0
-    local rc = vim.api.nvim_win_get_cursor(win)
-    print(vim.inspect(rc))
+function M.update_select_node_id(tree, bufnr)
+    local max_row = vim.api.nvim_buf_line_count(bufnr)
+    local rc = vim.api.nvim_win_get_cursor(0)
+    if rc[1] == max_row then return end
     vim.api.nvim_win_set_cursor(win, { rc[1] + 1, rc[2] })
     M.select_node_id = tree:get_node():get_id()
     tree:render()
@@ -123,6 +123,7 @@ function M.open()
                     line:append("󰔶 ", "ErrorMsg")
                 end
                 if node.id == M.select_node_id then
+                    print("Selected node: " .. node.id)
                     line:append(node.text, "CursorLine")
                 else
                     line:append(node.text, "Normal")
@@ -139,7 +140,8 @@ function M.open()
                 else
                     line:append("󰷈 ")
                 end
-                if  node.id == M.select_node_id then
+                if node.id == M.select_node_id then
+                    print("Selected node: " .. node.id)
                     line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "CursorLine")
                 else
                     line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
@@ -192,7 +194,7 @@ function M.open()
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
-    vim.keymap.set("n", "j", function() M.update_select_node_id(tree) end, { buffer = popup.bufnr, nowait = true })
+    vim.keymap.set("n", "j", function() M.update_select_node_id(tree, popup.bufnr) end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
