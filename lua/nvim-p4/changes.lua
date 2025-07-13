@@ -74,7 +74,7 @@ function M.open()
         border = { style = "rounded", text = { top = "[ Pending Changelists ]", top_align = "center" } },
         position = "50%",
         size = { width = 80, height = 25 },
-        buf_options = { modifiable = false, readonly = true },
+        buf_options = { modifiable = true, readonly = true },
     })
     -- local changelists = vim.tbl_flatten({
     --   p4.get_changelists_by_status("pending"),
