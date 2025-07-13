@@ -130,32 +130,24 @@ function M.open()
     })
     tree:render()
 
-  -- vim.keymap.set("n", "<CR>", function()
-  --   local node = tree:get_node()
-  --   if node and node.data.type == "file" then
-  --     vim.cmd("edit " .. node.data.name)
-  --   elseif node then
-  --     tree:toggle(node:get_id())
-  --     tree:render(popup.bufnr)
-  --   end
-  -- end, { buffer = popup.bufnr })
-
-
-  -- vim.keymap.set("n", "r", function()
-  --   popup:unmount()
-  --   M.open()
-  -- end, { buffer = popup.bufnr })
-  --
-  -- vim.keymap.set("n", "c", function()
-  --   popup:unmount()
-  --   client.show_client_selector(function()
-  --     M.open()
-  --   end)
-  -- end, { buffer = popup.bufnr })
+    vim.keymap.set("n", "<F5>", function()
+        popup:unmount()
+        M.open()
+    end, { buffer = popup.bufnr })
+  
+    vim.keymap.set("n", "c", function()
+        popup:unmount()
+        client.select_client(function()
+            M.open()
+        end)
+    end, { buffer = popup.bufnr })
 
     -- Set up key mappings for the popup buffer
     vim.keymap.set("n", "<CR>", function()
-        local node = tree:get_node()
+        local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
+        print("Get Row: " .. row)
+        local node = tree:get_node(row)
+        print("Get Node: " .. vim.inspect(node))
         if node and node:has_children() then
             if node:is_expanded() then
                 node:collapse()
