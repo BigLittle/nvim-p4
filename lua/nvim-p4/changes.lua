@@ -74,7 +74,7 @@ function M.open()
         border = { style = "rounded", text = { top = "[ Pending Changelists ]", top_align = "center" } },
         position = "50%",
         size = { width = 80, height = 25 },
-        buf_options = { modifiable = true, readonly = true },
+        buf_options = { modifiable = true, readonly = false },
     })
     -- local changelists = vim.tbl_flatten({
     --   p4.get_changelists_by_status("pending"),
@@ -125,7 +125,8 @@ function M.open()
   -- })
 
     popup:mount()
-    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, { "Client: " .. client.name, string.rep("─", 78) })
+    local icon = "  "
+    vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, { icon .. client.name, string.rep("─", 78) })
   -- tree:render(popup.bufnr)
 
   -- vim.keymap.set("n", "<CR>", function()
@@ -152,7 +153,7 @@ function M.open()
   -- end, { buffer = popup.bufnr })
 
     -- Set up key mappings for the popup buffer
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Esc>", function() popup:unmount() end, { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Esc>", popup:unmount(), { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "q", function() popup:unmount() end, { noremap = true, silent = true })
 
     -- Disable horizontal navigation keys
