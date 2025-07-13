@@ -52,6 +52,14 @@ function M.get_changelist_numbers()
   return changelist_numbers
 end
 
+function M.update_select_node_id(tree)
+    local win = 0
+    local row, col = table.unpack(vim.api.nvim_win_get_cursor(win))
+    vim.api.nvim_win_set_cursor(win, { row + 1, col })
+    M.select_node_id = tree:get_node():get_id()
+    tree:render()
+end
+
 function M.open()
     local changelist_numbers = M.get_changelist_numbers()
     local cursorline_hl = vim.api.nvim_get_hl_by_name("CursorLine", true)
@@ -183,10 +191,7 @@ function M.open()
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
-    vim.keymap.set("n", "j", function()
-        M.select_node_id = tree:get_node():get_id()
-        tree:render()
-    end, { buffer = popup.bufnr, nowait = true })
+    vim.keymap.set("n", "j", M.update_select_node_id(tree), { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
