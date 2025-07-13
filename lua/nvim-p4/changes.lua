@@ -57,7 +57,7 @@ function M.update_select_node_id(tree, bufnr)
     local max_row = vim.api.nvim_buf_line_count(bufnr)
     local rc = vim.api.nvim_win_get_cursor(0)
     if rc[1] == max_row then return end
-    vim.api.nvim_win_set_cursor(win, { rc[1] + 1, rc[2] })
+    vim.api.nvim_win_set_cursor(0, { rc[1] + 1, rc[2] })
     M.select_node_id = tree:get_node():get_id()
     tree:render()
 end
