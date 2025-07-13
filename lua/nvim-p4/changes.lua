@@ -142,14 +142,14 @@ function M.open()
         bufnr = popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
+            node:expand()
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
             if node:has_children() then
-                line:append(node:is_expanded() and " " or " ", "SpecialChar")
+                line:append(node:is_expanded() and " " or " ", "SpecialChar")
             else
                 line:append("  ")
             end
-            print(vim.inspect(node.data))
             line:append(node.text)
 
             return line
@@ -185,7 +185,11 @@ function M.open()
         local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
         local node = tree:get_node(row)
         if node and node:has_children() then
-            node:toggle()
+            if node:is_expanded() then
+                node:collapse()
+            else
+                node:expand()
+            end
             tree:render()
         end
     end, { buffer = popup.bufnr, nowait = true })
