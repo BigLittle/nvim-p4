@@ -75,6 +75,7 @@ function M.open()
         local cl_data = {}
         cl_data["id"] = num
         cl_data["text"] = num .. "   " .. desc:gsub("%s+", " ")
+        cl_data["changlist"] = true
         local children = {}
         for _, file in ipairs(M.get_opened_files(num)) do
             table.insert(children, Tree.Node(file))
@@ -92,7 +93,7 @@ function M.open()
         prepare_node = function(node)
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
-            if node:has_children() then
+            if node.changlist then
                 line:append(" ")
                 line:append(node:is_expanded() and " " or " ", "SpecialChar")
                 line:append("󰔶 ", "ErrorMsg")
