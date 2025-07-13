@@ -57,13 +57,13 @@ function M.update_select_node_id(tree, bufnr)
     local max_row = vim.api.nvim_buf_line_count(bufnr)
     local rc = vim.api.nvim_win_get_cursor(0)
     if rc[1] == max_row then return end
+    local line = tree:get_node().render_line
+
     vim.api.nvim_win_set_cursor(0, { rc[1] + 1, rc[2] })
-    local node = tree:get_node()
-    print(vim.inspect(node))
-
-
-
-
+    line = tree:get_node().render_line
+    local texts = line._texts
+    local last_text = texts[#texts]
+    print(vim.inspect(last_text))
 
 
     tree:render()
@@ -145,11 +145,13 @@ function M.open()
                 end
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
+            node.render_line = line
             return line
         end,
     })
 
     tree:render()
+    M.update_select_node_id(tree, popup.bufnr)
 
     vim.keymap.set("n", "<F5>", function()
         popup:unmount()
