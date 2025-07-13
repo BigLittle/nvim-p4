@@ -67,7 +67,7 @@ function M.open()
         position = "50%",
         size = { width = 100, height = 25 },
         buf_options = { modifiable = true, readonly = false },
-        win_options = { wrap = false }
+        win_options = { wrap = false },
         ns_id = "nvim_p4_changes",
     })
 
