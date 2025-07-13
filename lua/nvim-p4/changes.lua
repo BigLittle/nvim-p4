@@ -129,9 +129,9 @@ function M.open()
                 line:append("   ")
                 local ft = node.depot_file:match("^.+(%.[^%.]+)$")
                 if ft == ".cpp" or ft == ".hpp" then
-                    line:append(" ", "#5599ff")
+                    line:append(" ", "MiniIconsAzure")
                 elseif ft == ".py" then
-                    line:append(" ", "#ffd43b")
+                    line:append(" ", "MiniIconsYellow")
                 else
                     line:append(" ")
                 end
