@@ -116,18 +116,22 @@ function M.open()
         -- table.insert(nodes, node)
     end
 
-  -- local tree = Tree(nodes, {
-  --   prepare_node = function(node)
-  --     local line = Line()
-  --     line:append(node.text, node.hl)
-  --     return line
-  --   end,
-  -- })
+
+
+
 
     popup:mount()
     local icon = "  "
     vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, { icon .. client.name, string.rep("─", 78) })
-  -- tree:render(popup.bufnr)
+
+    local tree = Tree(popup.bufnr, {
+        nodes = nodes,
+        winid = popup.winid,
+        render_node = function(node)
+            return node:render()
+        end,
+    })
+    tree:render()
 
   -- vim.keymap.set("n", "<CR>", function()
   --   local node = tree:get_node()
@@ -153,8 +157,16 @@ function M.open()
   -- end, { buffer = popup.bufnr })
 
     -- Set up key mappings for the popup buffer
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Esc>", popup:unmount(), { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "q", popup:unmount(), { noremap = true, silent = true })
+    vim.keymap.set("n", "<CR>", function()
+        local row = vim.api.nvim_win_get_cursor(popup.winid)[1]
+        local node = tree:get_node(row)
+        if node and node:has_children() then
+            node:toggle()
+            tree:render()
+        end
+    end, { buffer = popup.bufnr, nowait = true })
+    vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
+    vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
 
     -- Disable horizontal navigation keys
     vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })

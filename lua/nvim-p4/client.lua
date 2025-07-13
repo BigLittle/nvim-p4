@@ -82,7 +82,7 @@ function M.select_client(callback)
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(menu.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
 
-    -- Unmount the menu when leaving the buffer.
+    -- Unmount the menu when leaving the buffer
     menu:on(event.BufLeave, function() menu:unmount() end)
 end
 return M
