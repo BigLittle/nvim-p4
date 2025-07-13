@@ -155,7 +155,7 @@ function M.open()
             return line
         end,
     })
-   -- tree:render(3)
+    tree:render(3)
 
   -- vim.keymap.set("n", "<CR>", function()
   --   local node = tree:get_node()
