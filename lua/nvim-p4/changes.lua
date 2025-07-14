@@ -15,6 +15,10 @@ local function split(input)
   return t
 end
 
+local function rstrip(str)
+    return str:match("^%s*(.-)%s*$")
+end
+
 function M.open_local_file(depot_file)
     local out = split(io.popen("p4 where " .. depot_file):read("*a"))
     local local_file = out[#out]
@@ -99,32 +103,28 @@ function M.open()
 
     popup:mount()
 
-    normal_hl = vim.api.nvim_get_hl_by_name("Normal", true)
-    vim.cmd("highlight! P4ChangesHead guifg=" .. normal_hl.background .. " guibg=" .. normal_hl.background .. " gui=bold")
-    vim.cmd("highlight! P4ChangesSelect guifg=" ..normal_hl.foreground .. " guibg=#365a98 gui=bold")
-
     local tree = Tree({
         bufnr = popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
             if M.select_node == nil then M.select_node = node end
             local text_hl = "Normal"
-            if node == M.select_node then text_hl = "P4ChangesSelect" end
+            if node == M.select_node then text_hl = "Visual" end
 
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
             if node.changlist then
                 line:append(" ")
                 if node.empty then
-                    line:append("  ", "P4ChangesHead")
+                    line:append("  ", "EndOfBuffer")
                     line:append("󰔶 ", "MiniIconsCyan")
                 else
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                line:append(node.text, text_hl)
+                line:append(rstrip(node.text), text_hl)
             else
-                line:append("   ", "P4ChangesHead")
+                line:append("   ", "EndOfBuffer")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
                 line:append(icon.." ", hl)
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
