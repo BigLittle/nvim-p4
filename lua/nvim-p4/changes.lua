@@ -123,7 +123,7 @@ function M.open()
         prepare_node = function(node)
             if M.select_node_id == nil then M.select_node_id = node:get_id() end
             local text_hl = "Normal"
-            if node.get_id() == M.select_node_id then text_hl = "ErrorMsg" end
+            if node:get_id() == M.select_node_id then text_hl = "ErrorMsg" end
 
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
