@@ -2,6 +2,7 @@ local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
 local Tree = require("nui.tree")
 local Line = require("nui.line")
+local Icons = require("mini.icons")
 local client = require("nvim-p4.client")
 
 local M = { select_node_id = nil }
@@ -21,7 +22,7 @@ function M.open_local_file(depot_file)
         print("Local file for " .. depot_file .. " does not exist.")
         return
     else
-        vim.cmd("edit " .. local_file)
+        vim.cmd("keepalt keepjumps edit " .. local_file)
     end
 end
 
@@ -74,6 +75,7 @@ function M.open()
     local cursorline_hl = vim.api.nvim_get_hl_by_name("CursorLine", true)
 
     local popup = Popup({
+        relative = "editor",
         enter = true,
         focusable = true,
         border = {
@@ -130,22 +132,23 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                line:append(node.text, "Normal")
+                line:append(node.text, "CursorLine")
             else
                 line:append("   ")
-                local ft = node.depot_file:match("^.+(%.[^%.]+)$")
-                if ft == ".cpp" or ft == ".hpp" then
-                    line:append(" ", "MiniIconsAzure")
-                elseif ft == ".py" then
-                    line:append(" ", "MiniIconsYellow")
-                elseif ft == ".lua" then
-                    line:append(" ", "MiniIconsAzure")
-                else
-                    line:append("󰷈 ")
-                end
+                local icon, hl, is_default = Icons.get("file", node.depot_file)
+                line:append(icon, hl)
+                -- local ft = node.depot_file:match("^.+(%.[^%.]+)$")
+                -- if ft == ".cpp" or ft == ".hpp" then
+                --     line:append(" ", "MiniIconsAzure")
+                -- elseif ft == ".py" then
+                --     line:append(" ", "MiniIconsYellow")
+                -- elseif ft == ".lua" then
+                --     line:append(" ", "MiniIconsAzure")
+                -- else
+                --     line:append("󰷈 ")
+                -- end
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
-            node.render_line = line
             return line
         end,
     })

@@ -51,6 +51,7 @@ function M.select_client(callback)
     max_width = math.max(max_width + 4, 24)
 
     local menu = Menu({
+        relative = "editor",
         position = "50%",
         size = { width = max_width, height = max_height },
         border = {
