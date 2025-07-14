@@ -33,7 +33,6 @@ function M.get_opened_files(changelist_number)
         local file = {}
         local result = split(line)
         if #result < 6 then return {} end
-        file["id"] = result[1] -- use for tree node id
         file["depot_file"] = result[1]:match("(%S+)#")
         file["rev"] = result[1]:match("#(%d+)")
         file["action"] = result[3]
@@ -57,7 +56,6 @@ end
 function M.open()
     M.select_node = nil
     local changelist_numbers = M.get_changelist_numbers()
-    local cursorline_hl = vim.api.nvim_get_hl_by_name("CursorLine", true)
 
     local popup = Popup({
         relative = "editor",
@@ -107,7 +105,7 @@ function M.open()
         prepare_node = function(node)
             if M.select_node == nil then M.select_node = node end
             local text_hl = "Normal"
-            if node == M.select_node then text_hl = "CursorLine" end
+            if node == M.select_node then text_hl = "ErrorMsg" end
 
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
