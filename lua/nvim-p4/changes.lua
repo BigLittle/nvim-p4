@@ -5,7 +5,7 @@ local Line = require("nui.line")
 local Icons = require("mini.icons")
 local client = require("nvim-p4.client")
 
-local M = { select_node_id = nil }
+local M = { select_node = nil }
 
 local function split(input)
   local t = {}
@@ -54,24 +54,8 @@ function M.get_changelist_numbers()
   return changelist_numbers
 end
 
-function M.update_select_node_id(tree, bufnr)
-    local max_row = vim.api.nvim_buf_line_count(bufnr)
-    local rc = vim.api.nvim_win_get_cursor(0)
-    if rc[1] == max_row then return end
-    local line = tree:get_node().render_line
-
-    vim.api.nvim_win_set_cursor(0, { rc[1] + 1, rc[2] })
-    line = tree:get_node().render_line
-    local texts = line._texts
-    local last_text = texts[#texts]
-    print(vim.inspect(last_text))
-    last_text:set(last_text._content, "CursorLine")
-
-    tree:render()
-end
-
 function M.open()
-    M.select_node_id = nil
+    M.select_node = nil
     local changelist_numbers = M.get_changelist_numbers()
     local cursorline_hl = vim.api.nvim_get_hl_by_name("CursorLine", true)
 
@@ -121,9 +105,9 @@ function M.open()
         bufnr = popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
-            if M.select_node_id == nil then M.select_node_id = node:get_id() end
+            if M.select_node == nil then M.select_node = node end
             local text_hl = "Normal"
-            if node:get_id() == M.select_node_id then text_hl = "ErrorMsg" end
+            if node == M.select_node then text_hl = "CursorLine" end
 
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
@@ -148,25 +132,25 @@ function M.open()
     })
 
     tree:render()
-    -- M.update_select_node_id(tree, popup.bufnr)
 
     vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
         buffer = popup.bufnr,
         callback = function()
             local node = tree:get_node()
             if not node then return end
-            local new_id = node:get_id()
-            if M.select_node_id == new_id then return end
-            M.select_node_id = node:get_id()
+            if M.select_node == node then return end
+            M.select_node = node
             tree:render()
         end,
     })
 
+    -- Refresh
     vim.keymap.set("n", "<F5>", function()
         popup:unmount()
         M.open()
     end, { buffer = popup.bufnr })
 
+    -- Select a client
     vim.keymap.set("n", "c", function()
         popup:unmount()
         client.select_client(function()
@@ -174,7 +158,7 @@ function M.open()
         end)
     end, { buffer = popup.bufnr })
 
-    -- Set up key mappings for the popup buffer
+    -- Toggle the expansion of the current node if it is a changelist
     vim.keymap.set("n", "o", function()
         local node = tree:get_node()
         if not node then return end
@@ -188,6 +172,7 @@ function M.open()
         tree:render()
     end, { buffer = popup.bufnr, nowait = true })
 
+    -- Open the selected file in the editor
     vim.keymap.set("n", "e", function()
         local node = tree:get_node()
         if not node then return end
@@ -203,8 +188,7 @@ function M.open()
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
-    -- vim.keymap.set("n", "j", function() M.update_select_node_id(tree, popup.bufnr) end, { buffer = popup.bufnr, nowait = true })
-
+    -- Close the popup with 'q' or 'Esc'
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
 
