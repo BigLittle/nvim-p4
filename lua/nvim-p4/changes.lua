@@ -102,7 +102,7 @@ function M.open()
     normal_hl = vim.api.nvim_get_hl_by_name("Normal", true)
     vim.cmd("highlight! P4ChangesHead guifg=" .. normal_hl.background .. " guibg=" .. normal_hl.background .. " gui=bold")
     vim.cmd("highlight! P4ChangesSelect guifg=" ..normal_hl.foreground .. " guibg=#365a98 gui=bold")
-    vim.api.nvim_set_hl(popup.ns_id, "Cursor", "P4ChangesHead")
+    vim.api.nvim_set_hl(popup.ns_id, "Cursor", vim.api.nvim_get_hl_by_name("P4ChangesHead", true))
 
     local tree = Tree({
         bufnr = popup.bufnr,
