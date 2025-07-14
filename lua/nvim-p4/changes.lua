@@ -71,6 +71,7 @@ function M.update_select_node_id(tree, bufnr)
 end
 
 function M.open()
+    M.select_node_id = nil
     local changelist_numbers = M.get_changelist_numbers()
     local cursorline_hl = vim.api.nvim_get_hl_by_name("CursorLine", true)
 
@@ -115,12 +116,15 @@ function M.open()
     end
 
     popup:mount()
-    vim.api.nvim_set_hl(popup.ns_id, "CursorLine", { bg = "#365a98", fg = "None" })
 
     local tree = Tree({
         bufnr = popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
+            if M.select_node_id == nil then M.select_node_id = node:get_id() end
+            local text_hl = "Normal"
+            if node.get_id() == M.select_node_id then text_hl = "ErrorMsg" end
+
             local line = Line()
             line:append(string.rep("  ", node:get_depth() - 1))
             if node.changlist then
@@ -132,12 +136,12 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                line:append(node.text, "ErrorMsg")
+                line:append(node.text, text_hl)
             else
                 line:append("   ")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
                 line:append(icon.." ", hl)
-                line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
+                line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
             end
             return line
         end,
@@ -151,11 +155,10 @@ function M.open()
         callback = function()
             local node = tree:get_node()
             if not node then return end
-            local line = node.render_line
-            local texts = line._texts
-            local last_text = texts[#texts]
-            last_text:set(last_text._content, "ErrorMsg")
-            line:render()
+            local new_id = node:get_id()
+            if M.select_node_id == new_id then return end
+            M.select_node_id = node:get_id()
+            tree:render()
         end,
     })
 
