@@ -102,7 +102,8 @@ function M.open()
     end
 
     popup:mount()
-    vim.api.nvim_set_hl(popup.ns_id, "CursorLine", { bg = "None" })
+    vim.api.nvim_set_hl(popup.ns_id, "Cursor", { bg = "NONE", fg = "NONE" })
+    vim.api.nvim_set_hl(popup.ns_id, "lCursor", { bg = "NONE", fg = "NONE" })
 
     local tree = Tree({
         bufnr = popup.bufnr,
@@ -128,7 +129,7 @@ function M.open()
                 line:append("   ", "EndOfBuffer")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
                 line:append(icon.." ", hl)
-                line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
+                line:append(node.depot_file.. " #" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
             end
             return line
         end,
