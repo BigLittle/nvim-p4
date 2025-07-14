@@ -132,21 +132,11 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                line:append(node.text, "CursorLine")
+                line:append(node.text, "ErrorMsg")
             else
                 line:append("   ")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
-                line:append(icon, hl)
-                -- local ft = node.depot_file:match("^.+(%.[^%.]+)$")
-                -- if ft == ".cpp" or ft == ".hpp" then
-                --     line:append(" ", "MiniIconsAzure")
-                -- elseif ft == ".py" then
-                --     line:append(" ", "MiniIconsYellow")
-                -- elseif ft == ".lua" then
-                --     line:append(" ", "MiniIconsAzure")
-                -- else
-                --     line:append("󰷈 ")
-                -- end
+                line:append(icon.." ", hl)
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", "Normal")
             end
             return line
@@ -155,6 +145,19 @@ function M.open()
 
     tree:render()
     -- M.update_select_node_id(tree, popup.bufnr)
+
+    vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        buffer = popup.bufnr,
+        callback = function()
+            local node = tree:get_node()
+            if not node then return end
+            local line = node.render_line
+            local texts = line._texts
+            local last_text = texts[#texts]
+            last_text:set(last_text._content, "ErrorMsg")
+            line:render()
+        end,
+    })
 
     vim.keymap.set("n", "<F5>", function()
         popup:unmount()
