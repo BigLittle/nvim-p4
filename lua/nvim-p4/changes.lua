@@ -102,6 +102,7 @@ function M.open()
     end
 
     popup:mount()
+    vim.api.nvim_set_hl(popup.ns_id, "CursorLine", { bg = "None" })
 
     local tree = Tree({
         bufnr = popup.bufnr,
@@ -116,7 +117,7 @@ function M.open()
             if node.changlist then
                 line:append(" ")
                 if node.empty then
-                    line:append("██", "EndOfBuffer")
+                    line:append("  ", "EndOfBuffer")
                     line:append("󰔶 ", "MiniIconsCyan")
                 else
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
@@ -124,7 +125,7 @@ function M.open()
                 end
                 line:append(rstrip(node.text), text_hl)
             else
-                line:append("███", "EndOfBuffer")
+                line:append("   ", "EndOfBuffer")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
                 line:append(icon.." ", hl)
                 line:append(node.depot_file.. "#" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
