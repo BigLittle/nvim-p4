@@ -104,9 +104,9 @@ function M.open()
     popup:mount()
     -- vim.api.nvim_set_hl(popup.ns_id, "Cursor", { bg = "NONE", fg = "NONE" })
     -- vim.api.nvim_set_hl(popup.ns_id, "lCursor", { bg = "NONE", fg = "NONE" })
-    local normal_hl = vim.api.nvim_get_hl_by_name("Normal", true)
+    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     print(vim.inspect(normal_hl))
-    vim.api.nvim_set_hl(popup.ns_id, "EndOfBuffer", { fg = normal_hl.background } )
+    vim.api.nvim_set_hl(popup.ns_id, "EndOfBuffer", { fg = normal_hl.bg } )
 
     local tree = Tree({
         bufnr = popup.bufnr,
@@ -117,7 +117,7 @@ function M.open()
             if node == M.select_node then text_hl = "Visual" end
 
             local line = Line()
-            line:append(" ", "EndOfBuffer")
+            line:append(".", "EndOfBuffer")
 
             line:append(string.rep("  ", node:get_depth() - 1))
             if node.changlist then
