@@ -9,7 +9,8 @@ function M.bootstrap()
 end
 
 function M.get_all_clients()
-    local out = io.popen("p4 clients --me"):read("*a")
+    -- local out = io.popen("p4 clients --me"):read("*a")
+    local out = vim.fn.system("p4 clients --me")
     print(vim.inspect(out))
     local clients = {}
     for line in out:gmatch("[^\n]+") do
