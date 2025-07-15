@@ -20,7 +20,7 @@ local function rstrip(str)
 end
 
 function M.open_local_file(depot_file)
-    local out = split(io.popen("p4 where " .. depot_file):read("*a"))
+    local out = split(vim.fn.system("p4 where " .. depot_file))
     local local_file = out[#out]
     if vim.fn.filereadable(local_file) == 0 then
         print("Local file for " .. depot_file .. " does not exist.")
@@ -31,7 +31,7 @@ function M.open_local_file(depot_file)
 end
 
 function M.get_opened_files(changelist_number)
-    local out = io.popen("p4 opened -c " .. changelist_number .. " -C ".. client.name):read("*a")
+    local out = vim.fn.system("p4 opened -c " .. changelist_number .. " -C ".. client.name)
     local files = {}
     for line in out:gmatch("[^\n]+") do
         local file = {}
@@ -48,7 +48,6 @@ function M.get_opened_files(changelist_number)
 end
 
 function M.get_changelist_numbers()
-  -- local out = io.popen("p4 changes --me -c " .. client.name .. " -s pending"):read("*a")
   local out = vim.fn.system("p4 changes --me -c " .. client.name .. " -s pending")
   local changelist_numbers = { "default" }
   for line in out:gmatch("[^\n]+") do
@@ -86,7 +85,7 @@ function M.open()
 
     local nodes = {}
     for _, num in ipairs(changelist_numbers) do
-        local desc = io.popen('p4 -Ztag -F "%desc%" describe -s ' .. num):read("*a")
+        local desc = vim.fn.system('p4 -Ztag -F "%desc%" describe -s ' .. num)
         local cl_data = {}
         cl_data["id"] = num
         cl_data["text"] = num .. "   " .. desc:gsub("%s+", " ")
