@@ -104,8 +104,9 @@ function M.open()
     popup:mount()
     -- vim.api.nvim_set_hl(popup.ns_id, "Cursor", { bg = "NONE", fg = "NONE" })
     -- vim.api.nvim_set_hl(popup.ns_id, "lCursor", { bg = "NONE", fg = "NONE" })
-    local hl = vim.api.nvim_get_hl_by_name("EndOfBuffer", true)
-    print(vim.inspect(hl))
+    local normal_hl = vim.api.nvim_get_hl_by_name("Normal", true)
+    print(vim.inspect(normal_hl))
+    vim.api.nvim_set_hl(popup.ns_id, "EndOfBuffer", { fg = normal_hl.background } )
 
     local tree = Tree({
         bufnr = popup.bufnr,
