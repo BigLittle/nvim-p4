@@ -59,7 +59,6 @@ end
 
 function M.open()
     M.select_node = nil
-    print("Opening pending changelists for client: " .. client.name)
     local changelist_numbers = M.get_changelist_numbers()
 
     local popup = Popup({

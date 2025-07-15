@@ -10,7 +10,6 @@ end
 
 function M.get_all_clients()
     local out = vim.fn.system("p4 clients --me")
-    print(vim.inspect(out))
     local clients = {}
     for line in out:gmatch("[^\n]+") do
         local client_name = string.match(line, "Client%s+(%S+)")
