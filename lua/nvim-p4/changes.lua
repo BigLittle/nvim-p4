@@ -104,9 +104,8 @@ function M.open()
     popup:mount()
     -- vim.api.nvim_set_hl(popup.ns_id, "Cursor", { bg = "NONE", fg = "NONE" })
     -- vim.api.nvim_set_hl(popup.ns_id, "lCursor", { bg = "NONE", fg = "NONE" })
-    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" , rgb = true})
-    print(vim.inspect(normal_hl))
-    vim.api.nvim_set_hl(popup.ns_id, "EndOfBuffer", { fg = normal_hl.bg } )
+    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+    vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
 
     local tree = Tree({
         bufnr = popup.bufnr,
@@ -117,12 +116,12 @@ function M.open()
             if node == M.select_node then text_hl = "Visual" end
 
             local line = Line()
-            line:append(".", "EndOfBuffer")
+            line:append(" ", "P4ChangesHead")
 
             line:append(string.rep("  ", node:get_depth() - 1))
             if node.changlist then
                 if node.empty then
-                    line:append("  ", "EndOfBuffer")
+                    line:append("  ", "P4ChangesHead")
                     line:append("󰔶 ", "MiniIconsCyan")
                 else
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
@@ -130,7 +129,7 @@ function M.open()
                 end
                 line:append(rstrip(node.text), text_hl)
             else
-                line:append("  ", "EndOfBuffer")
+                line:append("  ", "P4ChangesHead")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
                 line:append(icon.." ", hl)
                 line:append(node.depot_file.. " #" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
