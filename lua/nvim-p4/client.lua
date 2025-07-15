@@ -10,6 +10,7 @@ end
 
 function M.get_all_clients()
     local out = io.popen("p4 clients --me"):read("*a")
+    print(vim.inspect(out))
     local clients = {}
     for line in out:gmatch("[^\n]+") do
         local client_name = string.match(line, "Client%s+(%S+)")
@@ -20,7 +21,7 @@ end
 
 function M.set_client(client_name)
     M.name = client_name
-    os.execute("p4 set P4CLIENT=" .. client_name)
+    -- os.execute("p4 set P4CLIENT=" .. client_name)
     local out = io.popen("p4 info"):read("*a")
     local client_root = out:match("Client root: (%S+)")
     if client_root then M.root = client_root end
