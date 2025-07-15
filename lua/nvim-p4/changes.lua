@@ -48,7 +48,8 @@ function M.get_opened_files(changelist_number)
 end
 
 function M.get_changelist_numbers()
-  local out = io.popen("p4 changes --me -c " .. client.name .. " -s pending"):read("*a")
+  -- local out = io.popen("p4 changes --me -c " .. client.name .. " -s pending"):read("*a")
+  local out = vim.fn.system("p4 changes --me -c " .. client.name .. " -s pending")
   local changelist_numbers = { "default" }
   for line in out:gmatch("[^\n]+") do
     local num = line:match("Change (%d+)")
