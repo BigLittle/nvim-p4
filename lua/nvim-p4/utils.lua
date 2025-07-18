@@ -16,11 +16,11 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd)
-  local out = io.popen(cmd)
-  -- local out = vim.fn.system(cmd)
+  -- local out = io.popen(cmd)
+  local out = vim.fn.system(cmd)
   if not out then return "" end
   local result = out:read("*a")
-  out:close()
+  -- out:close()
   return result
 end
 
