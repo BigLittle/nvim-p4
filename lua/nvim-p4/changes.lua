@@ -93,7 +93,7 @@ function M.open()
                 line:append("  ", "P4ChangesHead")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
                 line:append(icon.." ", hl)
-                line:append(node.depot_file.. " #" .. node.rev .. " " .. "<" .. node.type .. ">", text_hl)
+                line:append(node.depot_file.. " #" .. node.work_rev .. "/#" .. node.head_rev, text_hl)
             end
             return line
         end,
@@ -148,10 +148,10 @@ function M.open()
             if node.empty then return end
             local children = tree:get_nodes(node:get_id())
             for _, child in ipairs(children) do
-                M.open_local_file(child.depot_file)
+                utils.edit_file(child.client_file)
             end
         else
-            M.open_local_file(node.depot_file)
+            utils.edit_file(node.client_file)
         end
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })

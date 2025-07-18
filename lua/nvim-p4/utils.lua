@@ -24,4 +24,19 @@ function M.get_output(cmd)
   return result
 end
 
+-- Edit a file with the given path
+function M.edit_file(path)
+    if not path or path == "" then
+        vim.api.nvim_err_writeln("No file path provided")
+        return
+    end
+    local abs_path = vim.fn.fnamemodify(path, ":p")
+    if not vim.fn.filereadable(abs_path) then
+        vim.api.nvim_err_writeln("File does not exist: " .. abs_path)
+        return
+    end
+    vim.cmd("keepalt keepjumps edit " .. abs_path)
+end
+
+
 return M
