@@ -114,8 +114,9 @@ function M.open()
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
         -- TODO update tree instead of the whole popup
-        M.popup = nil
         M.popup:unmount()
+        print(M.popup)
+        M.popup = nil
         M.open()
     end, { buffer = M.popup.bufnr })
 
@@ -124,8 +125,8 @@ function M.open()
         local current_client = client.name
         client.select_client(function()
             if client.name == current_client then return end
-            M.popup = nil
             M.popup:unmount()
+            M.popup = nil
             M.open()
         end)
     end, { buffer = M.popup.bufnr })
