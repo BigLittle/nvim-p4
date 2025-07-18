@@ -4,23 +4,12 @@ local Tree = require("nui.tree")
 local Line = require("nui.line")
 local Icons = require("mini.icons")
 local client = require("nvim-p4.client")
+local utils = require("nvim-p4.utils")
 
 local M = { select_node = nil }
 
-local function split(input)
-  local t = {}
-  for word in input:gmatch("%S+") do
-    t[#t+1] = word
-  end
-  return t
-end
-
-local function rstrip(str)
-    return str:match("^%s*(.-)%s*$")
-end
-
 function M.open_local_file(depot_file)
-    local out = split(vim.fn.system("p4 where " .. depot_file))
+    local out = utils.split(vim.fn.system("p4 where " .. depot_file))
     local local_file = out[#out]
     if vim.fn.filereadable(local_file) == 0 then
         print("Local file for " .. depot_file .. " does not exist.")
@@ -35,7 +24,7 @@ function M.get_opened_files(changelist_number)
     local files = {}
     for line in out:gmatch("[^\n]+") do
         local file = {}
-        local result = split(line)
+        local result = utile.split(line)
         if #result < 6 then return {} end
         file["depot_file"] = result[1]:match("(%S+)#")
         file["rev"] = result[1]:match("#(%d+)")
@@ -102,8 +91,6 @@ function M.open()
     end
 
     popup:mount()
-    -- vim.api.nvim_set_hl(popup.ns_id, "Cursor", { bg = "NONE", fg = "NONE" })
-    -- vim.api.nvim_set_hl(popup.ns_id, "lCursor", { bg = "NONE", fg = "NONE" })
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
 
@@ -127,7 +114,7 @@ function M.open()
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
                 end
-                line:append(rstrip(node.text), text_hl)
+                line:append(utils.rstrip(node.text), text_hl)
             else
                 line:append("  ", "P4ChangesHead")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
