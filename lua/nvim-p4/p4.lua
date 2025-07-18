@@ -29,39 +29,57 @@ function M.changes()
 end
 
 
-
-
-
+-- Get file path from depot file
+function M.where(depot_file)
+    local out = utils.split(utils.get_output("p4 -c " .. client.name .. " where " .. depot_file))
+    local path = out[#out]
+    return path
+end
 
 -- Dump file information for a depot file
 function M.fstat(depot_file)
     local out = utils.get_output("p4 -c " .. client.name .. " fstat -Olhp " .. depot_file)
     local file = {}
-    for line in out:gmatch("[^\n]+") do
-        if line:match("^... depotFile ") then
-            file.depot_file = line:match("^... depotFile (%S+)")
-        elseif line:match("^... clientFile ") then
-            file.client_file = line:match("^... clientFile (%S+)")
-        elseif line:match("^... path ") then
-            file.path = line:match("^... path (%S+)")
-        elseif line:match("^... headAction ") then
-            file.head_action = line:match("^... headAction (%S+)")
-        elseif line:match("^... headType ") then
-            file.head_type = line:match("^... headType (%S+)")
-        elseif line:match("^... headRev ") then
-            file.head_rev = tonumber(line:match("^... headRev (%d+)"))
-        elseif line:match("^... headChange ") then
-            file.head_change = tonumber(line:match("^... headChange (%d+)"))
-        elseif line:match("^... haveRev ") then
-            file.have_rev = tonumber(line:match("^... haveRev (%d+)"))
-        elseif line:match("^... action ") then
-            file.action = line:match("^... action (%S+)")
-        elseif line:match("^... change ") then
-            file.change = line:match("^... change (%S+)")
-        elseif line:match("^... workRev ") then
-            file.work_rev = tonumber(line:match("workRev (%d+)"))
-        end
-    end
+    file.depot_file = depot_file
+    -- file.client_file = out:match("... clientFile (%S+)")
+    file.path = out:match("... path (%S+)")
+    -- file.head_action = out:match("... headAction (%S+)")
+    -- file.head_type = out:match("... headType (%S+)")
+    file.head_rev = tonumber(out:match("... headRev (%d+)"))
+    file.head_change = tonumber(out:match("... headChange (%d+)"))
+    file.have_rev = tonumber(out:match("... haveRev (%d+)"))
+    file.action = out:match("... action (%S+)")
+    file.change = out:match("... change (%d+)")
+    file.type = out:match("... type (%S+)")
+    file.work_rev = tonumber(out:match("... workRev (%d+)"))
+
+
+
+    -- for line in out:gmatch("[^\n]+") do
+    --     if line:match("^... depotFile ") then
+    --         file.depot_file = line:match("^... depotFile (%S+)")
+    --     elseif line:match("^... clientFile ") then
+    --         file.client_file = line:match("^... clientFile (%S+)")
+    --     elseif line:match("^... path ") then
+    --         file.path = line:match("^... path (%S+)")
+    --     elseif line:match("^... headAction ") then
+    --         file.head_action = line:match("^... headAction (%S+)")
+    --     elseif line:match("^... headType ") then
+    --         file.head_type = line:match("^... headType (%S+)")
+    --     elseif line:match("^... headRev ") then
+    --         file.head_rev = tonumber(line:match("^... headRev (%d+)"))
+    --     elseif line:match("^... headChange ") then
+    --         file.head_change = tonumber(line:match("^... headChange (%d+)"))
+    --     elseif line:match("^... haveRev ") then
+    --         file.have_rev = tonumber(line:match("^... haveRev (%d+)"))
+    --     elseif line:match("^... action ") then
+    --         file.action = line:match("^... action (%S+)")
+    --     elseif line:match("^... change ") then
+    --         file.change = line:match("^... change (%S+)")
+    --     elseif line:match("^... workRev ") then
+    --         file.work_rev = tonumber(line:match("workRev (%d+)"))
+    --     end
+    -- end
     return file
 end
 

@@ -9,21 +9,8 @@ local p4 = require("nvim-p4.p4")
 
 local M = { select_node = nil }
 
-function M.open_local_file(depot_file)
-    local out = utils.split(vim.fn.system("p4 where " .. depot_file))
-    local local_file = out[#out]
-    if vim.fn.filereadable(local_file) == 0 then
-        print("Local file for " .. depot_file .. " does not exist.")
-        return
-    else
-        vim.cmd("keepalt keepjumps edit " .. local_file)
-    end
-end
-
-
 function M.open()
     M.select_node = nil
-    local changelists = p4.changes()
 
     local popup = Popup({
         relative = "editor",
@@ -40,14 +27,14 @@ function M.open()
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
         },
         position = "50%",
-        size = { width = 100, height = 25 },
+        size = { width = 120, height = 20 },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
         ns_id = "nvim_p4_changes",
     })
 
     local nodes = {}
-    for _, changlist in ipairs(changelists) do
+    for _, changlist in ipairs(p4.changes()) do
         local cl_data = {}
         cl_data["id"] = changlist.number
         cl_data["text"] = changlist.number .. "   " .. changlist.description
@@ -92,8 +79,13 @@ function M.open()
             else
                 line:append("  ", "P4ChangesHead")
                 local icon, hl, is_default = Icons.get("file", node.depot_file)
-                line:append(icon.." ", hl)
-                line:append(node.depot_file.. " #" .. node.work_rev .. "/#" .. node.head_rev, text_hl)
+                if not icon then
+                    icon = "󰈙 " -- Default icon if not found
+                    hl = "Normal"
+                else
+                  line:append(icon.." ", hl)
+                end
+                line:append(node.depot_file.. " #" .. node.work_rev .. "/" .. node.head_rev .. " <" .. node.type .. ">", text_hl)
             end
             return line
         end,
