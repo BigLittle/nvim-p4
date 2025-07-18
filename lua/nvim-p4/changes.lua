@@ -7,12 +7,19 @@ local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
 local p4 = require("nvim-p4.p4")
 
-local M = { select_node = nil }
+local M = {}
+M.select_node = nil
+M.popup = nil
 
 function M.open()
+    if M.popup ~= nil then
+        M.popup:show()
+        return
+    end
+
     M.select_node = nil
 
-    local popup = Popup({
+    M.popup = Popup({
         relative = "editor",
         enter = true,
         focusable = true,
@@ -51,12 +58,12 @@ function M.open()
         table.insert(nodes, node)
     end
 
-    popup:mount()
+    M.popup:mount()
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
 
     local tree = Tree({
-        bufnr = popup.bufnr,
+        bufnr = M.popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
             if M.select_node == nil then M.select_node = node end
@@ -94,7 +101,7 @@ function M.open()
     tree:render()
 
     vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-        buffer = popup.bufnr,
+        buffer = M.popup.bufnr,
         callback = function()
             local node = tree:get_node()
             if not node then return end
@@ -106,17 +113,22 @@ function M.open()
 
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
-        popup:unmount()
+        -- TODO update tree instead of the whole popup
+        M.popup = nil
+        M.popup:unmount()
         M.open()
-    end, { buffer = popup.bufnr })
+    end, { buffer = M.popup.bufnr })
 
     -- Select a client
     vim.keymap.set("n", "c", function()
-        popup:unmount()
+        local current_client = client.name
         client.select_client(function()
+            if client.name == current_client then return end
+            M.popup = nil
+            M.popup:unmount()
             M.open()
         end)
-    end, { buffer = popup.bufnr })
+    end, { buffer = M.popup.bufnr })
 
     -- Toggle the expansion of the current node if it is a changelist
     vim.keymap.set("n", "o", function()
@@ -130,7 +142,7 @@ function M.open()
             node:expand()
         end
         tree:render()
-    end, { buffer = popup.bufnr, nowait = true })
+    end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Open the selected file in the editor
     vim.keymap.set("n", "e", function()
@@ -145,20 +157,20 @@ function M.open()
         else
             utils.edit_file(node.path)
         end
-        popup:unmount()
-    end, { buffer = popup.bufnr, nowait = true })
+        M.popup:hide()
+    end, { buffer = M.popup.bufnr, nowait = true })
 
-    -- Close the popup with 'q' or 'Esc'
-    vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
-    vim.keymap.set("n", "<Esc>", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
+    -- Hide the popup with 'q' or 'Esc'
+    vim.keymap.set("n", "q", function() M.popup:hide() end, { buffer = M.popup.bufnr, nowait = true })
+    vim.keymap.set("n", "<Esc>", function() M.popup:hide() end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Disable horizontal navigation keys
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(popup.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
 
     -- Unmount the popup when leaving the buffer
-    popup:on(event.BufLeave, function() popup:unmount() end)
+    M.popup:on(event.BufLeave, function() M.popup:hide() end)
 end
 return M
