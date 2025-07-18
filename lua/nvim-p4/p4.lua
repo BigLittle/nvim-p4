@@ -5,7 +5,7 @@ local M = {}
 
 
 -- Get one line description of a changelist 
-function M.describe(num):
+function M.describe(num)
     local desc = utils.get_output('p4 -Ztag -F "%desc%" describe -s ' .. num)
     return desc:gsub("%s+", " ")
 end

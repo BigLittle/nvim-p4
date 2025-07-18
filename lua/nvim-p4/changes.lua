@@ -5,6 +5,7 @@ local Line = require("nui.line")
 local Icons = require("mini.icons")
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
+local p4 = require("nvim-p4.p4")
 
 local M = { select_node = nil }
 
@@ -19,36 +20,10 @@ function M.open_local_file(depot_file)
     end
 end
 
-function M.get_opened_files(changelist_number)
-    local out = vim.fn.system("p4 opened -c " .. changelist_number .. " -C ".. client.name)
-    local files = {}
-    for line in out:gmatch("[^\n]+") do
-        local file = {}
-        local result = utile.split(line)
-        if #result < 6 then return {} end
-        file["depot_file"] = result[1]:match("(%S+)#")
-        file["rev"] = result[1]:match("#(%d+)")
-        file["action"] = result[3]
-        file["chnum"] = changelist_number
-        file["type"] = result[6]:match("%((.-)%)")
-        table.insert(files, file)
-    end
-    return files
-end
-
-function M.get_changelist_numbers()
-  local out = vim.fn.system("p4 changes --me -c " .. client.name .. " -s pending")
-  local changelist_numbers = { "default" }
-  for line in out:gmatch("[^\n]+") do
-    local num = line:match("Change (%d+)")
-    if num then table.insert(changelist_numbers, num) end
-  end
-  return changelist_numbers
-end
 
 function M.open()
     M.select_node = nil
-    local changelist_numbers = M.get_changelist_numbers()
+    local changelists = p4.changes()
 
     local popup = Popup({
         relative = "editor",
@@ -72,14 +47,13 @@ function M.open()
     })
 
     local nodes = {}
-    for _, num in ipairs(changelist_numbers) do
-        local desc = vim.fn.system('p4 -Ztag -F "%desc%" describe -s ' .. num)
+    for _, changlist in ipairs(changelists) do
         local cl_data = {}
-        cl_data["id"] = num
-        cl_data["text"] = num .. "   " .. desc:gsub("%s+", " ")
+        cl_data["id"] = changlist.number
+        cl_data["text"] = changlist.number .. "   " .. changlist.description
         cl_data["changlist"] = true
         cl_data["empty"] = false
-        local opened_files = M.get_opened_files(num)
+        local opened_files = p4.opened(changlist.number)
         if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
         local children = {}
         for _, file in ipairs(opened_files) do
