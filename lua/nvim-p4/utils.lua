@@ -19,9 +19,10 @@ function M.get_output(cmd)
   -- local out = io.popen(cmd)
   local out = vim.fn.system(cmd)
   if not out then return "" end
-  local result = out:read("*a")
+  return out
+  --local result = out:read("*a")
   -- out:close()
-  return result
+  --return result
 end
 
 -- Edit a file with the given path
