@@ -42,6 +42,8 @@ function M.fstat(depot_file)
             file.depot_file = line:match("^... depotFile (%S+)")
         elseif line:match("^... clientFile ") then
             file.client_file = line:match("^... clientFile (%S+)")
+        elseif line:match("^... path ") then
+            file.path = line:match("^... path (%S+)")
         elseif line:match("^... headAction ") then
             file.head_action = line:match("^... headAction (%S+)")
         elseif line:match("^... headType ") then

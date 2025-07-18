@@ -148,10 +148,10 @@ function M.open()
             if node.empty then return end
             local children = tree:get_nodes(node:get_id())
             for _, child in ipairs(children) do
-                utils.edit_file(child.client_file)
+                utils.edit_file(child.path)
             end
         else
-            utils.edit_file(node.client_file)
+            utils.edit_file(node.path)
         end
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
