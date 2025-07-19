@@ -34,7 +34,7 @@ Install the plugin with lazy.nvim:
 
 ## 🧑‍💻 Usage
 
-`:P4Changes` to see the status of your Perforce workspace. If no client is set, a popup menu will appear. 
+`:P4Changes` to see the status of current active client. If no client is set, a popup menu will appear. 
 
    | Key     | Action                         |
    | ------- | ------------------------------ |
@@ -45,7 +45,7 @@ Install the plugin with lazy.nvim:
    | j / k   | Navigation                     |
    | Esc / q | Hide window                    |
 
-`:P4Clients` to select a active client (workspace) from all your Perforce workspaces.
+`:P4Clients` to select an active client from all your Perforce workspaces.
 
    | Key     | Action        |
    | ------- | ------------- |
