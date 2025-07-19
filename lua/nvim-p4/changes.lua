@@ -49,7 +49,7 @@ function M.open()
             text = {
                 top = "[  "..client.name.." ]",
                 top_align = "center",
-                bottom = "Last updated: " .. os.date("%Y-%m-%d %H:%M:%S"),
+                bottom = " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ",
                 bottom_align = "center",
             },
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
@@ -117,9 +117,9 @@ function M.open()
 
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
-        tree.nodes = M.prepare_nodes()
+        tree:set_nodes(M.prepare_nodes())
         tree:render()
-        M.popup.border:set_text("bottom", "Last updated: " .. os.date("%Y-%m-%d %H:%M:%S"), "center")
+        M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
     end, { buffer = M.popup.bufnr })
 
     -- Select a client
