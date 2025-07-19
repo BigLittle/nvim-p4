@@ -86,7 +86,7 @@ function M.opened(changelist_number)
     end
 
     local files = M.fstat(depot_files)
-    prinvt(vim.inspect(files))
+    print(vim.inspect(files))
     for _, file in ipairs(files) do
         file.differ_from_head = diff_table[file.depotFile] ~= nil
     end
