@@ -16,8 +16,7 @@ end
 
 -- List all clients currently available on the server
 function M.get_clients()
-    local cmd = { "p4", "clients", "--me" }
-    local out = utils.get_output(cmd)
+    local out = vim.fn.system("p4 clients --me")
     local clients = {}
     for line in out:gmatch("[^\n]+") do
         local client_name = line:match("Client%s+(%S+)")
