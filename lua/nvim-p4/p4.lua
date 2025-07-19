@@ -5,14 +5,16 @@ local M = {}
 
 -- Get all pending changelists for the current client
 function M.changes()
-    local out = utils.get_output({ "p4", "changes" , "-c", client.name, "-s", "pending", "--me" })
-    local changelists = {}
-    table.insert(changelists, { number = "default", description = "" })
-    for line in out:gmatch("[^\n]+") do
-        local num = line:match("Change (%d+)")
-        if num then table.insert(changelists, { number = num, description = M.describe(num) }) end
-    end
-    return changelists
+    local cmd = { "p4", "changes", "-c", client.name, "-s", "pending", "--me" }
+    utils.get_output(cmd, function(out)
+        local changelists = {}
+        table.insert(changelists, { number = "default", description = "" })
+        for line in out:gmatch("[^\n]+") do
+            local num = line:match("Change (%d+)")
+            if num then table.insert(changelists, { number = num, description = M.describe(num) }) end
+        end
+        return changelists
+    end)
 end
 
 -- Get one line description of a changelist 
