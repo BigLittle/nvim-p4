@@ -34,13 +34,21 @@ Install the plugin with lazy.nvim:
 
 ## 🧑‍💻 Usage
 
-- `:P4Changes` to see the status of your Perforce workspace. If no client is set, a popup menu will appear.
-   Keyboard shortcuts:
-   | Key | Action |
-   | F5 | Refresh |
-   | o | Expand / Collapse a changelist |
-   | e | Edit file(s) in a new buffer |
-   | j / k | Navigation |
-   | Esc / q | Hide window |
+`:P4Changes` to see the status of your Perforce workspace. If no client is set, a popup menu will appear. 
 
-- `:P4Clients` to select a active client (workspace) from all your Perforce workspaces.
+   | Key     | Action                         |
+   | ------- | ------------------------------ |
+   | F5      | Refresh current status         |
+   | c       | Switch to another client       |
+   | o       | Expand / Collapse a changelist |
+   | e       | Edit file(s) in a new buffer   |
+   | j / k   | Navigation                     |
+   | Esc / q | Hide window                    |
+
+`:P4Clients` to select a active client (workspace) from all your Perforce workspaces.
+
+   | Key     | Action        |
+   | ------- | ------------- |
+   | Enter   | Select client |
+   | j / k   | Navigation    |
+   | Esc / q | Hide window   |
