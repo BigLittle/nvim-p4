@@ -27,16 +27,13 @@ function M.fstat(depot_files)
     local fields = { "depotFile", "path", "headRev", "type", "workRev" }
     local cmd = { "p4", "-c", client.name, "fstat", "-T", '"'..table.concat(fields, ",")..'"', "-Olhp" }
     for _, depot_file in ipairs(depot_files) do table.insert(cmd, depot_file) end
-    print(vim.inspect(cmd))
     local out = utils.get_output(cmd)
-    print(vim.inspect(out))
     local files = {}
     for section in out:gmatch("([^\n]+.-)\n\n") do
         local file = {}
-        print(vim.inspect(section))
         -- Extract fields from the section
         for _, field in ipairs(fields) do
-            local value = section:match(field .. ": (%S+)")
+            local value = section:match(field .. " (%S+)")
             if value then
                 if field == "headRev" or field == "workRev" then
                     file[field] = tonumber(value)
@@ -88,8 +85,6 @@ function M.opened(changelist_number)
         diff_table[paths] = i
     end
 
-    print(vim.inspect(diff_table))
-    print(vim.inspect(depot_files))
     local files = M.fstat(depot_files)
     print(vim.inspect(files))
     for _, file in ipairs(files) do
