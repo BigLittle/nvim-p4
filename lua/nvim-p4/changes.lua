@@ -68,7 +68,7 @@ function M.open()
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesVariable", { fg = "#7dc2ff" } )
+    vim.api.nvim_set_hl(0, "P4ChangesVariable", { fg = "#56a3ff" } )
 
     local tree = Tree({
         bufnr = M.popup.bufnr,
@@ -98,19 +98,19 @@ function M.open()
                 else
                     line:append(" ", "Normal")
                 end
-                if node.work_rev == node.head_rev then
+                if node.workRev == node.headRev then
                     line:append(" ", "MiniIconsGreen")
                 else
                     line:append(" ", "MiniIconsYellow")
                 end
-                local icon, hl, _ = Icons.get("file", node.depot_file)
+                local icon, hl, _ = Icons.get("file", node.depotFile)
                 if not icon then
                     icon = " " -- Default icon if not found
                     hl = "Normal"
                 else
                   line:append(icon.." ", hl)
                 end
-                line:append(node.depot_file.. " #" .. node.work_rev .. "/" .. node.head_rev .. " <" .. node.type .. ">", text_hl)
+                line:append(node.depotFile.. " #" .. node.workRev .. "/" .. node.headRev .. " <" .. node.type .. ">", text_hl)
             end
             return line
         end,
