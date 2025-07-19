@@ -47,8 +47,8 @@ end
 function M.get_output(cmd, on_done)
     local popup = M.loading()
     local handle = vim.system(cmd, { text = true }, function(result)
-        popup.timer:stop()
         popup:unmount()
+        popup.timer:stop()
         if result.code ~= 0 then
             vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
             on_done("")
