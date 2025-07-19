@@ -99,7 +99,7 @@ function M.open()
                     line:append(" ", "Normal")
                 end
                 if node.work_rev == node.head_rev then
-                    line:append("󱍸 ", "MiniIconsGreen")
+                    line:append("󰓦 ", "MiniIconsGreen")
                 else
                     line:append(" ", "MiniIconsYellow")
                 end
