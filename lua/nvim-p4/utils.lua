@@ -25,13 +25,13 @@ function M.get_output(cmd)
     -- out:close()
     --return result
 
-    vim.system(M.split(cmd), { text = true }, function(obj)
-        if obj.code ~= 0 then
-            vim.api.nvim_err_writeln("Command failed: " .. cmd)
-            return ""
-        end
-        return obj.stdout
-    end)
+    local handle = vim.system(M.split(cmd), { text = true })
+    local result = handle:wait()
+    if result.code ~= 0 then
+        vim.api.nvim_err_writeln("Error executing command: " .. cmd)
+        return ""
+    end
+    return result.stdout
 end
 
 -- Edit a file with the given path
