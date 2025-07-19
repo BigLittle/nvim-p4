@@ -68,7 +68,7 @@ function M.open()
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesVariable", { fg = "#5dccec" } )
+    vim.api.nvim_set_hl(0, "P4ChangesVariable", { fg = "#7dc2ff" } )
 
     local tree = Tree({
         bufnr = M.popup.bufnr,
@@ -94,9 +94,9 @@ function M.open()
             else
                 line:append("  ", "P4ChangesHead")
                 if node.differ_from_head then
-                    line:append(" ", "P4ChangesVariable")
+                    line:append(" ", "P4ChangesVariable")
                 else
-                    line:append(" ", "Normal")
+                    line:append(" ", "Normal")
                 end
                 if node.work_rev == node.head_rev then
                     line:append(" ", "MiniIconsGreen")
