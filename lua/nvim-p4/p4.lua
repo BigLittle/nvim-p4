@@ -5,7 +5,8 @@ local M = {}
 
 -- Get all pending changelists for the current client
 function M.changes()
-  local out = utils.get_output("p4 changes -c " .. client.name.. " -s pending --me")
+  -- local out = utils.get_output("p4 changes -c " .. client.name.. " -s pending --me")
+  local out = utils.get_output({ "p4", "changes" , "-c", client.name, "-s", "pending", "--me" })
   local changelists = {}
   table.insert(changelists, { number = "default", description = "" })
   for line in out:gmatch("[^\n]+") do
@@ -17,13 +18,15 @@ end
 
 -- Get one line description of a changelist 
 function M.describe(num)
-    local desc = utils.get_output('p4 -Ztag -F "%desc%" describe -s ' .. num)
+    -- local desc = utils.get_output('p4 -Ztag -F "%desc%" describe -s ' .. num)
+    local desc = utils.get_output( {"p4", "-Ztag", "-F", '%desc%', "describe", "-s", num })
     return desc:gsub("%s+", " ")
 end
 
 -- Dump file information for a depot file
 function M.fstat(depot_file)
-    local out = utils.get_output("p4 -c " .. client.name .. " fstat -Olhp " .. depot_file)
+    -- local out = utils.get_output("p4 -c " .. client.name .. " fstat -Olhp " .. depot_file)
+    local out = utils.get_output( { "p4", "-c", client.name, "fstat" , "-Olhp", depot_file })
     local file = {}
     file.depot_file = depot_file
     -- file.client_file = out:match("... clientFile (%S+)")
@@ -42,13 +45,15 @@ end
 
 -- Display information about the current p4 server
 function M.info()
-    local out = utils.get_output("p4 -c " .. client.name .. " info")
+    -- local out = utils.get_output("p4 -c " .. client.name .. " info")
+    local out = utils.get_output({ "p4", "-c", client.name, "info" })
     return out
 end
 
 -- Get all default / pending changelists for the current client
 function M.opened(changelist_number)
-    local out = utils.get_output("p4 -c " .. client.name .. " opened -c " .. changelist_number)
+    -- local out = utils.get_output("p4 -c " .. client.name .. " opened -c " .. changelist_number)
+    local out = utils.get_output({ "p4", "-c", client.name, "opened", "-c" .. changelist_number })
     local files = {}
     for line in out:gmatch("[^\n]+") do
         local depot_file = utils.split(line)[1]:match("(%S+)#")
@@ -66,7 +71,8 @@ end
 
 -- Get file path from depot file
 function M.where(depot_file)
-    local out = utils.split(utils.get_output("p4 -c " .. client.name .. " where " .. depot_file))
+    -- local out = utils.split(utils.get_output("p4 -c " .. client.name .. " where " .. depot_file))
+    local out = utils.split(utils.get_output({"p4", "-c", client.name, "where", depot_file } ))
     local path = out[#out]
     return path
 end

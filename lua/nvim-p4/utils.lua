@@ -16,16 +16,7 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd)
-    -- local out = vim.fn.system(cmd)
-    -- if not out then return "" end
-    -- return out
-
-    -- local out = io.popen(cmd)
-    --local result = out:read("*a")
-    -- out:close()
-    --return result
-
-    local handle = vim.system(M.split(cmd), { text = true })
+    local handle = vim.system(cmd, { text = true })
     local result = handle:wait()
     if result.code ~= 0 then
         vim.api.nvim_err_writeln("Error executing command: " .. cmd)
