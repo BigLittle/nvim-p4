@@ -5,8 +5,8 @@ local utils = require("nvim-p4.utils")
 local function show_loading_popup()
     local loading_popup = Popup({
         relative = "editor",
-        enter = false,
-        focusable = false,
+        enter = true,
+        focusable = true,
         border = { style = "rounded" },
         position = "50%",
         size = { width = 20, height = 3 },
