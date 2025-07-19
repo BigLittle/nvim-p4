@@ -30,6 +30,7 @@ function M.fstat(depot_files)
     local files = {}
     for section in out:gmatch("([^\n]+.-)\n\n") do
         local file = {}
+        print(vim.inspect(section))
         -- Extract fields from the section
         for _, field in ipairs(fields) do
             local value = section:match(field .. ": (%S+)")
@@ -85,6 +86,7 @@ function M.opened(changelist_number)
     end
 
     local files = M.fstat(depot_files)
+    prinvt(vim.inspect(files))
     for _, file in ipairs(files) do
         file.differ_from_head = diff_table[file.depotFile] ~= nil
     end
