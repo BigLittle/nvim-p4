@@ -60,7 +60,10 @@ function M.opened(changelist_number)
         table.insert(depot_files, word)
         table.insert(cmd, word)
     end
-    local diff_table = utils.split(utils.get_output(cmd))
+    local diff_table = {}
+    for i , paths in ipairs(utils.split(utils.get_output(cmd))) do
+        diff_table[paths] = i
+    end
 
     local files = {}
     for _, depot_file in ipairs(depot_files) do
