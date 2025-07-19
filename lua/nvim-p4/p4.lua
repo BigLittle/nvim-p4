@@ -45,21 +45,6 @@ function M.fstat(depot_files)
         table.insert(files, file)
     end
     return files
-
-    -- local file = {}
-    -- file.depot_file = depot_file
-    -- -- file.client_file = out:match("... clientFile (%S+)")
-    -- file.path = out:match("... path (%S+)")
-    -- -- file.head_action = out:match("... headAction (%S+)")
-    -- -- file.head_type = out:match("... headType (%S+)")
-    -- file.head_rev = tonumber(out:match("... headRev (%d+)"))
-    -- -- file.head_change = tonumber(out:match("... headChange (%d+)"))
-    -- -- file.have_rev = tonumber(out:match("... haveRev (%d+)"))
-    -- -- file.action = out:match("... action (%S+)")
-    -- -- file.change = out:match("... change (%d+)")
-    -- file.type = out:match("... type (%S+)")
-    -- file.work_rev = tonumber(out:match("... workRev (%d+)"))
-    -- return file
 end
 
 -- Display information about the current p4 server
@@ -75,7 +60,7 @@ function M.opened(changelist_number)
     local depot_files = {}
 
     -- Check if the depot file is different from the head revision
-    cmd = { "p4", "-c", client.name, "diff", "-sa",  }
+    cmd = { "p4", "-c", client.name, "diff", "-sa" }
     for word in out:gmatch("(%S+)#") do
         table.insert(depot_files, word)
         table.insert(cmd, word)
@@ -86,17 +71,9 @@ function M.opened(changelist_number)
     end
 
     local files = M.fstat(depot_files)
-    print(vim.inspect(files))
     for _, file in ipairs(files) do
-        file.differ_from_head = diff_table[file.depotFile] ~= nil
+        file.differ_from_head = diff_table[file.path] ~= nil
     end
-
-    -- local files = {}
-    -- for _, depot_file in ipairs(depot_files) do
-    --     local file = M.fstat(depot_file)
-    --     file.differ_from_head = diff_table[file.path] ~= nil
-    --     table.insert(files, file)
-    -- end
     return files
 end
 
