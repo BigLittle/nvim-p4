@@ -1,42 +1,11 @@
-local Popup = require("nui.popup")
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
-
-local function show_loading_popup()
-    local loading_popup = Popup({
-        relative = "editor",
-        enter = false,
-        focusable = false,
-        border = { style = "rounded" },
-        position = "50%",
-        size = { width = 20, height = 3 },
-    })
-    loading_popup:mount()
-    print(vim.inspect(loading_popup.bufnr))
-
-    -- animation setup
-    local frames = { "⠋", "⠙", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
-    local frame_index = 1
-    --local timer = vim.loop.new_timer()
-    --timer:start(0, 150, vim.schedule_wrap(function()
-    --    vim.api.nvim_buf_set_lines(loading_popup.bufnr, 0, -1, false, {
-    --        " " .. frames[frame_index] .. " Processing ... ",
-    --    })
-    --    frame_index = (frame_index % #frames) + 1
-    --end))
-    --loading_popup.timer = timer
-    return loading_popup
-end
 
 local M = {}
 
 -- Get all pending changelists for the current client
 function M.changes()
-    local loading_popup = show_loading_popup() -- Show loading popup while fetching data
     local out = utils.get_output({ "p4", "changes" , "-c", client.name, "-s", "pending", "--me" })
-    --loading_popup.timer:stop()
-    loading_popup:unmount()
-
     local changelists = {}
     table.insert(changelists, { number = "default", description = "" })
     for line in out:gmatch("[^\n]+") do
