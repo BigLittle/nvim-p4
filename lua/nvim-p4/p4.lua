@@ -57,6 +57,9 @@ function M.opened(changelist_number)
         local depot_file = utils.split(line)[1]:match("(%S+)#")
         if depot_file == "" then return {} end
         local file = M.fstat(depot_file)
+        cmd = { "p4", "-c", client.name, "diff", "-sa", depot_file }
+        local diff = utils.get_output(cmd)
+        file.differ_from_head = diff ~= ""
         table.insert(files, file)
     end
     return files
