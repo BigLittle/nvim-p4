@@ -29,7 +29,7 @@ end
 function M.set_client(client_name)
     M.name = client_name
     -- os.execute("p4 set P4CLIENT=" .. client_name)
-    local out = p4.info()
+    local out = vim.fn.system("p4 -c " .. client_name .. " info")
     local client_root = out:match("Client root: (%S+)")
     if client_root then M.root = client_root end
 end
