@@ -99,9 +99,9 @@ function M.open()
                     line:append(" ", "Normal")
                 end
                 if node.work_rev == node.head_rev then
-                    line:append("󰓦 ", "MiniIconsGreen")
+                    line:append(" ", "MiniIconsGreen")
                 else
-                    line:append(" ", "MiniIconsYellow")
+                    line:append(" ", "MiniIconsYellow")
                 end
                 local icon, hl, _ = Icons.get("file", node.depot_file)
                 if not icon then
