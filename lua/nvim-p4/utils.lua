@@ -2,11 +2,11 @@ local M = {}
 
 -- Split a string into a table of words
 function M.split(input)
-  local t = {}
-  for word in input:gmatch("%S+") do
-    t[#t+1] = word
-  end
-  return t
+    local t = {}
+    for word in input:gmatch("%S+") do
+        t[#t+1] = word
+    end
+    return t
 end
 
 -- Strip trailing whitespace from a string
@@ -16,13 +16,22 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd)
-  -- local out = io.popen(cmd)
-  local out = vim.fn.system(cmd)
-  if not out then return "" end
-  return out
-  --local result = out:read("*a")
-  -- out:close()
-  --return result
+    -- local out = vim.fn.system(cmd)
+    -- if not out then return "" end
+    -- return out
+
+    -- local out = io.popen(cmd)
+    --local result = out:read("*a")
+    -- out:close()
+    --return result
+
+    vim.system(M.split(cmd), { text = true }, function(obj)
+        if obj.code ~= 0 then
+            vim.api.nvim_err_writeln("Command failed: " .. cmd)
+            return ""
+        end
+        return obj.stdout
+    end)
 end
 
 -- Edit a file with the given path
