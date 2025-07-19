@@ -11,21 +11,10 @@ function M.loading()
         size = { width = 18, height = 1 },
     })
     loading_popup:mount()
+    vim.api.nvim_buf_set_lines(loading_popup.bufnr, 0, -1, false, {
+        "  Processing ... ",
+    })
     loading_popup:hide()
-
-    -- animation setup
-    local frames = { "⠋", "⠙", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
-    local frame_index = 1
-    local timer = vim.loop.new_timer()
-    timer:start(0, 150, vim.schedule_wrap(function()
-        if loading_popup.bufnr then
-            vim.api.nvim_buf_set_lines(loading_popup.bufnr, 0, -1, false, {
-                " " .. frames[frame_index] .. " Processing ... ",
-            })
-        end
-        frame_index = (frame_index % #frames) + 1
-    end))
-    loading_popup.timer = timer
     return loading_popup
 end
 
@@ -46,25 +35,15 @@ function M.rstrip(str)
 end
 
 -- Get the output of a shell command
-function M.get_output(cmd, on_done)
+function M.get_output(cmd)
     M.loading_popup:show()
-    local handle = vim.system(cmd, { text = true }, vim.schedule_wrap(function(result)
-        M.loading_popup:hide()
-        if result.code ~= 0 then
-            vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
-            on_done("")
-        else
-            on_done(result.stdout)
-        end
-    end))
-
-    -- local handle = vim.system(cmd, { text = true })
-    -- local result = handle:wait()
-    -- if result.code ~= 0 then
-    --     vim.api.nvim_err_writeln("Error executing command: " .. cmd)
-    --     return ""
-    -- end
-    -- return result.stdout
+    local result = vim.system(cmd, { text = true }):wait()
+    M.loading_popup:hide()
+    if result.code ~= 0 then
+        vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
+        return ""
+    end
+    return result.stdout
 end
 
 -- Edit a file with the given path
