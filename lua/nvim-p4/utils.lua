@@ -8,10 +8,10 @@ function M.loading()
         focusable = false,
         border = { style = "rounded" },
         position = "50%",
-        size = { width = 20, height = 1 },
+        size = { width = 19, height = 1 },
     })
     loading_popup:mount()
-    print(vim.inspect(loading_popup.bufnr))
+    loading_popup:hide()
 
     -- animation setup
     local frames = { "⠋", "⠙", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
@@ -29,6 +29,8 @@ function M.loading()
     return loading_popup
 end
 
+M.loading_popup = M.loading()
+
 -- Split a string into a table of words
 function M.split(input)
     local t = {}
@@ -45,10 +47,9 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd, on_done)
-    local popup = M.loading()
+    M.loading_popup:show()
     local handle = vim.system(cmd, { text = true }, function(result)
-        popup:unmount()
-        popup.timer:stop()
+        popup:hide()
         if result.code ~= 0 then
             vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
             on_done("")
