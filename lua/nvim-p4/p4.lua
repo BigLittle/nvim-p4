@@ -11,11 +11,11 @@ local function show_loading_popup()
         position = "50%",
         size = { width = 20, height = 3 },
     })
+    loading_popup:mount()
 
     -- animation setup
     local frames = { "⠋", "⠙", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
     local frame_index = 1
-
     local timer = vim.loop.new_timer()
     timer:start(0, 150, vim.schedule_wrap(function()
         vim.api.nvim_buf_set_lines(loading_popup.bufnr, 0, -1, false, {
@@ -23,7 +23,6 @@ local function show_loading_popup()
         })
         frame_index = (frame_index % #frames) + 1
     end))
-    loading_popup:mount()
     loading_popup.timer = timer
     return loading_popup
 end
