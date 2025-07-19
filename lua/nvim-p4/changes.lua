@@ -181,10 +181,10 @@ function M.open()
             for _, child in ipairs(children) do
                 utils.edit_file(child.path)
             end
+            M.popup:hide()
         else
             utils.edit_file(node.path)
         end
-        M.popup:hide()
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Hide the popup with 'q' or 'Esc'
