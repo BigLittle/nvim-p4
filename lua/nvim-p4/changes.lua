@@ -56,7 +56,10 @@ function M.open()
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
         },
         position = "50%",
-        size = { width = 120, height = 20 },
+        size = {
+            width = math.min(120, math.floor(vim.o.columns * 0.8)),
+            height = math.min(20, math.floor(vim.o.lines * 0.5)),
+        },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
         ns_id = "nvim_p4_changes",
@@ -109,16 +112,55 @@ function M.open()
 
     tree:render()
 
-    vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+    -- Hide the popup when leaving the buffer
+    M.popup:on(event.BufLeave, function() M.popup:hide() end)
+    M.popup:on({ event.CursorMoved, event.CursorMovedI }, function()
+        local node = tree:get_node()
+        if not node then return end
+        if M.select_node == node then return end
+        M.select_node = node
+        tree:render()
+    end)
+    M.popup:on(event.VimResized, function()
+        if M.popup == nil then return end
+        local config = {
+            relative = "editor",
+            size = {
+                width = math.min(120, math.floor(vim.o.columns * 0.8)),
+                height = math.min(20, math.floor(vim.o.lines * 0.5)),
+            },
+            position = "50%",
+        }
+        M.popup:update_layout(config)
+        tree:render()
+    end)
+
+    -- vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+    --     buffer = M.popup.bufnr,
+    --     callback = function()
+    --         local node = tree:get_node()
+    --         if not node then return end
+    --         if M.select_node == node then return end
+    --         M.select_node = node
+    --         tree:render()
+    --     end,
+    -- })
+
+
+
+
+
+
+    vim.api.nvim_create_autocmd("VimResized", {
         buffer = M.popup.bufnr,
         callback = function()
-            local node = tree:get_node()
-            if not node then return end
-            if M.select_node == node then return end
-            M.select_node = node
+            if M.popup == nil then return end
+            M.popup:resize({ width = math.max(120, vim.o.columns - 10), height = math.min(20, vim.o.lines - 5) })
             tree:render()
         end,
     })
+
+
 
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
@@ -178,7 +220,5 @@ function M.open()
     vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
 
-    -- Unmount the popup when leaving the buffer
-    M.popup:on(event.BufLeave, function() M.popup:hide() end)
 end
 return M
