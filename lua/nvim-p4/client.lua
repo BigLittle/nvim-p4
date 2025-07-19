@@ -8,6 +8,13 @@ function M.bootstrap()
     if client_name then M.set_client(client_name) end
 end
 
+function M.ensure_client(callback)
+    if M.name == nil then M.select_client() end
+    if M.name == nil then return end
+    callback()
+end
+
+
 function M.get_all_clients()
     local out = vim.fn.system("p4 clients --me")
     local clients = {}

@@ -4,16 +4,10 @@ local utils = require("nvim-p4.utils")
 local M = {}
 
 
--- Get one line description of a changelist 
-function M.describe(num)
-    local desc = utils.get_output('p4 -Ztag -F "%desc%" describe -s ' .. num)
-    return desc:gsub("%s+", " ")
-end
-
 function M.changes()
   local out = utils.get_output("p4 changes -c " .. client.name.. " -s pending --me")
   local changelists = {}
-  table.insert(changelists, { number = "default", description = "Default Changelist" })
+  table.insert(changelists, { number = "default", description = "" })
   for line in out:gmatch("[^\n]+") do
     local num = line:match("Change (%d+)")
     if num then table.insert(changelists, { number = num, description = M.describe(num) }) end
@@ -27,6 +21,20 @@ function M.changes()
   -- end
   -- return changelist_numbers
 end
+
+-- Get one line description of a changelist 
+function M.describe(num)
+    local desc = utils.get_output('p4 -Ztag -F "%desc%" describe -s ' .. num)
+    return desc:gsub("%s+", " ")
+end
+
+-- Display information about the current p4 server
+function M.info()
+    local out = utils.get_output("p4 -c " .. client.name .. " info")
+    return out
+end
+
+
 
 
 -- Get file path from depot file

@@ -115,7 +115,6 @@ function M.open()
     vim.keymap.set("n", "<F5>", function()
         -- TODO update tree instead of the whole popup
         M.popup:unmount()
-        print(M.popup)
         M.popup = nil
         M.open()
     end, { buffer = M.popup.bufnr })
