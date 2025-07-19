@@ -16,6 +16,18 @@ function M.changes()
     return changelists
 end
 
+-- List all clients currently available on the server
+function M.clients()
+    local cmd = { "p4", "clients", "--me" }
+    local out = utils.get_output(cmd)
+    local clients = {}
+    for line in out:gmatch("[^\n]+") do
+        local client_name = line:match("Client%s+(%S+)")
+        if client_name then table.insert(clients, client_name) end
+    end
+    return clients
+end
+
 -- Get one line description of a changelist 
 function M.describe(num)
     local cmd = { "p4", "-Ztag", "-F", '%desc%', "describe", "-s", num }

@@ -1,5 +1,6 @@
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
+local p4 = require("nvim-p4.p4")
 local M = { name = nil, root = nil }
 
 function M.bootstrap()
@@ -14,27 +15,16 @@ function M.ensure_client(callback)
     callback()
 end
 
-
-function M.get_all_clients()
-    local out = vim.fn.system("p4 clients --me")
-    local clients = {}
-    for line in out:gmatch("[^\n]+") do
-        local client_name = string.match(line, "Client%s+(%S+)")
-        if client_name then table.insert(clients, client_name) end
-    end
-    return clients
-end
-
 function M.set_client(client_name)
     M.name = client_name
-    os.execute("p4 set P4CLIENT=" .. client_name)
-    local out = vim.fn.system("p4 info")
+    -- os.execute("p4 set P4CLIENT=" .. client_name)
+    local out = p4.info()
     local client_root = out:match("Client root: (%S+)")
     if client_root then M.root = client_root end
 end
 
 function M.select_client(callback)
-    local clients = M.get_all_clients()
+    local clients = p4.clients()
     if #clients == 0 then
         print("No Perforce clients found.")
         return
