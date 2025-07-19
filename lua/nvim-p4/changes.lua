@@ -85,7 +85,7 @@ function M.open()
             if node.changlist then
                 if node.empty then
                     line:append("  ", "P4ChangesHead")
-                    line:append("󰔶 ", "MiniIconsCyan")
+                    line:append("󰔶 ", "MiniIconsBlue")
                 else
                     line:append(node:is_expanded() and " " or " ", "SpecialChar")
                     line:append("󰔶 ", "ErrorMsg")
@@ -103,10 +103,10 @@ function M.open()
                 else
                     line:append(" ", "MiniIconsYellow")
                 end
-                local icon, hl, _ = Icons.get("file", node.depotFile)
-                if not icon then
+                local icon, hl, is_fallback = Icons.get("file", node.depotFile)
+                if is_fallback then
                     icon = " " -- Default icon if not found
-                    hl = "Normal"
+                    hl = "MiniIconsGray"
                 else
                   line:append(icon.." ", hl)
                 end
