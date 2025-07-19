@@ -1,6 +1,6 @@
-local changes = require("nvim-p4.changes")
-local client = require("nvim-p4.client")
 local p4 = require("nvim-p4.p4")
+local client = require("nvim-p4.client")
+local changes = require("nvim-p4.changes")
 
 client.bootstrap()
 
