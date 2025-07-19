@@ -49,7 +49,7 @@ end
 function M.get_output(cmd, on_done)
     M.loading_popup:show()
     local handle = vim.system(cmd, { text = true }, function(result)
-        popup:hide()
+        M.loading_popup:hide()
         if result.code ~= 0 then
             vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
             on_done("")
