@@ -25,7 +25,8 @@ function M.loading()
         end
         frame_index = (frame_index % #frames) + 1
     end))
-    return { loading_popup, timer }
+    loading_popup.timer = timer
+    return loading_popup
 end
 
 -- Split a string into a table of words
@@ -44,10 +45,10 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd)
-    local popup, timer = M.loading()
+    local popup = M.loading()
     local handle = vim.system(cmd, { text = true })
     local result = handle:wait()
-    timer:stop()
+    popup.timer:stop()
     popup:unmount()
     if result.code ~= 0 then
         vim.api.nvim_err_writeln("Error executing command: " .. cmd)
