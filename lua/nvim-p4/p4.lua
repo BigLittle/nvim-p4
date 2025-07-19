@@ -52,16 +52,28 @@ end
 function M.opened(changelist_number)
     local cmd = { "p4", "-c", client.name, "opened", "-c" .. changelist_number }
     local out = utils.get_output(cmd)
+    local depot_files = {}
+
+    -- Check if the depot file is different from the head revision
+    cmd = { "p4", "-c", client.name, "diff", "-sa",  }
+    for word in out:gmatch("(%S+)#") do
+        table.insert(depot_files, word)
+        table.insert(cmd, word)
+    end
+    local diff_table = utils.split(utils.get_output(cmd))
+
     local files = {}
-    for line in out:gmatch("[^\n]+") do
-        local depot_file = utils.split(line)[1]:match("(%S+)#")
-        if depot_file == "" then return {} end
+    for _, depot_file in ipairs(depot_files) do
         local file = M.fstat(depot_file)
-        cmd = { "p4", "-c", client.name, "diff", "-sa", depot_file }
-        local diff = utils.get_output(cmd)
-        file.differ_from_head = diff ~= ""
+        file.diff_from_head = diff_table[file.path] ~= nil
         table.insert(files, file)
     end
+    -- for line in out:gmatch("[^\n]+") do
+    --     local depot_file = utils.split(line)[1]:match("(%S+)#")
+    --     if depot_file == "" then return {} end
+    --     local file = M.fstat(depot_file)
+    --     table.insert(files, file)
+    -- end
     return files
 end
 
