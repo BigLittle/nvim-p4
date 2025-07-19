@@ -26,7 +26,9 @@ end
 function M.fstat(depot_files)
     local fields = { "depotFile", "path", "headRev", "type", "workRev" }
     local cmd = { "p4", "-c", client.name, "fstat", "-T", '"'..table.concat(fields, ",")..'"', "-Olhp", table.concat(depot_files, " ") }
+    print(vim.inspect(cmd))
     local out = utils.get_output(cmd)
+    print(vim.inspect(out))
     local files = {}
     for section in out:gmatch("([^\n]+.-)\n\n") do
         local file = {}
@@ -85,6 +87,8 @@ function M.opened(changelist_number)
         diff_table[paths] = i
     end
 
+    print(vim.inspect(diff_table))
+    print(vim.inspect(depot_files))
     local files = M.fstat(depot_files)
     print(vim.inspect(files))
     for _, file in ipairs(files) do
