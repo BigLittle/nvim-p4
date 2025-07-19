@@ -61,21 +61,13 @@ function M.opened(changelist_number)
         table.insert(cmd, word)
     end
     local diff_table = utils.split(utils.get_output(cmd))
-    print(vim.inspect(diff_table))
 
     local files = {}
     for _, depot_file in ipairs(depot_files) do
         local file = M.fstat(depot_file)
-        print(vim.inspect(file.path))
-        file.diff_from_head = diff_table[file.path] ~= nil
+        file.differ_from_head = diff_table[file.path] ~= nil
         table.insert(files, file)
     end
-    -- for line in out:gmatch("[^\n]+") do
-    --     local depot_file = utils.split(line)[1]:match("(%S+)#")
-    --     if depot_file == "" then return {} end
-    --     local file = M.fstat(depot_file)
-    --     table.insert(files, file)
-    -- end
     return files
 end
 
