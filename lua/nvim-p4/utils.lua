@@ -8,7 +8,7 @@ function M.loading()
         focusable = false,
         border = { style = "rounded" },
         position = "50%",
-        size = { width = 20, height = 3 },
+        size = { width = 20, height = 1 },
     })
     loading_popup:mount()
     print(vim.inspect(loading_popup.bufnr))
@@ -44,17 +44,18 @@ function M.rstrip(str)
 end
 
 -- Get the output of a shell command
-function M.get_output(cmd)
+function M.get_output(cmd, on_done)
     local popup = M.loading()
-    local handle = vim.system(cmd, { text = true })
-    local result = handle:wait()
-    popup.timer:stop()
-    popup:unmount()
-    if result.code ~= 0 then
-        vim.api.nvim_err_writeln("Error executing command: " .. cmd)
-        return ""
-    end
-    return result.stdout
+    local handle = vim.system(cmd, { text = true }, function(result)
+        popup.timer:stop()
+        popup:unmount()
+        if result.code ~= 0 then
+            vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
+            on_done("")
+        else
+            on_done(result.stdout)
+        end
+    end)
 
     -- local handle = vim.system(cmd, { text = true })
     -- local result = handle:wait()

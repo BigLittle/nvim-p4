@@ -44,9 +44,8 @@ end
 
 -- Display information about the current p4 server
 function M.info()
-    -- local out = utils.get_output("p4 -c " .. client.name .. " info")
-    local out = utils.get_output({ "p4", "-c", client.name, "info" })
-    return out
+    local cmd = { "p4", "-c", client.name, "info" }
+    utils.get_output(cmd, function(out) return out end)
 end
 
 -- Get all default / pending changelists for the current client
