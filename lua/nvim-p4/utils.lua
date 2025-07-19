@@ -36,9 +36,9 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd)
-    M.loading_popup:show()
+    -- M.loading_popup:show()
     local result = vim.system(cmd, { text = true }):wait()
-    M.loading_popup:hide()
+    -- M.loading_popup:hide()
     if result.code ~= 0 then
         vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
         return ""
