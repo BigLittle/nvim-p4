@@ -8,16 +8,37 @@ local utils = require("nvim-p4.utils")
 local p4 = require("nvim-p4.p4")
 
 local M = {}
-M.select_node = nil
 M.popup = nil
+M.select_node = nil
+
+-- Prepare nodes for the tree view
+function M.prepare_nodes()
+    M.select_node = nil
+    local nodes = {}
+    for _, changelist in ipairs(p4.changes()) do
+        local cl_data = {}
+        cl_data["id"] = changelist.number
+        cl_data["text"] = changelist.number .. "   " .. changelist.description
+        cl_data["changlist"] = true
+        cl_data["empty"] = false
+        local opened_files = p4.opened(changelist.number)
+        if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
+        local children = {}
+        for _, file in ipairs(opened_files) do
+            table.insert(children, Tree.Node(file))
+        end
+        local node = Tree.Node(cl_data, children)
+        node:expand() -- Expand the node by default
+        table.insert(nodes, node)
+    end
+    return nodes
+end
 
 function M.open()
     if M.popup ~= nil then
         M.popup:show()
         return
     end
-
-    M.select_node = nil
 
     M.popup = Popup({
         relative = "editor",
@@ -26,9 +47,9 @@ function M.open()
         border = {
             style = "rounded",
             text = {
-                top = "[ Pending Changelists ]",
+                top = "[  "..client.name.." ]",
                 top_align = "center",
-                bottom = "  "..client.name.." ",
+                bottom = "Last updated: " .. os.date("%Y-%m-%d %H:%M:%S"),
                 bottom_align = "center",
             },
             padding = { top = 0, bottom = 0, left = 0, right = 1 },
@@ -40,28 +61,11 @@ function M.open()
         ns_id = "nvim_p4_changes",
     })
 
-    local nodes = {}
-    for _, changlist in ipairs(p4.changes()) do
-        local cl_data = {}
-        cl_data["id"] = changlist.number
-        cl_data["text"] = changlist.number .. "   " .. changlist.description
-        cl_data["changlist"] = true
-        cl_data["empty"] = false
-        local opened_files = p4.opened(changlist.number)
-        if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
-        local children = {}
-        for _, file in ipairs(opened_files) do
-            table.insert(children, Tree.Node(file))
-        end
-        local node = Tree.Node(cl_data, children)
-        node:expand() -- Expand the node by default
-        table.insert(nodes, node)
-    end
-
     M.popup:mount()
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
 
+    local nodes = M.prepare_nodes()
     local tree = Tree({
         bufnr = M.popup.bufnr,
         nodes = nodes,
@@ -113,10 +117,9 @@ function M.open()
 
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
-        -- TODO update tree instead of the whole popup
-        M.popup:unmount()
-        M.popup = nil
-        M.open()
+        tree.nodes = M.prepare_nodes()
+        tree:render()
+        M.popup.border:set_text("bottom", "Last updated: " .. os.date("%Y-%m-%d %H:%M:%S"), "center")
     end, { buffer = M.popup.bufnr })
 
     -- Select a client

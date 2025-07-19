@@ -5,9 +5,7 @@ local p4 = require("nvim-p4.p4")
 client.bootstrap()
 
 vim.api.nvim_create_user_command('P4Changes', function()
-    if client.name == nil then client.select_client() end
-    if client.name == nil then return end
-    changes.open()
+    client.ensure_client(function() changes.open() end)
 end, { desc = "View all pending changelists in current client." })
 
 vim.api.nvim_create_user_command('P4Clients', function()
@@ -18,7 +16,5 @@ vim.api.nvim_create_user_command('P4Clients', function()
 end, { desc = "Select a Perforce client." })
 
 vim.api.nvim_create_user_command('P4Info', function()
-    client.ensure_client(function()
-        print(p4.info())
-    end)
+    client.ensure_client(function() print(p4.info()) end)
 end, { desc = "Show Perforce info." })
