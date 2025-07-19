@@ -114,6 +114,8 @@ function M.open()
 
     -- Hide the popup when leaving the buffer
     M.popup:on(event.BufLeave, function() M.popup:hide() end)
+
+    -- Highlight the current node
     M.popup:on({ event.CursorMoved, event.CursorMovedI }, function()
         local node = tree:get_node()
         if not node then return end
@@ -121,6 +123,8 @@ function M.open()
         M.select_node = node
         tree:render()
     end)
+
+    --Auto-resize the popup when the window is resized
     M.popup:on(event.VimResized, function()
         if M.popup == nil then return end
         local config = {
@@ -134,33 +138,6 @@ function M.open()
         M.popup:update_layout(config)
         tree:render()
     end)
-
-    -- vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-    --     buffer = M.popup.bufnr,
-    --     callback = function()
-    --         local node = tree:get_node()
-    --         if not node then return end
-    --         if M.select_node == node then return end
-    --         M.select_node = node
-    --         tree:render()
-    --     end,
-    -- })
-
-
-
-
-
-
-    vim.api.nvim_create_autocmd("VimResized", {
-        buffer = M.popup.bufnr,
-        callback = function()
-            if M.popup == nil then return end
-            M.popup:resize({ width = math.max(120, vim.o.columns - 10), height = math.min(20, vim.o.lines - 5) })
-            tree:render()
-        end,
-    })
-
-
 
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
