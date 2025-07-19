@@ -107,9 +107,8 @@ function M.open()
                 if is_fallback then
                     icon = " " -- Default icon if not found
                     hl = "MiniIconsGray"
-                else
-                  line:append(icon.." ", hl)
                 end
+                line:append(icon.." ", hl)
                 line:append(node.depotFile.. " #" .. node.workRev .. "/" .. node.headRev .. " <" .. node.type .. ">", text_hl)
             end
             return line
