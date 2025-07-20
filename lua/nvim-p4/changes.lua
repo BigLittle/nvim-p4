@@ -1,5 +1,6 @@
 local Popup = require("nui.popup")
 local Input = require("nui.input")
+local Menu = require("nui.menu")
 local Tree = require("nui.tree")
 local Line = require("nui.line")
 local event = require("nui.utils.autocmd").event
@@ -17,28 +18,68 @@ M.changlists = {}
 
 
 function M.move_opened_file(callback)
-    local input_popup = Input({
+    local items = {}
+    local max_width = 0
+    for changelist, _ in pairs(M.changlists) do
+        table.insert(items, Menu.item(" "..changelist.." ", { value = changelist, }))
+        local len = vim.fn.strdisplaywidth(changelist)
+        if len > max_width then max_width = len end
+    end
+
+    local menu = Menu({
+        relative = "editor",
         position = "50%",
-        size = { width = 25 },
+        size = { width = max_width + 4, height = 5 },
         border = {
             style = "rounded",
-            text = { top = "[ Move to ... ]", top_align = "center" },
+            text = { top = "[ Move to Changlist ]", top_align = "center", },
+            padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
-        win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
-        }, {
-        prompt = " Changelist: ",
-        default_value = "",
-        on_submit = callback,
-    })
-    input_popup:mount()
+    }, {
+        lines = items,
+        keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
 
-    vim.api.nvim_create_autocmd(event.BufLeave, {
-        buffer = input_popup.bufnr,
-        once = true,
-        callback = function()
-            input_popup:unmount()
+        -- Highlight the selected item
+        on_change = function(item, menu)
+            vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 0, -1)
+        end,
+
+        -- Set the selected client
+        on_submit = function(item)
+            callback(item.value)
         end,
     })
+
+    menu:mount()
+
+
+    -- Unmount the menu when leaving the buffer
+    menu:on(event.BufLeave, function() menu:unmount() end)
+
+
+    -- local input_popup = Input({
+    --     position = "50%",
+    --     size = { width = 25 },
+    --     border = {
+    --         style = "rounded",
+    --         text = { top = "[ Move to ... ]", top_align = "center" },
+    --     },
+    --     win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
+    --     }, {
+    --     prompt = " Changelist: ",
+    --     default_value = "",
+    --     on_submit = callback,
+    -- })
+    -- input_popup:mount()
+    --
+    -- vim.api.nvim_create_autocmd(event.BufLeave, {
+    --     buffer = input_popup.bufnr,
+    --     once = true,
+    --     callback = function()
+    --         input_popup:unmount()
+    --     end,
+    -- })
 end
 
 -- Prepare nodes for the tree view
