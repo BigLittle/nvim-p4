@@ -223,18 +223,12 @@ function M.open()
 
     -- Move opened file between changelist
     vim.keymap.set("n", "m", function()
-        vim.b.__taking_input = true
         local node = tree:get_node()
-        if not node then
-            vim.b.__taking_input = false
-            return
-        end
-        if node.changlist then
-            vim.b.__taking_input = false
-            return
-        end
+        if not node then return end
+        if node.changlist then return end
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
+        vim.b.__taking_input = true
         M.move_opened_file(function(value)
             vim.b.__taking_input = false
             if value == current_changelist or value == "" then return end
