@@ -18,7 +18,7 @@ function M.move_opened_file(callback)
     local items = {}
     local max_width = 0
     for _, changelist in ipairs(M.changlists) do
-        table.insert(items, Menu.item("  "..changelist.." ", { value = changelist, index = _ - 1}))
+        table.insert(items, Menu.item(" "..changelist.." ", { value = changelist, index = _ - 1}))
         local len = vim.fn.strdisplaywidth(changelist)
         if len > max_width then max_width = len end
     end
@@ -26,13 +26,12 @@ function M.move_opened_file(callback)
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = 13, height = #items },
+        size = { width = max_width + 4, height = #items },
         border = {
             style = "double",
-            text = { top = " Move to ", top_align = "center", },
-            padding = { top = 0, bottom = 0, left = 0, right = 1 },
+            padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
-        win_options = { winhighlight = "Normal:MiniIconsOrange,FloatBorder:MiniIconsOrange" },
+        win_options = { winhighlight = "Normal:Normal,FloatBorder:MiniIconsOrange" },
     }, {
         lines = items,
         keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
@@ -40,6 +39,7 @@ function M.move_opened_file(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
             vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
         end,
 
@@ -117,7 +117,7 @@ function M.open()
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#c4e6ff" } )
+    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#89c2ff" } )
 
     local tree = Tree({
         bufnr = M.popup.bufnr,
