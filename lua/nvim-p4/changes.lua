@@ -1,5 +1,4 @@
 local Popup = require("nui.popup")
-local Input = require("nui.input")
 local Menu = require("nui.menu")
 local Tree = require("nui.tree")
 local Line = require("nui.line")
@@ -15,13 +14,11 @@ M.select_node = nil
 M.changlists = {}
 
 
-
-
 function M.move_opened_file(callback)
     local items = {}
     local max_width = 0
-    for changelist, _ in pairs(M.changlists) do
-        table.insert(items, Menu.item(" "..changelist.." ", { value = changelist, }))
+    for _, changelist in ipairs(M.changlists) do
+        table.insert(items, Menu.item(" "..changelist.." ", { value = changelist, index = _ - 1}))
         local len = vim.fn.strdisplaywidth(changelist)
         if len > max_width then max_width = len end
     end
@@ -29,12 +26,13 @@ function M.move_opened_file(callback)
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = max_width + 4, height = 5 },
+        size = { width = 16, height = #itmes},
         border = {
-            style = "rounded",
-            text = { top = "[ Move to Changlist ]", top_align = "center", },
+            style = "double",
+            text = { top = "[ Move to ]", top_align = "center", },
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
+        win_options = { winhighlight = "ErrorMsg:NormalFloat,FloatBorder:FloatBorder" },
     }, {
         lines = items,
         keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
@@ -88,7 +86,7 @@ function M.prepare_nodes()
     M.changlists = {}
     local nodes = {}
     for _, changelist in ipairs(p4.changes()) do
-        M.changlists[changelist.number] = changelist.description
+        table.insert(M.changlists, changelist.number)
         local cl_data = {}
         cl_data["id"] = changelist.number
         cl_data["text"] = changelist.number .. "   " .. changelist.description:gsub("%s+", " ")
