@@ -46,6 +46,15 @@ function M.get_output(cmd)
     return result.stdout
 end
 
+-- Check if buffer is empty and unmodified
+function M.is_empty_unmodified_buffer(bufnr)
+    bufnr = bufnr or vim.api.nvim_get_current_buf()
+    return vim.api.nvim_buf_get_name(bufnr) == ""
+        and not vim.api.nvim_buf_get_option(bufnr, "modified")
+        and vim.api.nvim_buf_line_count(bufnr) == 1
+        and vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1] == ""
+end
+
 -- Edit a file with the given path
 function M.edit_file(path)
     if not path or path == "" then
@@ -57,7 +66,17 @@ function M.edit_file(path)
         vim.api.nvim_err_writeln("File does not exist: " .. abs_path)
         return
     end
+
+    local curent_buf = vim.api.nvim_get_current_buf()
+
     vim.cmd("keepalt keepjumps edit " .. abs_path)
+
+    -- Close the previous buffer if it was empty and unmodified
+    vim.schedule(function()
+        if M.is_empty_unmodified_buffer(curent_buf) then
+            vim.api.nvim_buf_delete(curent_buf, { force = true })
+        end
+    end)
 end
 
 

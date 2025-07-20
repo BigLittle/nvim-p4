@@ -186,9 +186,9 @@ function M.open()
             for _, child in ipairs(children) do
                 utils.edit_file(child.path)
             end
-            M.popup:hide()
         else
             utils.edit_file(node.path)
+            M.popup:show()
         end
     end, { buffer = M.popup.bufnr, nowait = true })
 
