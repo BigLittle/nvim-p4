@@ -19,7 +19,7 @@ end
 -- Get one line description of a changelist 
 function M.describe(num)
     local cmd = { "p4", "-Ztag", "-F", '%desc%', "describe", "-s", num }
-    return utils.get_output(cmd):gsub("%s+", " ")
+    return utils.get_output(cmd)
 end
 
 -- Dump file information for a depot file
@@ -77,6 +77,12 @@ function M.opened(changelist_number)
         file.differ_from_head = diff_table[file.path] ~= nil
     end
     return files
+end
+
+-- Move opened files between changelists
+function M.reopen(depot_file, changelist_number)
+    local cmd = { "p4", "-c", client.name, "reopen", "-c", changelist_number, depot_file }
+    return utils.get_output(cmd)
 end
 
 -- Get file path from depot file

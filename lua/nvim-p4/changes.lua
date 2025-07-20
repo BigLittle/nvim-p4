@@ -1,7 +1,8 @@
 local Popup = require("nui.popup")
-local event = require("nui.utils.autocmd").event
+local Input = require("nui.input")
 local Tree = require("nui.tree")
 local Line = require("nui.line")
+local event = require("nui.utils.autocmd").event
 local Icons = require("mini.icons")
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
@@ -10,15 +11,58 @@ local p4 = require("nvim-p4.p4")
 local M = {}
 M.popup = nil
 M.select_node = nil
+M.changlists = {}
+
+
+
+
+function M.move_opened_file(callback)
+    local input_popup = Input({
+        position = "50%",
+        size = { width = 25, height = 1 },
+        border = {
+            style = "rounded",
+            text = { top = "Move to ...", top_align = "center" },
+        },
+        win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
+        }, {
+        prompt = " Changelist: ",
+        default_value = "",
+        -- on_change = function(value)
+        --     if value == "" then
+        --         input_popup:set_text(" Changelist: ")
+        --     else
+        --         local cl_desc = M.changlists[value]
+        --         if cl_desc then
+        --             input_popup:set_text(" Changelist: " .. value .. " - " .. cl_desc)
+        --         else
+        --             input_popup:set_text(" Changelist: " .. value .. " (not exist)")
+        --         end
+        --     end
+        -- end,
+        on_submit = callback,
+    })
+    input_popup:mount()
+
+    vim.api.nvim_create_autocmd(event.BufLeave, {
+        buffer = input_popup.bufnr,
+        once = true,
+        callback = function()
+            input_popup:unmount()
+        end,
+    })
+end
 
 -- Prepare nodes for the tree view
 function M.prepare_nodes()
     M.select_node = nil
+    M.changlists = {}
     local nodes = {}
     for _, changelist in ipairs(p4.changes()) do
+        M.changlists[changelist.number] = changelist.description
         local cl_data = {}
         cl_data["id"] = changelist.number
-        cl_data["text"] = changelist.number .. "   " .. changelist.description
+        cl_data["text"] = changelist.number .. "   " .. changelist.description:gsub("%s+", " ")
         cl_data["changlist"] = true
         cl_data["empty"] = false
         local opened_files = p4.opened(changelist.number)
@@ -163,6 +207,26 @@ function M.open()
         local current_client = client.name
         client.select_client(function()
             if client.name == current_client then return end
+            M.popup:unmount()
+            M.popup = nil
+            M.open()
+        end)
+    end, { buffer = M.popup.bufnr })
+
+    -- Move opened file between changelist
+    vim.keymap.set("n", "m", function()
+        local node = tree:get_node()
+        if not node then return end
+        if node.changlist then return end
+        local current_changelist = node:get_parent_id()
+        local depot_file = node.depotFile
+        M.move_opened_file(function(value)
+            if value == current_changelist then return end
+            if not M.changlists[value] then
+                vim.api.nvim_err_writeln("Invalid changelist: " .. value .. ".")
+                return
+            end
+            p4.reopen(depot_file, value)
             M.popup:unmount()
             M.popup = nil
             M.open()
