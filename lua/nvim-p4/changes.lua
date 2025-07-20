@@ -18,7 +18,7 @@ function M.move_opened_file(callback)
     local items = {}
     local max_width = 0
     for _, changelist in ipairs(M.changlists) do
-        table.insert(items, Menu.item(" "..changelist.." ", { value = changelist, index = _ - 1}))
+        table.insert(items, Menu.item("  "..changelist.." ", { value = changelist, index = _ - 1}))
         local len = vim.fn.strdisplaywidth(changelist)
         if len > max_width then max_width = len end
     end
@@ -117,7 +117,7 @@ function M.open()
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#89c2ff" } )
+    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#99caff" } )
 
     local tree = Tree({
         bufnr = M.popup.bufnr,
@@ -168,7 +168,7 @@ function M.open()
 
     -- Hide the popup when leaving the buffer
     M.popup:on(event.BufLeave, function()
-        if vim.b.__taking_input then return end
+        if vim.g.__taking_input then return end
         M.popup:hide()
     end)
 
@@ -228,9 +228,9 @@ function M.open()
         if node.changlist then return end
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
-        vim.b.__taking_input = true
+        vim.g.__taking_input = true
         M.move_opened_file(function(value)
-            vim.b.__taking_input = false
+            vim.g.__taking_input = false
             if value == current_changelist or value == "" then return end
             p4.reopen(depot_file, value)
             tree:set_nodes(M.prepare_nodes())
