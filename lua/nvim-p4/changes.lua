@@ -18,7 +18,7 @@ function M.move_opened_file(callback)
     local items = {}
     local max_width = 0
     for _, changelist in ipairs(M.changlists) do
-        table.insert(items, Menu.item(" "..changelist.." ", { value = changelist, index = _ - 1}))
+        table.insert(items, Menu.item("  "..changelist.." ", { value = changelist, index = _ - 1}))
         local len = vim.fn.strdisplaywidth(changelist)
         if len > max_width then max_width = len end
     end
@@ -29,10 +29,10 @@ function M.move_opened_file(callback)
         size = { width = 13, height = #items },
         border = {
             style = "double",
-            text = { top = "[ Move to ]", top_align = "center", },
-            padding = { top = 0, bottom = 0, left = 0, right = 0 },
+            text = { top = " Move to ", top_align = "center", },
+            padding = { top = 0, bottom = 0, left = 0, right = 1 },
         },
-        win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:MiniIconsOrange" },
+        win_options = { winhighlight = "Normal:MiniIconsOrange,FloatBorder:MiniIconsOrange" },
     }, {
         lines = items,
         keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
@@ -40,7 +40,7 @@ function M.move_opened_file(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 0, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
         end,
 
         -- Set the selected client
@@ -226,17 +226,17 @@ function M.open()
         vim.b.__taking_input = true
         local node = tree:get_node()
         if not node then
-            vim.b__taking_input = false
+            vim.b.__taking_input = false
             return
         end
         if node.changlist then
-            vim.b__taking_input = false
+            vim.b.__taking_input = false
             return
         end
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
         M.move_opened_file(function(value)
-            vim.b__taking_input = false
+            vim.b.__taking_input = false
             if value == current_changelist or value == "" then return end
             p4.reopen(depot_file, value)
             tree:set_nodes(M.prepare_nodes())
