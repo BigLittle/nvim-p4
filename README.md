@@ -7,6 +7,7 @@ A Neovim plugin for intuitive and interactive Perforce changelist management.
 - 🖥 Set/Switch active client using a popup menu
 - 📋 Show all pending changelists for the active client
 - 📂 Easily to edit opened file(s)
+- 🚚 Move opened file bewteen changelists
 
 ## 📃 Requirements
 
@@ -39,9 +40,10 @@ Install the plugin with lazy.nvim:
    | Key     | Action                         |
    | ------- | ------------------------------ |
    | F5      | Refresh current status         |
-   | c       | Switch to another client       |
    | Space   | Expand / Collapse a changelist |
+   | c       | Switch to another client       |
    | e       | Edit file(s) in a new buffer   |
+   | m       | Move file to other changelist  |
    | j / k   | Navigation                     |
    | Esc / q | Hide window                    |
 
