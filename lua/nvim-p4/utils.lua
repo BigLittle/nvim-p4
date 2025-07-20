@@ -68,19 +68,15 @@ function M.edit_file(path)
         return
     end
 
-    local empty_bufs = {}
+    -- Open file in an empty and unmodified buffer if possible
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        if M.is_empty_unmodified_buffer(buf) then table.insert(empty_bufs, buf) end
-    end
-
-    vim.cmd("keepalt keepjumps edit " .. abs_path)
-
-    -- Close the previous buffer if it was empty and unmodified
-    vim.schedule(function()
-        for _, buf in ipairs(empty_bufs) do
-            vim.api.nvim_buf_delete(buf, { force = false })
+        if M.is_empty_unmodified_buffer(buf) then
+            vim.api.nvim_set_current_buf(buf)
+            vim.cmd("keepalt keepjumps edit " .. abs_path)
+            return
         end
-    end)
+    end
+    vim.cmd("keepalt keepjumps edit " .. abs_path)
 end
 
 
