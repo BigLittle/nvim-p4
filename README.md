@@ -40,7 +40,7 @@ Install the plugin with lazy.nvim:
    | ------- | ------------------------------ |
    | F5      | Refresh current status         |
    | c       | Switch to another client       |
-   | o       | Expand / Collapse a changelist |
+   | Space   | Expand / Collapse a changelist |
    | e       | Edit file(s) in a new buffer   |
    | j / k   | Navigation                     |
    | Esc / q | Hide window                    |

@@ -68,7 +68,7 @@ function M.open()
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesVariable", { fg = "#87cefa" } )
+    -- vim.api.nvim_set_hl(0, "P4ChangesVariable", { fg = "#87cefa" } )
 
     local tree = Tree({
         bufnr = M.popup.bufnr,
@@ -94,7 +94,7 @@ function M.open()
             else
                 line:append("  ", "P4ChangesHead")
                 if node.differ_from_head then
-                    line:append(" ", "P4ChangesVariable")
+                    line:append(" ", "Normal")
                 else
                     line:append(" ", "Normal")
                 end
@@ -170,7 +170,7 @@ function M.open()
     end, { buffer = M.popup.bufnr })
 
     -- Toggle the expansion of the current node if it is a changelist
-    vim.keymap.set("n", "o", function()
+    vim.keymap.set("n", "<Space>", function()
         local node = tree:get_node()
         if not node then return end
         if not node.changlist then return end
