@@ -26,7 +26,7 @@ function M.move_opened_file(callback)
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = 16, height = #itmes},
+        size = { width = 16, height = #items },
         border = {
             style = "double",
             text = { top = "[ Move to ]", top_align = "center", },
