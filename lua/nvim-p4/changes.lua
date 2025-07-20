@@ -26,13 +26,13 @@ function M.move_opened_file(callback)
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = 16, height = #items },
+        size = { width = 13, height = #items },
         border = {
             style = "double",
             text = { top = "[ Move to ]", top_align = "center", },
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
-        win_options = { winhighlight = "ErrorMsg:NormalFloat,FloatBorder:FloatBorder" },
+        win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:MiniIconsOrange" },
     }, {
         lines = items,
         keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
@@ -51,33 +51,11 @@ function M.move_opened_file(callback)
 
     menu:mount()
 
-
     -- Unmount the menu when leaving the buffer
-    menu:on(event.BufLeave, function() menu:unmount() end)
-
-
-    -- local input_popup = Input({
-    --     position = "50%",
-    --     size = { width = 25 },
-    --     border = {
-    --         style = "rounded",
-    --         text = { top = "[ Move to ... ]", top_align = "center" },
-    --     },
-    --     win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
-    --     }, {
-    --     prompt = " Changelist: ",
-    --     default_value = "",
-    --     on_submit = callback,
-    -- })
-    -- input_popup:mount()
-    --
-    -- vim.api.nvim_create_autocmd(event.BufLeave, {
-    --     buffer = input_popup.bufnr,
-    --     once = true,
-    --     callback = function()
-    --         input_popup:unmount()
-    --     end,
-    -- })
+    menu:on(event.BufLeave, function()
+        callback("")
+        menu:unmount()
+    end)
 end
 
 -- Prepare nodes for the tree view
@@ -259,11 +237,7 @@ function M.open()
         local depot_file = node.depotFile
         M.move_opened_file(function(value)
             vim.b__taking_input = false
-            if value == current_changelist then return end
-            if not M.changlists[value] then
-                vim.api.nvim_err_writeln("Invalid changelist: " .. value .. ".")
-                return
-            end
+            if value == current_changelist or value == "" then return end
             p4.reopen(depot_file, value)
             tree:set_nodes(M.prepare_nodes())
             tree:render()
