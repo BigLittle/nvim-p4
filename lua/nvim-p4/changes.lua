@@ -19,27 +19,15 @@ M.changlists = {}
 function M.move_opened_file(callback)
     local input_popup = Input({
         position = "50%",
-        size = { width = 25, height = 1 },
+        size = { width = 25 },
         border = {
             style = "rounded",
-            text = { top = "Move to ...", top_align = "center" },
+            text = { top = "[ Move to ... ]", top_align = "center" },
         },
         win_options = { winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder" },
         }, {
         prompt = " Changelist: ",
         default_value = "",
-        -- on_change = function(value)
-        --     if value == "" then
-        --         input_popup:set_text(" Changelist: ")
-        --     else
-        --         local cl_desc = M.changlists[value]
-        --         if cl_desc then
-        --             input_popup:set_text(" Changelist: " .. value .. " - " .. cl_desc)
-        --         else
-        --             input_popup:set_text(" Changelist: " .. value .. " (not exist)")
-        --         end
-        --     end
-        -- end,
         on_submit = callback,
     })
     input_popup:mount()
@@ -231,20 +219,16 @@ function M.open()
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
         M.move_opened_file(function(value)
-            if value == current_changelist then
-                vim.b__taking_input = false
-                return
-            end
+            vim.b__taking_input = false
+            if value == current_changelist then return end
             if not M.changlists[value] then
                 vim.api.nvim_err_writeln("Invalid changelist: " .. value .. ".")
-                vim.b__taking_input = false
                 return
             end
             p4.reopen(depot_file, value)
-            M.popup:unmount()
-            M.popup = nil
-            M.open()
-            vim.b__taking_input = false
+            tree:set_nodes(M.prepare_nodes())
+            tree:render()
+            M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
         end)
     end, { buffer = M.popup.bufnr })
 
