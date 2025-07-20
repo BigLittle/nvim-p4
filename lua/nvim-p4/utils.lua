@@ -49,7 +49,8 @@ end
 -- Check if buffer is empty and unmodified
 function M.is_empty_unmodified_buffer(bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
-    return vim.api.nvim_buf_get_name(bufnr) == ""
+    return vim.api.nvim_buf_is_loaded(bufnr)
+        and vim.api.nvim_buf_get_name(bufnr) == ""
         and not vim.api.nvim_buf_get_option(bufnr, "modified")
         and vim.api.nvim_buf_line_count(bufnr) == 1
         and vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1] == ""
@@ -67,14 +68,17 @@ function M.edit_file(path)
         return
     end
 
-    local curent_buf = vim.api.nvim_get_current_buf()
+    local empty_bufs = {}
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if M.is_empty_unmodified_buffer(buf) then table.insert(empty_bufs, buf) end
+    end
 
     vim.cmd("keepalt keepjumps edit " .. abs_path)
 
     -- Close the previous buffer if it was empty and unmodified
     vim.schedule(function()
-        if M.is_empty_unmodified_buffer(curent_buf) then
-            vim.api.nvim_buf_delete(curent_buf, { force = true })
+        for _, buf in ipairs(empty_bufs) do
+            vim.api.nvim_buf_delete(buf, { force = false })
         end
     end)
 end
