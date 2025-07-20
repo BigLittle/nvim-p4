@@ -87,8 +87,8 @@ function M.open()
 
     M.popup = Popup({
         relative = "editor",
-        enter = false,
-        focusable = false,
+        enter = true,
+        focusable = true,
         border = {
             style = "rounded",
             text = {
@@ -162,7 +162,10 @@ function M.open()
     tree:render()
 
     -- Hide the popup when leaving the buffer
-    M.popup:on(event.BufLeave, function() M.popup:hide() end)
+    M.popup:on(event.BufLeave, function()
+        if vim.b.__taking_input then return end
+        M.popup:hide()
+    end)
 
     -- Highlight the current node
     M.popup:on({ event.CursorMoved, event.CursorMovedI }, function()
@@ -215,21 +218,33 @@ function M.open()
 
     -- Move opened file between changelist
     vim.keymap.set("n", "m", function()
+        vim.b.__taking_input = true
         local node = tree:get_node()
-        if not node then return end
-        if node.changlist then return end
+        if not node then
+            vim.b__taking_input = false
+            return
+        end
+        if node.changlist then
+            vim.b__taking_input = false
+            return
+        end
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
         M.move_opened_file(function(value)
-            if value == current_changelist then return end
+            if value == current_changelist then
+                vim.b__taking_input = false
+                return
+            end
             if not M.changlists[value] then
                 vim.api.nvim_err_writeln("Invalid changelist: " .. value .. ".")
+                vim.b__taking_input = false
                 return
             end
             p4.reopen(depot_file, value)
             M.popup:unmount()
             M.popup = nil
             M.open()
+            vim.b__taking_input = false
         end)
     end, { buffer = M.popup.bufnr })
 
