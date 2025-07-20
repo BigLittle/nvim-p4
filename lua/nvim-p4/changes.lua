@@ -87,8 +87,8 @@ function M.open()
 
     M.popup = Popup({
         relative = "editor",
-        enter = true,
-        focusable = true,
+        enter = false,
+        focusable = false,
         border = {
             style = "rounded",
             text = {
