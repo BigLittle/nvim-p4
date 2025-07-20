@@ -122,6 +122,13 @@ function M.open()
 
     -- Highlight the current node
     M.popup:on({ event.CursorMoved, event.CursorMovedI }, function()
+        if vim.b.__moving_cursor then return end
+        vim.b.__moving_cursor = true
+        vim.schedule(function()
+            local cursor = vim.api.nvim_win_get_cursor(M.popup.winid)
+            vim.api.nvim_win_set_cursor(M.popup.winid, { cursor[1], 0 })
+            vim.b.__moving_cursor = false
+        end)
         local node = tree:get_node()
         if not node then return end
         if M.select_node == node then return end
@@ -195,12 +202,6 @@ function M.open()
     -- Hide the popup with 'q' or 'Esc'
     vim.keymap.set("n", "q", function() M.popup:hide() end, { buffer = M.popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() M.popup:hide() end, { buffer = M.popup.bufnr, nowait = true })
-
-    -- Disable horizontal navigation keys
-    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "h", "<Nop>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "l", "<Nop>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "<Left>", "<Nop>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(M.popup.bufnr, "n", "<Right>", "<Nop>", { noremap = true, silent = true })
 
 end
 return M
