@@ -8,6 +8,7 @@ A Neovim plugin for intuitive and interactive Perforce changelist management.
 - 📋 Show all pending changelists for the active client
 - 📂 Easily to edit opened file(s)
 - 🚚 Move opened file bewteen changelists
+- 🔄 Revert opened file
 
 ## 📃 Requirements
 

@@ -14,7 +14,9 @@ M.select_node = nil
 M.changlists = {}
 
 function M.revert_opened_file(callback)
-    local items = { "Revert If Unchanged", "Revert" }
+    local items = {}
+    table.insert(items, Menu.item(" Revert If Unchanged ", { value = "Revert If Unchanged" }))
+    table.insert(items, Menu.item(" Revert ", { value = "Revert" }))
     local menu = Menu({
         relative = "editor",
         position = "50%",
