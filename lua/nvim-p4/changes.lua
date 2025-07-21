@@ -117,7 +117,7 @@ function M.open()
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#99caff" } )
+    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
 
     local tree = Tree({
         bufnr = M.popup.bufnr,
@@ -143,14 +143,14 @@ function M.open()
             else
                 line:append("  ", "P4ChangesHead")
                 if node.differ_from_head then
-                    line:append(" ", "P4ChangesEdit")
+                    line:append("", "P4ChangesEdit")
                 else
                     line:append(" ", "Normal")
                 end
                 if node.workRev == node.headRev then
-                    line:append(" ", "MiniIconsGreen")
+                    line:append("󱍸 ", "MiniIconsGreen")
                 else
-                    line:append(" ", "MiniIconsYellow")
+                    line:append("", "MiniIconsYellow")
                 end
                 local icon, hl, is_fallback = Icons.get("file", node.depotFile)
                 if is_fallback then
@@ -168,7 +168,7 @@ function M.open()
 
     -- Hide the popup when leaving the buffer
     M.popup:on(event.BufLeave, function()
-        if vim.g.__taking_input then return end
+        if vim.g.__focused then return end
         M.popup:hide()
     end)
 
@@ -228,9 +228,9 @@ function M.open()
         if node.changlist then return end
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
-        vim.g.__taking_input = true
+        vim.g.__focused = true
         M.move_opened_file(function(value)
-            vim.g.__taking_input = false
+            vim.g.__focused = false
             if value == current_changelist or value == "" then return end
             p4.reopen(depot_file, value)
             tree:set_nodes(M.prepare_nodes())
@@ -260,12 +260,15 @@ function M.open()
         if node.changlist then
             if node.empty then return end
             local children = tree:get_nodes(node:get_id())
+            vim.g.__focused = true
             for _, child in ipairs(children) do
                 utils.edit_file(child.path)
             end
+            vim.g.__focused = false
         else
+            vim.g.__focused = true
             utils.edit_file(node.path)
-            M.popup:show()
+            vim.g.__focused = false
         end
     end, { buffer = M.popup.bufnr, nowait = true })
 

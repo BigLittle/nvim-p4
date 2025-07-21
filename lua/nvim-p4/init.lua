@@ -18,3 +18,11 @@ end, { desc = "Select a Perforce client." })
 vim.api.nvim_create_user_command('P4Info', function()
     client.ensure_client(function() print(p4.info()) end)
 end, { desc = "Show Perforce info." })
+
+vim.api.nvim_create_user_command('P4Edit', function()
+    client.ensure_client(function()
+        if client.name == nil then return end
+        local path = vim.api.nvim_buf_get_name(0)
+        p4.edit(nil, path)
+    end)
+end, { desc = "Open file in a client for edit." })

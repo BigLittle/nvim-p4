@@ -22,6 +22,19 @@ function M.describe(num)
     return utils.get_output(cmd)
 end
 
+-- Open file in a client for edit
+function M.edit(changelist, path)
+    if not path:match("^("..client.root..")") then
+        print("Current file: "..path.." does not in the client.")
+        return
+    end
+    local cmd = { "p4", "-c", client.name, "edit", "-c", changelist, path }
+    if changelist == nil or changelist == "default" then
+        cmd = { "p4", "-c", client.name, "edit", path }
+    end
+    return utils.get_output(cmd)
+end
+
 -- Dump file information for a depot file
 function M.fstat(depot_files)
     local fields = { "depotFile", "path", "headRev", "type", "workRev" }
