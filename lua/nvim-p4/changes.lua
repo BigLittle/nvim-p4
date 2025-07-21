@@ -10,8 +10,16 @@ local p4 = require("nvim-p4.p4")
 
 local M = {}
 M.popup = nil
+M.tree = nil
 M.select_node = nil
 M.changlists = {}
+
+local function refresh_tree()
+    M.tree:set_nodes(M.prepare_nodes())
+    M.tree:render()
+    M.popup.border:set_text("top", "[  "..client.name.." ]", "center")
+    M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+end
 
 function M.revert_opened_file(callback)
     local items = {}
@@ -157,7 +165,7 @@ function M.open()
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
     vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
 
-    local tree = Tree({
+    M.tree = Tree({
         bufnr = M.popup.bufnr,
         nodes = nodes,
         prepare_node = function(node)
@@ -202,7 +210,7 @@ function M.open()
         end,
     })
 
-    tree:render()
+    M.tree:render()
 
     -- Hide the popup when leaving the buffer
     M.popup:on(event.BufLeave, function()
@@ -219,11 +227,11 @@ function M.open()
             vim.api.nvim_win_set_cursor(M.popup.winid, { cursor[1], 0 })
             vim.b.__moving_cursor = false
         end)
-        local node = tree:get_node()
+        local node = M.tree:get_node()
         if not node then return end
         if M.select_node == node then return end
         M.select_node = node
-        tree:render()
+        M.tree:render()
     end)
 
     --Auto-resize the popup when the window is resized
@@ -238,14 +246,12 @@ function M.open()
             position = "50%",
         }
         M.popup:update_layout(config)
-        tree:render()
+        M.tree:render()
     end)
 
     -- Refresh
     vim.keymap.set("n", "<F5>", function()
-        tree:set_nodes(M.prepare_nodes())
-        tree:render()
-        M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+        refresh_tree()
     end, { buffer = M.popup.bufnr })
 
     -- Select a client
@@ -253,15 +259,16 @@ function M.open()
         local current_client = client.name
         client.select_client(function()
             if client.name == current_client then return end
-            M.popup:unmount()
-            M.popup = nil
-            M.open()
+            refresh_tree()
+            -- M.popup:unmount()
+            -- M.popup = nil
+            -- M.open()
         end)
     end, { buffer = M.popup.bufnr })
 
     -- Move opened file between changelist
     vim.keymap.set("n", "m", function()
-        local node = tree:get_node()
+        local node = M.tree:get_node()
         if not node then return end
         if node.changlist then return end
         local current_changelist = node:get_parent_id()
@@ -271,15 +278,13 @@ function M.open()
             vim.g.__focused = false
             if value == current_changelist or value == "" then return end
             p4.reopen(depot_file, value)
-            tree:set_nodes(M.prepare_nodes())
-            tree:render()
-            M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+            refresh_tree()
         end)
     end, { buffer = M.popup.bufnr })
 
     -- Toggle the expansion of the current node if it is a changelist
     vim.keymap.set("n", "<Space>", function()
-        local node = tree:get_node()
+        local node = M.tree:get_node()
         if not node then return end
         if not node.changlist then return end
         if node.empty then return end
@@ -288,16 +293,16 @@ function M.open()
         else
             node:expand()
         end
-        tree:render()
+        M.tree:render()
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Open the selected file in the editor
     vim.keymap.set("n", "e", function()
-        local node = tree:get_node()
+        local node = M.tree:get_node()
         if not node then return end
         if node.changlist then
             if node.empty then return end
-            local children = tree:get_nodes(node:get_id())
+            local children = M.tree:get_nodes(node:get_id())
             vim.g.__focused = true
             for _, child in ipairs(children) do
                 utils.edit_file(child.path)
@@ -312,7 +317,7 @@ function M.open()
 
     -- Revert the selected file
     vim.keymap.set("n", "r", function()
-        local node = tree:get_node()
+        local node = M.tree:get_node()
         if not node then return end
         if node.changlist then return end
         local depot_file = node.depotFile
@@ -321,9 +326,7 @@ function M.open()
             vim.g.__focused = false
             if value == "" then return end
             p4.revert(depot_file, value == "Revert If Unchanged")
-            tree:set_nodes(M.prepare_nodes())
-            tree:render()
-            M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+            refresh_tree()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
