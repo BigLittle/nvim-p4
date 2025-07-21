@@ -100,9 +100,9 @@ end
 
 -- Revert opened file
 function M.revert(depot_file, unchanged_only)
-    local cmd = { "p4", "revert", "-C", client.name, depot_file}
+    local cmd = { "p4", "-c", client.name, "revert", depot_file}
     if unchanged_only then
-        cmd = { "p4", "revert", "-a", "-C", client.name, depot_file}
+        cmd = { "p4", "-c", client.name, "revert", "-a", depot_file}
     end
     return utils.get_output(cmd)
 end
