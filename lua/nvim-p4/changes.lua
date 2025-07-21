@@ -15,7 +15,7 @@ M.select_node = nil
 M.changlists = {}
 
 local function refresh_tree()
-    M.tree:set_nodes(M.prepare_nodes())
+    M.tree:set_nodes(prepare_nodes())
     M.tree:render()
     M.popup.border:set_text("top", "[  "..client.name.." ]", "center")
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
@@ -105,7 +105,7 @@ function M.move_opened_file(callback)
 end
 
 -- Prepare nodes for the tree view
-function M.prepare_nodes()
+local function prepare_nodes()
     M.select_node = nil
     M.changlists = {}
     local nodes = {}
@@ -134,7 +134,7 @@ function M.open()
         M.popup:show()
         return
     end
-    local nodes = M.prepare_nodes()
+    local nodes = prepare_nodes()
 
     M.popup = Popup({
         relative = "editor",
@@ -250,9 +250,7 @@ function M.open()
     end)
 
     -- Refresh
-    vim.keymap.set("n", "<F5>", function()
-        refresh_tree()
-    end, { buffer = M.popup.bufnr })
+    vim.keymap.set("n", "<F5>", function() refresh_tree() end, { buffer = M.popup.bufnr })
 
     -- Select a client
     vim.keymap.set("n", "c", function()
@@ -260,9 +258,6 @@ function M.open()
         client.select_client(function()
             if client.name == current_client then return end
             refresh_tree()
-            -- M.popup:unmount()
-            -- M.popup = nil
-            -- M.open()
         end)
     end, { buffer = M.popup.bufnr })
 
