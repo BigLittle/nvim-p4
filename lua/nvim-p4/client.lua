@@ -36,7 +36,7 @@ end
 function M.select_client(callback)
     local clients = M.get_clients()
     if #clients == 0 then
-        print("No Perforce clients found.")
+        utils.notify_warning("No Perforce clients found.")
         return
     end
     local icon = "  "

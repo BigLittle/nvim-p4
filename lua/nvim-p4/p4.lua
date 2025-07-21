@@ -25,7 +25,7 @@ end
 -- Open file in a client for edit
 function M.edit(changelist, path)
     if not path:match("^("..client.root..")") then
-        print("Current file: "..path.." does not in the client.")
+        utils.notify_error("Current file: "..path.." does not in the client.")
         return
     end
     local cmd = { "p4", "-c", client.name, "edit", "-c", changelist, path }
@@ -95,6 +95,15 @@ end
 -- Move opened files between changelists
 function M.reopen(depot_file, changelist_number)
     local cmd = { "p4", "-c", client.name, "reopen", "-c", changelist_number, depot_file }
+    return utils.get_output(cmd)
+end
+
+-- Revert opened file
+function M.revert(depot_file, unchanged_only)
+    local cmd = { "p4", "revert", "-C", client.name, depot_file}
+    if unchanged_only then
+        cmd = { "p4", "revert", "-a", "-C", client.name, depot_file}
+    end
     return utils.get_output(cmd)
 end
 

@@ -1,6 +1,14 @@
 local Popup = require("nui.popup")
 local M = {}
 
+function M.notify_error(msg)
+    vim.notify(msg, vim.log.levels.ERROR)
+end
+
+function M.notify_warning(msg)
+    vim.notify(msg, vim.log.levels.WARN)
+end
+
 function M.loading()
     local loading_popup = Popup({
         relative = "editor",

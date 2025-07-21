@@ -13,6 +13,42 @@ M.popup = nil
 M.select_node = nil
 M.changlists = {}
 
+function M.revert_opened_file(callback)
+    local items = { "Revert If Unchanged", "Revert" }
+    local menu = Menu({
+        relative = "editor",
+        position = "50%",
+        size = { width = 23, height = #items },
+        border = {
+            style = "double",
+            padding = { top = 0, bottom = 0, left = 0, right = 0 },
+        },
+        win_options = { winhighlight = "Normal:Normal,FloatBorder:MiniIconsOrange" },
+    }, {
+        lines = items,
+        keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
+
+        -- Highlight the selected item
+        on_change = function(item, menu)
+            vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
+        end,
+
+        -- Set the selected client
+        on_submit = function(item)
+            callback(item.value)
+        end,
+    })
+
+    menu:mount()
+
+    -- Unmount the menu when leaving the buffer
+    menu:on(event.BufLeave, function()
+        callback("")
+        menu:unmount()
+    end)
+end
 
 function M.move_opened_file(callback)
     local items = {}
@@ -145,12 +181,12 @@ function M.open()
                 if node.differ_from_head then
                     line:append("", "P4ChangesEdit")
                 else
-                    line:append(" ", "Normal")
+                    line:append("", "Normal")
                 end
                 if node.workRev == node.headRev then
                     line:append("󱍸 ", "MiniIconsGreen")
                 else
-                    line:append("", "MiniIconsYellow")
+                    line:append(" ", "MiniIconsYellow")
                 end
                 local icon, hl, is_fallback = Icons.get("file", node.depotFile)
                 if is_fallback then
@@ -270,6 +306,23 @@ function M.open()
             utils.edit_file(node.path)
             vim.g.__focused = false
         end
+    end, { buffer = M.popup.bufnr, nowait = true })
+
+    -- Revert the selected file
+    vim.keymap.set("n", "r", function()
+        local node = tree:get_node()
+        if not node then return end
+        if node.changlist then return end
+        local depot_file = node.depotFile
+        vim.g.__focused = true
+        M.revert_opened_file(function(value)
+            vim.g.__focused = false
+            if value == "" then return end
+            p4.revert(depot_file, value == "Revert If Unchanged")
+            tree:set_nodes(M.prepare_nodes())
+            tree:render()
+            M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+        end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Hide the popup with 'q' or 'Esc'

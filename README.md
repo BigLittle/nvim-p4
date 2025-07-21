@@ -37,15 +37,16 @@ Install the plugin with lazy.nvim:
 
 `:P4Changes` to see the status of current active client. If no client is set, a popup menu will appear. 
 
-   | Key     | Action                         |
-   | ------- | ------------------------------ |
-   | F5      | Refresh current status         |
-   | Space   | Expand / Collapse a changelist |
-   | c       | Switch to another client       |
-   | e       | Edit file(s) in a new buffer   |
-   | m       | Move file to other changelist  |
-   | j / k   | Navigation                     |
-   | Esc / q | Hide window                    |
+   | Key     | Action                                 |
+   | ------- | -------------------------------------- |
+   | Esc / q | Hide window                            |
+   | F5      | Refresh current status                 |
+   | Space   | Expand / Collapse a changelist         |
+   | c       | Switch to another client               |
+   | e       | Edit file(s) in a new buffer           |
+   | j / k   | Navigation                             |
+   | m       | Move opened file to another changelist |
+   | r       | Revert opened file                     |
 
 `:P4Clients` to select an active client from all your Perforce workspaces.
 
@@ -54,3 +55,5 @@ Install the plugin with lazy.nvim:
    | Enter   | Select client |
    | j / k   | Navigation    |
    | Esc / q | Hide window   |
+
+`:P4Edit` to make current buffer file opened for edit in current active client.
