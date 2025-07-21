@@ -15,12 +15,12 @@ M.changlists = {}
 
 function M.revert_opened_file(callback)
     local items = {}
-    table.insert(items, Menu.item(" Revert If Unchanged ", { value = "Revert If Unchanged", index = 0 }))
-    table.insert(items, Menu.item(" Revert ", { value = "Revert", index = 1 }))
+    table.insert(items, Menu.item("  Revert If Unchanged ", { value = "Revert If Unchanged", index = 0 }))
+    table.insert(items, Menu.item("  Revert ", { value = "Revert", index = 1 }))
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = 23, height = #items },
+        size = { width = 22, height = #items },
         border = {
             style = "double",
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
