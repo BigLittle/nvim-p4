@@ -14,6 +14,32 @@ M.tree = nil
 M.select_node = nil
 M.changlists = {}
 
+-- Prepare nodes for the tree view
+local function prepare_nodes()
+    M.select_node = nil
+    M.changlists = {}
+    local nodes = {}
+    for _, changelist in ipairs(p4.changes()) do
+        table.insert(M.changlists, changelist.number)
+        local cl_data = {}
+        cl_data["id"] = changelist.number
+        cl_data["text"] = changelist.number .. "   " .. changelist.description:gsub("%s+", " ")
+        cl_data["changlist"] = true
+        cl_data["empty"] = false
+        local opened_files = p4.opened(changelist.number)
+        if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
+        local children = {}
+        for _, file in ipairs(opened_files) do
+            table.insert(children, Tree.Node(file))
+        end
+        local node = Tree.Node(cl_data, children)
+        node:expand() -- Expand the node by default
+        table.insert(nodes, node)
+    end
+    return nodes
+end
+
+-- Update tree contents and render it
 local function refresh_tree()
     M.tree:set_nodes(prepare_nodes())
     M.tree:render()
@@ -102,31 +128,6 @@ function M.move_opened_file(callback)
         callback("")
         menu:unmount()
     end)
-end
-
--- Prepare nodes for the tree view
-local function prepare_nodes()
-    M.select_node = nil
-    M.changlists = {}
-    local nodes = {}
-    for _, changelist in ipairs(p4.changes()) do
-        table.insert(M.changlists, changelist.number)
-        local cl_data = {}
-        cl_data["id"] = changelist.number
-        cl_data["text"] = changelist.number .. "   " .. changelist.description:gsub("%s+", " ")
-        cl_data["changlist"] = true
-        cl_data["empty"] = false
-        local opened_files = p4.opened(changelist.number)
-        if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
-        local children = {}
-        for _, file in ipairs(opened_files) do
-            table.insert(children, Tree.Node(file))
-        end
-        local node = Tree.Node(cl_data, children)
-        node:expand() -- Expand the node by default
-        table.insert(nodes, node)
-    end
-    return nodes
 end
 
 function M.open()
