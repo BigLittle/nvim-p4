@@ -12,7 +12,7 @@ end
 function M.loading()
     local loading_popup = Popup({
         relative = "editor",
-        enter = false,
+        enter = true,
         focusable = false,
         border = { style = "rounded" },
         position = "50%",
@@ -44,9 +44,7 @@ end
 
 -- Get the output of a shell command
 function M.get_output(cmd)
-    M.loading_popup:show()
     local result = vim.system(cmd, { text = true }):wait()
-    M.loading_popup:hide()
     if result.code ~= 0 then
         vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
         return ""
