@@ -194,10 +194,14 @@ function M.open()
                 else
                     line:append("", "Normal")
                 end
-                if node.workRev == node.headRev then
-                    line:append("󱍸 ", "MiniIconsGreen")
+                if node.headRev == nil then
+                    line:append(" ", "MiniIconsRed")
                 else
-                    line:append(" ", "MiniIconsYellow")
+                    if node.workRev == node.headRev then
+                        line:append("󱍸 ", "MiniIconsGreen")
+                    else
+                        line:append(" ", "MiniIconsYellow")
+                    end
                 end
                 local icon, hl, is_fallback = Icons.get("file", node.depotFile)
                 if is_fallback then
