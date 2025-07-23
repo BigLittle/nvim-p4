@@ -41,7 +41,9 @@ end
 
 -- Update tree contents and render it
 local function refresh_tree()
+    utils.loading_popup:show()
     M.tree:set_nodes(prepare_nodes())
+    utils.loading_popup:hide()
     M.tree:render()
     M.popup.border:set_text("top", "[  "..client.name.." ]", "center")
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
@@ -251,11 +253,7 @@ function M.open()
     end)
 
     -- Refresh
-    vim.keymap.set("n", "<F5>", function()
-        p4.loading_popup:show()
-        refresh_tree()
-        p4.loading_popup:hide()
-    end, { buffer = M.popup.bufnr })
+    vim.keymap.set("n", "<F5>", function() refresh_tree() end, { buffer = M.popup.bufnr })
 
     -- Select a client
     vim.keymap.set("n", "c", function()
