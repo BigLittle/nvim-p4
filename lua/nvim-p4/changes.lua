@@ -41,9 +41,7 @@ end
 
 -- Update tree contents and render it
 local function refresh_tree()
-    utils.loading_popup:show()
     M.tree:set_nodes(prepare_nodes())
-    utils.loading_popup:hide()
     M.tree:render()
     M.popup.border:set_text("top", "[  "..client.name.." ]", "center")
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
@@ -305,11 +303,9 @@ function M.open()
             for _, child in ipairs(children) do
                 utils.edit_file(child.path, utils.find_valid_buffer(M.popup.bufnr))
             end
-            M.popup:show()
         else
             M.popup:hide()
             utils.edit_file(node.path, utils.find_valid_buffer(M.popup.bufnr))
-            M.popup:show()
         end
     end, { buffer = M.popup.bufnr, nowait = true })
 
