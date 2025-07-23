@@ -301,12 +301,12 @@ function M.open()
             local children = M.tree:get_nodes(node:get_id())
             vim.g.__focused = true
             for _, child in ipairs(children) do
-                utils.edit_file(child.path, M.find_valid_buffer(M.popup.bufnr))
+                utils.edit_file(child.path, utils.find_valid_buffer(M.popup.bufnr))
             end
             vim.g.__focused = false
         else
             vim.g.__focused = true
-            utils.edit_file(node.path, M.find_valid_buffer(M.popup.bufnr))
+            utils.edit_file(node.path, utils.find_valid_buffer(M.popup.bufnr))
             vim.g.__focused = false
         end
     end, { buffer = M.popup.bufnr, nowait = true })
