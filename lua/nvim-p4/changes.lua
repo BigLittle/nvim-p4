@@ -133,7 +133,6 @@ end
 function M.open()
     if M.popup ~= nil then
         M.popup:show()
-        print(M.popup.bufnr)
         return
     end
     local nodes = prepare_nodes()
@@ -304,17 +303,15 @@ function M.open()
         if node.changlist then
             if node.empty then return end
             local children = M.tree:get_nodes(node:get_id())
-            vim.g.__focused = true
+            M.popup:hide()
+            print(M.popup.bufnr)
             for _, child in ipairs(children) do
                 utils.edit_file(child.path, utils.find_valid_buffer(M.popup.bufnr))
             end
-            vim.g.__focused = false
-            M.popup:hide()
         else
-            vim.g.__focused = true
-            utils.edit_file(node.path, utils.find_valid_buffer(M.popup.bufnr))
-            vim.g.__focused = false
             M.popup:hide()
+            print(M.popup.bufnr)
+            utils.edit_file(node.path, utils.find_valid_buffer(M.popup.bufnr))
         end
     end, { buffer = M.popup.bufnr, nowait = true })
 
