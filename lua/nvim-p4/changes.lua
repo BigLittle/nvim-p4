@@ -132,7 +132,11 @@ end
 
 function M.open()
     if M.popup ~= nil then
-        M.popup:show()
+        if vim.fn.bufwinid(M.popup.bufnr) == -1 then
+            M.popup:show()
+        else
+            M.popup:show()
+        end
         return
     end
     local nodes = prepare_nodes()
