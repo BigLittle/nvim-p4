@@ -133,6 +133,7 @@ end
 function M.open()
     if M.popup ~= nil then
         M.popup:show()
+        print(M.popup.bufnr)
         return
     end
     local nodes = prepare_nodes()
