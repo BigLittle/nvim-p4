@@ -4,6 +4,7 @@ local Tree = require("nui.tree")
 local Line = require("nui.line")
 local event = require("nui.utils.autocmd").event
 local Icons = require("mini.icons")
+local Opts = require("nvim-p4.config").opts.changes
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
 local p4 = require("nvim-p4.p4")
@@ -259,7 +260,7 @@ function M.open()
     end)
 
     -- Refresh
-    vim.keymap.set("n", "<F5>", function() refresh_tree() end, { buffer = M.popup.bufnr })
+    vim.keymap.set("n", Opts.keymaps.refresh, function() refresh_tree() end, { buffer = M.popup.bufnr })
 
     -- Select a client
     vim.keymap.set("n", "c", function()
