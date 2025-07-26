@@ -57,6 +57,7 @@ function M.is_empty_unmodified_buffer(bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
     return vim.api.nvim_buf_is_loaded(bufnr)
         and vim.api.nvim_buf_get_name(bufnr) == ""
+        and vim.api.nvim_buf_get_option(bufnr, "modifiable")
         and not vim.api.nvim_buf_get_option(bufnr, "modified")
         and vim.api.nvim_buf_line_count(bufnr) == 1
         and vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1] == ""
@@ -81,7 +82,7 @@ function M.edit_file(path, bufnr)
         return
     end
     if bufnr ~= nil then vim.api.nvim_set_current_buf(bufnr) end
-    vim.cmd.edit(abs_path)
+    vim.cmd("keepalt keepjumps edit " .. abs_path)
 end
 
 return M

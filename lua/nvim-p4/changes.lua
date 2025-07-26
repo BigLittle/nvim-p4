@@ -304,13 +304,11 @@ function M.open()
             if node.empty then return end
             local children = M.tree:get_nodes(node:get_id())
             M.popup:hide()
-            print(M.popup.bufnr)
             for _, child in ipairs(children) do
                 utils.edit_file(child.path, utils.find_valid_buffer(M.popup.bufnr))
             end
         else
             M.popup:hide()
-            print(M.popup.bufnr)
             utils.edit_file(node.path, utils.find_valid_buffer(M.popup.bufnr))
         end
     end, { buffer = M.popup.bufnr, nowait = true })
