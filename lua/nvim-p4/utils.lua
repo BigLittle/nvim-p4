@@ -81,7 +81,7 @@ function M.edit_file(path, bufnr)
         return
     end
     if bufnr ~= nil then vim.api.nvim_set_current_buf(bufnr) end
-    vim.cmd("keepalt keepjumps edit " .. abs_path)
+    vim.cmd.edit(abs_path)
 end
 
 return M
