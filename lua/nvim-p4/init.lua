@@ -1,28 +1,37 @@
-local changes = require("nvim-p4.changes")
-local client = require("nvim-p4.client")
-local p4 = require("nvim-p4.p4")
+local M = {}
 
-client.bootstrap()
+function M.setup(opts)
+    require("nvim-p4.config").setup(opts)
+end
 
-vim.api.nvim_create_user_command('P4Changes', function()
-    client.ensure_client(function() changes.open() end)
-end, { desc = "View all pending changelists in current client." })
+return M
 
-vim.api.nvim_create_user_command('P4Clients', function()
-    client.select_client(function()
-        if client.name == nil then return end
-        print("Selected Perforce client: " .. client.name)
-    end)
-end, { desc = "Select a Perforce client." })
 
-vim.api.nvim_create_user_command('P4Info', function()
-    client.ensure_client(function() print(p4.info()) end)
-end, { desc = "Show Perforce info." })
-
-vim.api.nvim_create_user_command('P4Edit', function()
-    client.ensure_client(function()
-        if client.name == nil then return end
-        local path = vim.api.nvim_buf_get_name(0)
-        p4.edit(nil, path)
-    end)
-end, { desc = "Open file in a client for edit." })
+-- local changes = require("nvim-p4.changes")
+-- local client = require("nvim-p4.client")
+-- local p4 = require("nvim-p4.p4")
+--
+-- client.bootstrap()
+--
+-- vim.api.nvim_create_user_command('P4Changes', function()
+--     client.ensure_client(function() changes.open() end)
+-- end, { desc = "View all pending changelists in current client." })
+--
+-- vim.api.nvim_create_user_command('P4Clients', function()
+--     client.select_client(function()
+--         if client.name == nil then return end
+--         print("Selected Perforce client: " .. client.name)
+--     end)
+-- end, { desc = "Select a Perforce client." })
+--
+-- vim.api.nvim_create_user_command('P4Info', function()
+--     client.ensure_client(function() print(p4.info()) end)
+-- end, { desc = "Show Perforce info." })
+--
+-- vim.api.nvim_create_user_command('P4Edit', function()
+--     client.ensure_client(function()
+--         if client.name == nil then return end
+--         local path = vim.api.nvim_buf_get_name(0)
+--         p4.edit(nil, path)
+--     end)
+-- end, { desc = "Open file in a client for edit." })
