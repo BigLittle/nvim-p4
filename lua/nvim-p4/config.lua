@@ -3,7 +3,12 @@ local defalut = {
     },
     changes = {
         keymaps = {
+            edit = "e",
+            move = "m",
             refresh = "<F5>",
+            revert = "r",
+            switch_client = "c",
+            toggle_changelist = "<Space>",
         }
     }
 }

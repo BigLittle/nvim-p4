@@ -28,9 +28,7 @@ Install the plugin with lazy.nvim:
     "MunifTanjim/nui.nvim",
     "echasnovski/mini.icons",
   },
-  config = function()
-    require("nvim-p4")
-  end,
+  opts = {}
 }
 ```
 
@@ -54,7 +52,7 @@ Install the plugin with lazy.nvim:
    | Key     | Action        |
    | ------- | ------------- |
    | Enter   | Select client |
+   | Esc / q | Close window  |
    | j / k   | Navigation    |
-   | Esc / q | Hide window   |
 
 `:P4Edit` to make current buffer file opened for edit in current active client.

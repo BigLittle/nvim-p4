@@ -263,7 +263,7 @@ function M.open()
     vim.keymap.set("n", Opts.keymaps.refresh, function() refresh_tree() end, { buffer = M.popup.bufnr })
 
     -- Select a client
-    vim.keymap.set("n", "c", function()
+    vim.keymap.set("n", Opts.keymaps.switch_client, function()
         local current_client = client.name
         client.select_client(function()
             if client.name == current_client then return end
@@ -272,7 +272,7 @@ function M.open()
     end, { buffer = M.popup.bufnr })
 
     -- Move opened file between changelist
-    vim.keymap.set("n", "m", function()
+    vim.keymap.set("n", Opts.keymaps.move, function()
         local node = M.tree:get_node()
         if not node then return end
         if node.changlist then return end
@@ -288,7 +288,7 @@ function M.open()
     end, { buffer = M.popup.bufnr })
 
     -- Toggle the expansion of the current node if it is a changelist
-    vim.keymap.set("n", "<Space>", function()
+    vim.keymap.set("n", Opts.keymaps.toggle_changelist, function()
         local node = M.tree:get_node()
         if not node then return end
         if not node.changlist then return end
@@ -302,7 +302,7 @@ function M.open()
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Open the selected file in the editor
-    vim.keymap.set("n", "e", function()
+    vim.keymap.set("n", Opts.keymaps.edit, function()
         local node = M.tree:get_node()
         if not node then return end
         if node.changlist then
@@ -319,7 +319,7 @@ function M.open()
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Revert the selected file
-    vim.keymap.set("n", "r", function()
+    vim.keymap.set("n", Opts.keymaps.revert, function()
         local node = M.tree:get_node()
         if not node then return end
         if node.changlist then return end
