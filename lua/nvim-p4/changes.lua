@@ -329,6 +329,7 @@ function M.open()
             vim.g.__focused = false
             if value == "" then return end
             p4.revert(depot_file, value == "Revert If Unchanged")
+            vim.cmd("checktime")
             refresh_tree()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })

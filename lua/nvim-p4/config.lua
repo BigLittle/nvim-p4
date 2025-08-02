@@ -43,6 +43,7 @@ function M.setup(user_opts)
             if client.name == nil then return end
             local path = vim.api.nvim_buf_get_name(0)
             p4.edit(nil, path)
+            vim.cmd("checktime")
         end)
     end, { desc = "Open file in a client for edit." })
 end
