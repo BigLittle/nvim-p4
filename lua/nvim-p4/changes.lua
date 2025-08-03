@@ -50,12 +50,14 @@ end
 
 function M.diff_opened_file(haveRev, latestRev, callback)
     local items = {}
-    table.insert(items, Menu.item("  Diff against Have Revision (#" .. haveRev .. ") ", { value = "Diff against Have Revision", index = 0 }))
-    table.insert(items, Menu.item("  Diff against Latest Revision (#" .. latestRev .. ") ", { value = "Diff against Latest Revision", index = 1 }))
+    local label1 = "  Diff against Have Revision (#" .. haveRev .. ") "
+    local label2 = "  Diff against Latest Revision (#" .. latestRev .. ") "
+    table.insert(items, Menu.item(label1, { value = "Diff against Have Revision", index = 0 }))
+    table.insert(items, Menu.item(label2, { value = "Diff against Latest Revision", index = 1 }))
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = 30, height = #items },
+        size = { width = math.max(#label1, #label2) + 1 , height = #items },
         border = {
             style = "double",
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
