@@ -9,7 +9,7 @@ A Neovim plugin for intuitive and interactive Perforce changelist management.
 - 📂 Easily to edit opened file(s)
 - 🚚 Move opened file bewteen changelists
 - 🔄 Revert opened file
-- 📊 Diff opened file against depot content
+- 📊 Diff opened file against have / latest revision.
 
 ## 📃 Requirements
 
@@ -57,7 +57,7 @@ Install the plugin with lazy.nvim:
    | Esc / q | Close window  |
    | j / k   | Navigation    |
 
-`:P4Diff` to compare current buffer file to the depot content.
+`:P4Diff` to compare current buffer file to the depot content (the latest revision).
 
 `:P4Edit` to make current buffer file opened for edit in current active client.
 
