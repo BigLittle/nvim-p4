@@ -171,11 +171,11 @@ function M.where(file, return_syntax)
     local cmd = { "p4", "-c", client.name, "where", file }
     local out = utils.split(utils.get_output(cmd))
     if return_syntax == "depot" then
-        return out[0] or ""
-    elseif return_syntax == "client" then
         return out[1] or ""
-    elseif return_syntax == "local" then
+    elseif return_syntax == "client" then
         return out[2] or ""
+    elseif return_syntax == "local" then
+        return out[3] or ""
     else
         utils.notify_error("Invalid return syntax: " .. return_syntax)
     end
