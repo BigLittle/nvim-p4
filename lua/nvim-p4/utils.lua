@@ -89,13 +89,15 @@ end
 function M.diff_file(depot_file_contents, path)
     vim.cmd("tabnew")
     vim.cmd("vsplit " .. path)
+    local filetype = vim.bo.filetype
     vim.cmd("wincmd h")
     local diff_buf = vim.api.nvim_get_current_buf()
     vim.api.nvim_buf_set_lines(diff_buf, 0, -1, false, depot_file_contents)
-    vim.api.nvim_buf_set_option(diff_buf, 'modifiable', false)
     vim.api.nvim_buf_set_option(diff_buf, 'buftype', 'nofile')
     vim.api.nvim_buf_set_option(diff_buf, 'bufhidden', 'wipe')
-    vim.api.nvim_buf_set_option(diff_buf, 'filetype', vim.bo.filetype)
+    vim.api.nvim_buf_set_option(diff_buf, 'swapfile', false)
+    vim.api.nvim_buf_set_option(diff_buf, 'filetype', filetype)
+    vim.api.nvim_buf_set_option(diff_buf, 'modifiable', false)
     vim.cmd("windo diffthis")
 end
 
