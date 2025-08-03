@@ -48,6 +48,45 @@ local function refresh_tree()
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
 end
 
+function M.diff_opened_file(haveRev, latestRev, callback)
+    local items = {}
+    table.insert(items, Menu.item("  Diff against Have Revision (#" .. haveRev .. ") ", { value = "Diff against Have Revision", index = 0 }))
+    table.insert(items, Menu.item("  Diff against Latest Revision (#" .. latestRev .. ") ", { value = "Diff against Latest Revision", index = 1 }))
+    local menu = Menu({
+        relative = "editor",
+        position = "50%",
+        size = { width = 30, height = #items },
+        border = {
+            style = "double",
+            padding = { top = 0, bottom = 0, left = 0, right = 0 },
+        },
+        win_options = { winhighlight = "Normal:Normal,FloatBorder:MiniIconsOrange" },
+    }, {
+        lines = items,
+        keymap = { submit = { "<CR>" }, close = { "q", "<Esc>" }, },
+
+        -- Highlight the selected item
+        on_change = function(item, menu)
+            vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
+            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
+        end,
+
+        -- Set the selected client
+        on_submit = function(item)
+            callback(item.value)
+        end,
+    })
+
+    menu:mount()
+
+    -- Unmount the menu when leaving the buffer
+    menu:on(event.BufLeave, function()
+        callback("")
+        menu:unmount()
+    end)
+end
+
 function M.revert_opened_file(callback)
     local items = {}
     table.insert(items, Menu.item("  Revert If Unchanged ", { value = "Revert If Unchanged", index = 0 }))
@@ -316,6 +355,27 @@ function M.open()
             M.popup:hide()
             utils.edit_file(node.path, utils.find_valid_buffer(M.popup.bufnr))
         end
+    end, { buffer = M.popup.bufnr, nowait = true })
+
+    -- Diff the selected file with the head revision
+    vim.keymap.set("n", Opts.keymaps.diff, function()
+        local node = M.tree:get_node()
+        if not node then return end
+        if node.changlist then return end
+        vim.g.__focused = true
+        M.diff_opened_file(node.haveRev, node.headRev, function(value)
+            vim.g.__focused = false
+            if value == "" then return end
+            local cleaned = ""
+            if value == "Diff against Have Revision" then
+                cleaned = p4.print(node.depotFile .. "#" .. node.haveRev):gsub("\n$", "")
+            elseif value == "Diff against Latest Revision" then
+                cleaned = p4.print(node.depotFile .. "#" .. node.headRev):gsub("\n$", "")
+            end
+            local depot_file_contents = vim.split(cleaned, "\n", { plain = true })
+            M.popup:hide()
+            utils.diff_file(depot_file_contents, node.path)
+        end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Revert the selected file

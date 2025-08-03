@@ -3,6 +3,7 @@ local defalut = {
     },
     changes = {
         keymaps = {
+            diff = "d",
             edit = "e",
             move = "m",
             refresh = "<F5>",
@@ -73,7 +74,8 @@ function M.setup(user_opts)
             if client.name == nil then return end
             local path = vim.api.nvim_buf_get_name(0)
             local depot_file = p4.where(path, "depot")
-            local depot_file_contents = vim.split(p4.print(depot_file), "\n", { plain = true })
+            local cleaned = p4.print(depot_file):gsub("\n$", "")
+            local depot_file_contents = vim.split(cleaned, "\n", { plain = true })
             utils.diff_file(depot_file_contents, path)
         end)
     end, { desc = "Diff file in a client." })

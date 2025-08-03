@@ -42,6 +42,7 @@ Install the plugin with lazy.nvim:
    | F5      | Refresh current status                 |
    | Space   | Expand / Collapse a changelist         |
    | c       | Switch to another client               |
+   | d       | Diff opened file                       |
    | e       | Edit file(s) in a new buffer           |
    | j / k   | Navigation                             |
    | m       | Move opened file to another changelist |
