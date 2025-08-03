@@ -369,14 +369,21 @@ function M.open()
             vim.g.__focused = false
             if value == "" then return end
             local cleaned = ""
+            local depot_file = ""
             if value == "Diff against Have Revision" then
-                cleaned = p4.print(node.depotFile .. "#" .. node.haveRev):gsub("\n$", "")
+                depot_file = node.depotFile .. "#" .. node.haveRev
+                cleaned = p4.print(depot_file):gsub("\n$", "")
             elseif value == "Diff against Latest Revision" then
-                cleaned = p4.print(node.depotFile .. "#" .. node.headRev):gsub("\n$", "")
+                depot_file = node.depotFile .. "#" .. node.headRev
+                cleaned = p4.print(depot_file):gsub("\n$", "")
             end
             local depot_file_contents = vim.split(cleaned, "\n", { plain = true })
             M.popup:hide()
             utils.diff_file(depot_file_contents, node.path)
+            -- update winbar --
+            vim.api.nvim_win_set_option(0, "winbar", " " .. node.path)
+            vim.cmd("wincmd h")
+            vim.api.nvim_win_set_option(0, "winbar", " ".. depot_file)
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
