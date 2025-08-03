@@ -145,6 +145,12 @@ function M.opened(changelist_number)
     return files
 end
 
+-- Print depot file in a client
+function M.print(depot_file)
+    local cmd = { "p4", "print", "-q", depot_file }
+    return utils.get_output(cmd)
+end
+
 -- Move opened files between changelists
 function M.reopen(depot_file, changelist_number)
     local cmd = { "p4", "-c", client.name, "reopen", "-c", changelist_number, depot_file }
@@ -161,10 +167,18 @@ function M.revert(depot_file, unchanged_only)
 end
 
 -- Get file path from depot file
-function M.where(depot_file)
-    local cmd = { "p4", "-c", client.name, "where", depot_file }
+function M.where(file, return_syntax)
+    local cmd = { "p4", "-c", client.name, "where", file }
     local out = utils.split(utils.get_output(cmd))
-    return out[#out]
+    if return_syntax == "depot" then
+        return out[0] or ""
+    elseif return_syntax == "client" then
+        return out[1] or ""
+    elseif return_syntax == "local" then
+        return out[2] or ""
+    else
+        utils.notify_error("Invalid return syntax: " .. return_syntax)
+    end
 end
 
 return M

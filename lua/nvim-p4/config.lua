@@ -18,6 +18,7 @@ local M = {}
 function M.setup(user_opts)
     M.opts = vim.tbl_deep_extend("force", defalut, user_opts or {})
 
+    local utils = require("nvim-p4.utils")
     local client = require("nvim-p4.client")
     local changes = require("nvim-p4.changes")
     local p4 = require("nvim-p4.p4")
@@ -46,6 +47,37 @@ function M.setup(user_opts)
             vim.cmd("checktime")
         end)
     end, { desc = "Open file in a client for edit." })
+
+    vim.api.nvim_create_user_command('P4RevertIfUnchanged', function()
+        client.ensure_client(function()
+            if client.name == nil then return end
+            local path = vim.api.nvim_buf_get_name(0)
+            local depot_file = p4.where(path, "depot")
+            p4.revert(depot_file, true)
+            vim.cmd("checktime")
+        end)
+    end, { desc = "Revert file in a client if it's unchnaged." })
+
+    vim.api.nvim_create_user_command('P4Revert', function()
+        client.ensure_client(function()
+            if client.name == nil then return end
+            local path = vim.api.nvim_buf_get_name(0)
+            local depot_file = p4.where(path, "depot")
+            p4.revert(depot_file, false)
+            vim.cmd("checktime")
+        end)
+    end, { desc = "Revert file in a client." })
+
+    vim.api.nvim_create_user_command('P4Diff', function()
+        client.ensure_client(function()
+            if client.name == nil then return end
+            local path = vim.api.nvim_buf_get_name(0)
+            local depot_file = p4.where(path, "depot")
+            local depot_file_contents = p4.print(depot_file)
+            utils.diff_file(depot_file_contents, path)
+        end)
+    end, { desc = "Diff file in a client." })
+
 end
 
 return M

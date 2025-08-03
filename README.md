@@ -55,4 +55,10 @@ Install the plugin with lazy.nvim:
    | Esc / q | Close window  |
    | j / k   | Navigation    |
 
+`:P4Diff` to compare current buffer file to the depot content.
+
 `:P4Edit` to make current buffer file opened for edit in current active client.
+
+`:P4Revert` to revert current buffer file.
+
+`:P4RevertIfUnchanged` to revert current buffer file if it's unchanged.
