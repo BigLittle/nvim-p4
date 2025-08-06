@@ -88,6 +88,16 @@ function M.edit(changelist, path)
     return utils.get_output(cmd)
 end
 
+-- Print detailed information about the revisions of files
+function M.filelog(path)
+    if not path:match("^("..client.root..")") then
+        utils.notify_error("Current file: "..path.." does not in the client.")
+        return
+    end
+    local cmd = { "p4", "filelog", "-t", "-l", path }
+    return utils.get_output(cmd)
+end
+
 -- Dump file information for a depot file
 function M.fstat(depot_files)
     local fields = { "depotFile", "path", "headRev", "type", "workRev", "haveRev" }
@@ -97,9 +107,10 @@ function M.fstat(depot_files)
     local files = {}
     for section in out:gmatch("([^\n]+.-)\n\n") do
         local file = {}
+        if section:match("... unresolved") then file["unresolved"] = true end
         -- Extract fields from the section
         for _, field in ipairs(fields) do
-            local value = section:match(field .. " (%S+)")
+            local value = section:match("... " .. field .. " (%S+)")
             if value then
                 if field == "headRev" or field == "workRev" or field == "haveRev" then
                     file[field] = tonumber(value)

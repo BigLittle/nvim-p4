@@ -10,7 +10,15 @@ local defalut = {
             revert = "r",
             switch_client = "c",
             toggle_changelist = "<Space>",
-        }
+        },
+        icons = {
+            edited = "󰷈",
+            opened = "󰈔",
+            synced = "󱍸",
+            unknown_ft = "",
+            unresolved = "󰱼",
+            unsynced = "",
+        },
     }
 }
 
@@ -80,6 +88,13 @@ function M.setup(user_opts)
         end)
     end, { desc = "Diff file in a client." })
 
+    vim.api.nvim_create_user_command('P4FileLog', function()
+        client.ensure_client(function()
+            if client.name == nil then return end
+            local path = vim.api.nvim_buf_get_name(0)
+            print(p4.filelog(path))
+        end)
+    end, { desc = "Print detailed information about the revisions of file." })
 end
 
 return M

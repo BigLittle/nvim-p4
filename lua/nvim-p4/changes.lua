@@ -236,22 +236,26 @@ function M.open()
             else
                 line:append("  ", "P4ChangesHead")
                 if node.differ_from_head then
-                    line:append("", "P4ChangesEdit")
+                    if node.unresolved then
+                        line:append(Opts.icons.unresolved, "WarningMsg")
+                    else
+                        line:append(Opts.icons.edited, "P4ChangesEdit")
+                    end
                 else
-                    line:append("", "Normal")
+                    line:append(Opts.icons.opened, "Normal")
                 end
                 if node.headRev == nil then
                     line:append(" ", "MiniIconsRed")
                 else
                     if node.workRev == node.headRev then
-                        line:append("󱍸 ", "MiniIconsGreen")
+                        line:append(Opts.icons.synced .. " ", "MiniIconsGreen")
                     else
-                        line:append(" ", "MiniIconsYellow")
+                        line:append(Opts.icons.unsynced .. " ", "MiniIconsYellow")
                     end
                 end
                 local icon, hl, is_fallback = Icons.get("file", node.depotFile)
                 if is_fallback then
-                    icon = " " -- Default icon if not found
+                    icon = Opts.icons.unknown_ft -- Default icon if not found
                     hl = "MiniIconsCyan"
                 end
                 line:append(icon.." ", hl)
