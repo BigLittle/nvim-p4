@@ -16,7 +16,7 @@ local defalut = {
             opened = "󰈔",
             synced = "󱍸",
             unknown_ft = "",
-            unresolved = "󰱼",
+            unresolved = "󰷊",
             unsynced = "",
         },
     }
