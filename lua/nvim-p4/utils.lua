@@ -46,7 +46,7 @@ end
 function M.get_output(cmd)
     local result = vim.system(cmd, { text = true }):wait()
     if result.code ~= 0 then
-        vim.api.nvim_err_writeln("Error executing command: " .. table.concat(cmd, " "))
+        M.notify_error("Error executing command: " .. table.concat(cmd, " "))
         return ""
     end
     return result.stdout
@@ -57,8 +57,8 @@ function M.is_empty_unmodified_buffer(bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
     return vim.api.nvim_buf_is_loaded(bufnr)
         and vim.api.nvim_buf_get_name(bufnr) == ""
-        and vim.api.nvim_buf_get_option(bufnr, "modifiable")
-        and not vim.api.nvim_buf_get_option(bufnr, "modified")
+        and vim.api.nvim_get_option_value("modifible", { buf = bufnr })
+        and not vim.api.nvim_get_option_value("modified", { buf = bufnr })
         and vim.api.nvim_buf_line_count(bufnr) == 1
         and vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1] == ""
 end
@@ -93,11 +93,11 @@ function M.diff_file(depot_file_contents, path)
     vim.cmd("wincmd h")
     local diff_buf = vim.api.nvim_get_current_buf()
     vim.api.nvim_buf_set_lines(diff_buf, 0, -1, false, depot_file_contents)
-    vim.api.nvim_buf_set_option(diff_buf, 'buftype', 'nofile')
-    vim.api.nvim_buf_set_option(diff_buf, 'bufhidden', 'wipe')
-    vim.api.nvim_buf_set_option(diff_buf, 'swapfile', false)
-    vim.api.nvim_buf_set_option(diff_buf, 'filetype', filetype)
-    vim.api.nvim_buf_set_option(diff_buf, 'modifiable', false)
+    vim.api.nvim_set_option_value("buftype", "nofile", { buf = diff_buf })
+    vim.api.nvim_set_option_value("bufhidden", "wipe", { buf = diff_buf })
+    vim.api.nvim_set_option_value("swapfile", false, { buf = diff_buf })
+    vim.api.nvim_set_option_value("filetype", filetype, { buf = diff_buf })
+    vim.api.nvim_set_option_value("modifiable", false, { buf = diff_buf })
     vim.cmd("windo diffthis")
 end
 
