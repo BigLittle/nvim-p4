@@ -37,8 +37,8 @@ function M.setup(user_opts)
 
     local utils = require("nvim-p4.utils")
     local client = require("nvim-p4.client")
-    local changes = require("nvim-p4.changes")
     local p4 = require("nvim-p4.p4")
+    local changes = require("nvim-p4.changes")
     client.bootstrap()
 
     vim.api.nvim_create_user_command('P4Changes', function()

@@ -5,8 +5,8 @@ local Line = require("nui.line")
 local event = require("nui.utils.autocmd").event
 local Icons = require("mini.icons")
 local Opts = require("nvim-p4.config").opts.changes
-local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
+local client = require("nvim-p4.client")
 local p4 = require("nvim-p4.p4")
 
 local M = {}

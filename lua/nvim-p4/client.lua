@@ -1,3 +1,4 @@
+local utils = require("nvim-p4.utils")
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
 local M = { name = nil, root = nil }
