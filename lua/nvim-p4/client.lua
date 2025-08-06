@@ -39,13 +39,10 @@ function M.select_client(callback)
         utils.notify_warning("No Perforce clients found.")
         return
     end
-    local icon = "  "
-    -- vim.cmd("highlight! P4ClientHead guifg=#365a98 guibg=#365a98 gui=bold")
-    -- vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
 
     local items = {}
     for _, name in ipairs(clients) do
-        table.insert(items, Menu.item(icon .. name .. " ", { value = name, index = _ - 1}))
+        table.insert(items, Menu.item("  " .. name .. " ", { value = name, index = _ - 1}))
     end
 
     local max_width = 0
