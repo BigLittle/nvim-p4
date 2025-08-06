@@ -31,7 +31,7 @@ function M.setup(user_opts)
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
     vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
-    vim.api.nvim_set_hl(0, "P4ClientHead", { fg = "#365a98", bg = "#365a98", bold = true })
+    vim.api.nvim_set_hl(0, "P4ClientHead", { fg = normal_hl.bg })
     vim.api.nvim_set_hl(0, "P4ClientName", { bg = "#365a98", bold = true })
     vim.api.nvim_set_hl(0, "P4ClientIcon", { fg = "#ffaa00", bg = "#365a98", bold = true })
 
