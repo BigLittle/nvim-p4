@@ -1,5 +1,6 @@
 local utils = require("nvim-p4.utils")
 local Menu = require("nui.menu")
+local ns_id = vim.api.nvim_create_namespace("nvim-p4_client")
 local event = require("nui.utils.autocmd").event
 local M = { name = nil, root = nil }
 
@@ -73,9 +74,9 @@ function M.select_client(callback)
             -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientHead", item.index, 0, 1)
             -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientIcon", item.index, 1, 3)
             -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 3, -1)
-            vim.api.nvim_buf_set_extmark(menu.bufnr, -1, item.index, 0, { end_col = 1, hl_group = "P4ClientHead"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, -1, item.index, 1, { end_col = 3, hl_group = "P4ClientIcon"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, -1, item.index, 3, { end_col = -1, hl_group = "P4ClientName"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 0, { end_col = 1, hl_group = "P4ClientHead"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 1, { end_col = 3, hl_group = "P4ClientIcon"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 3, { end_col = -1, hl_group = "P4ClientName"})
         end,
 
         -- Set the selected client
