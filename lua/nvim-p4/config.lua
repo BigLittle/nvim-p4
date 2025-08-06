@@ -12,6 +12,7 @@ local defalut = {
             toggle_changelist = "<Space>",
         },
         icons = {
+            client = "",
             edited = "󰷈",
             opened = "󰈔",
             synced = "󱍸",
@@ -27,7 +28,13 @@ local M = {}
 function M.setup(user_opts)
     M.opts = vim.tbl_deep_extend("force", defalut, user_opts or {})
 
-    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
+    vim.api.nvim_set_hl(0, "P4ClientHead", { fg = "#365a98", bg = "#365a98", bold = true })
+    vim.api.nvim_set_hl(0, "P4ClientName", { bg = "#365a98", bold = true })
+    vim.api.nvim_set_hl(0, "P4ClientIcon", { fg = "#ffaa00", bg = "#365a98", bold = true })
+
+    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+    vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
+    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
 
     local utils = require("nvim-p4.utils")
     local client = require("nvim-p4.client")

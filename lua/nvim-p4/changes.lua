@@ -190,7 +190,7 @@ function M.open()
         border = {
             style = "rounded",
             text = {
-                top = "[  "..client.name.." ]",
+                top = "[ ".. Opts.icons.client .." "..client.name.." ]",
                 top_align = "center",
                 bottom = " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ",
                 bottom_align = "center",
@@ -208,9 +208,9 @@ function M.open()
     })
     M.popup:mount()
 
-    local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-    vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
+    -- local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
+    -- vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
+    -- vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
 
     M.tree = Tree({
         bufnr = M.popup.bufnr,

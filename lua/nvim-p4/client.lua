@@ -40,8 +40,8 @@ function M.select_client(callback)
         return
     end
     local icon = "  "
-    vim.cmd("highlight! P4ClientHead guifg=#365a98 guibg=#365a98 gui=bold")
-    vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
+    -- vim.cmd("highlight! P4ClientHead guifg=#365a98 guibg=#365a98 gui=bold")
+    -- vim.cmd("highlight! P4ClientName guibg=#365a98 gui=bold")
 
     local items = {}
     for _, name in ipairs(clients) do
