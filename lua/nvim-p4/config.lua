@@ -27,6 +27,8 @@ local M = {}
 function M.setup(user_opts)
     M.opts = vim.tbl_deep_extend("force", defalut, user_opts or {})
 
+    vim.cmd("highlight! P4ClientIcon guifg=#ffaa00 guibg=#365a98 gui=bold")
+
     local utils = require("nvim-p4.utils")
     local client = require("nvim-p4.client")
     local changes = require("nvim-p4.changes")
