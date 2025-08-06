@@ -76,7 +76,7 @@ function M.select_client(callback)
             -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ClientName", item.index, 3, -1)
             vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 0, { end_col = 1, hl_group = "P4ClientHead"})
             vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 1, { end_col = 3, hl_group = "P4ClientIcon"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 3, { end_col = max_width - 1, hl_group = "P4ClientName"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, ns_id, item.index, 3, { end_col = max_width - 3, hl_group = "P4ClientName"})
         end,
 
         -- Set the selected client
