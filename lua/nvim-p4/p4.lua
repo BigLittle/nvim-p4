@@ -51,24 +51,33 @@ function M.blame_line()
     local path = vim.api.nvim_buf_get_name(bufnr)
     if not ensure_path(path) then return end
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+
+    
+    local original_lines = p4.print(path):gsub("\n$", "")
     local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    print(vim.inspect(curr_line))
-    get_original(path, function(original_lines)
-        get_annotate(path, function(blame_lines)
-            local line_map = utils.build_map(original_lines, curr_lines)
-            print(vim.inspect(line_map))
-            local orig_line = line_map[curr_line]
-            if not orig_line then
-                local info = blame_lines[orig_line]
-                print(vim.inspect(info))
-                utils.notify_info(
-                    string.format("Changelist %d: %s\nUser: %s\nDate: %s", info.cl, info.user, info.date)
-                )
-            else
-                utils.notify_info("Nothing")
-            end
-        end)
-    end)
+    local blocks = vim.diff(original_lines, table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
+    print(vim.inspect(blocks))
+
+
+
+    --
+    -- print(vim.inspect(curr_lines))
+    -- get_original(path, function(original_lines)
+    --     get_annotate(path, function(blame_lines)
+    --         local line_map = utils.build_map(original_lines, curr_lines)
+    --         print(vim.inspect(line_map))
+    --         local orig_line = line_map[curr_line]
+    --         if not orig_line then
+    --             local info = blame_lines[orig_line]
+    --             print(vim.inspect(info))
+    --             utils.notify_info(
+    --                 string.format("Changelist %d: %s\nUser: %s\nDate: %s", info.cl, info.user, info.date)
+    --             )
+    --         else
+    --             utils.notify_info("Nothing")
+    --         end
+    --     end)
+    -- end)
 end
 
 -- Get all pending changelists for the current client
