@@ -18,9 +18,13 @@ function M.build_revert_map(orig_len, curr_len, diffs)
     local i1, i2 = 1, 1
     local d = 1
     local current_diff = diffs[d]
-    local start1, len1, start2, len2 = unpack(current_diff)
     while i1 <= orig_len and i2 <= curr_len do
-        if current_diff and ((i1 >= start1 and i1 < start1 + len1) or (i2 >= start2 and i2 < start2 + len2)) then
+        if current_diff and (
+                (i1 >= current_diff[1] and i1 < current_diff[1] + current_diff[2]) or
+                (i2 >= current_diff[3] and i2 < current_diff[3] + current_diff[4])
+            ) then
+            local start1, len1, start2, len2 = unpack(current_diff)
+
             if len1 == 0 and len2 > 0 and i2 >= start2 and i2 < start2 + len2 then
                 map[i2] = nil
                 i2 = i2 + 1
@@ -39,7 +43,6 @@ function M.build_revert_map(orig_len, curr_len, diffs)
             if i1 >= start1 + len1 and i2 >= start2 + len2 then
                 d = d + 1
                 current_diff = diffs[d]
-                start1, len1, start2, len2 = unpack(current_diff)
             end
         else
             map[i2] = i1
