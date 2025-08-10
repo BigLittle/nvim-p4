@@ -18,7 +18,7 @@ local function get_annotate(path, callback)
         stdout_buffered = true,
         on_stdout = function(_, data)
             for _, line in ipairs(data) do
-                local cl, user, date, content = line:match("^(%d+): (%S+) ($S+) (.*)$")
+                local cl, user, date, content = line:match("^(%d+):%s(%S+)%s(%d+/%d+/%d+)%s(.*)$")
                 table.insert(result, { cl = tonumber(cl), user = user, date = date, content = content })
             end
             print(vim.inspect(result))
