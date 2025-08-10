@@ -17,6 +17,7 @@ local function get_annotate(path, callback)
     vim.fn.jobstart(cmd, {
         stdout_buffered = true,
         on_stdout = function(_, data)
+            table.remove(data, #data) -- Remove the last line which is usually empty
             for _, line in ipairs(data) do
                 local cl, user, date, content = line:match("^(%d+):%s(%S+)%s(%d+/%d+/%d+)%s(.*)$")
                 table.insert(result, { cl = tonumber(cl), user = user, date = date, content = content })
@@ -37,6 +38,7 @@ local function get_original(path, callback)
             for _, line in ipairs(data) do
                 table.insert(lines, line)
             end
+            print(vim.inspect(lines))
             callback(lines)
         end,
     })
