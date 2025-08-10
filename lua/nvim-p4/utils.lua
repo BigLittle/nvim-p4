@@ -13,7 +13,7 @@ function M.notify_warning(msg)
     vim.notify(msg, vim.log.levels.WARN)
 end
 
-function M.revert_map(orig_len, curr_len, diffs)
+function M.build_revert_map(orig_len, curr_len, diffs)
     local map = {}
     local i1, i2 = 1, 1
     local d = 1
