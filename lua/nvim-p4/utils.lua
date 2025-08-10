@@ -13,16 +13,25 @@ function M.notify_warning(msg)
     vim.notify(msg, vim.log.levels.WARN)
 end
 
-function M.build_map(original, current)
+function M.revert_map(orig_len, curr_len, diffs)
     local map = {}
-    local o_idx, c_idx = 1, 1
-    while o_idx <= #original and c_idx <= #current do
-        if original[o_idx] == current[c_idx] then
-            map[c_idx] = o_idx
-            o_idx = o_idx + 1
-            c_idx = c_idx + 1
+    local i1, i2 = 1, 1
+    local d = 1
+    while i1 <= orig_len or i2 <= curr_len do
+        local diff = diffs[d]
+        if diff and i1 == diff.start1 and i2 == diff.start2 then
+            i1 = i1 + diff.len1
+            for _ = 1, diff.len2 do
+                map[i2] = nil
+                i2 = i2 + 1
+            end
+            d = d + 1
         else
-            c_idx = c_idx + 1
+            if i1 <= orig_len and i2 <= curr_len then
+                map[i2] = i1
+            end
+            i1 = i1 + 1
+            i2 = i2 + 1
         end
     end
     return map

@@ -61,8 +61,15 @@ function M.blame_line()
     -- print(vim.inspect(blocks))
 
     get_annotate(path, function(anno_lines, contents)
-        local blocks = vim.diff(table.concat(contents,"\n"), table.concat(curr_lines, "\n"), { result_type = 'indices', algorithm = "patience" })
-        print(vim.inspect(blocks))
+        local diffs = vim.diff(table.concat(contents,"\n"), table.concat(curr_lines, "\n"), { result_type = 'indices', algorithm = "patience" })
+        local revert_map = utils.build_map(#contents, #curr_lines, diffs)
+        local orig_line = revert_map[curr_line]
+        print("Current line: " .. curr_line)
+        print(vim.inspect(revert_map[curr_line]))
+        print("Original line: " .. anno_lines[orig_line].content)
+        print("Original line: " .. anno_lines[orig_line].user)
+        print("Original line: " .. anno_lines[orig_line].data)
+        print("Original line: " .. anno_lines[orig_line].cl)
     end)
     --
     -- print(vim.inspect(curr_lines))
