@@ -17,24 +17,51 @@ function M.build_revert_map(orig_len, curr_len, diffs)
     local map = {}
     local i1, i2 = 1, 1
     local d = 1
-    while i1 <= orig_len or i2 <= curr_len do
+    while i1 <= orig_len and i2 <= curr_len do
         local diff = diffs[d]
-        if diff and i1 == diff.start1 and i2 == diff.start2 then
-            i1 = i1 + diff.len1
-            for _ = 1, diff.len2 do
-                map[i2] = nil
-                i2 = i2 + 1
+        if diff and i1 == diff[1] and i2 == diff[3] then
+            local len1, len2 = diff[2], diff[4]
+            if len1 > 0 and len2 == 0 then
+                i1 = i1 + len1
+            elseif len1 == 0 and len2 > 0 then
+                for _ = 1, len2 do
+                    map[i2] = nil
+                    i2 = i2 + 1
+                end
+            elseif len1 > 0 and len2 > 0 then
+                for _ = 1, len2 do
+                    map[i2] = nil
+                    i2 = i2 + 1
+                end
+                i1 = i1 + len1
             end
-            i1 = i1 + diff.len1
             d = d + 1
         else
-            if i1 <= orig_len and i2 <= curr_len then
-                map[i2] = i1
-            end
+            map[i2] = i1
             i1 = i1 + 1
             i2 = i2 + 1
         end
     end
+
+
+    -- while i1 <= orig_len or i2 <= curr_len do
+    --     local diff = diffs[d]
+    --     if diff and i1 == diff.start1 and i2 == diff.start2 then
+    --         i1 = i1 + diff.len1
+    --         for _ = 1, diff.len2 do
+    --             map[i2] = nil
+    --             i2 = i2 + 1
+    --         end
+    --         i1 = i1 + diff.len1
+    --         d = d + 1
+    --     else
+    --         if i1 <= orig_len and i2 <= curr_len then
+    --             map[i2] = i1
+    --         end
+    --         i1 = i1 + 1
+    --         i2 = i2 + 1
+    --     end
+    -- end
     return map
 end
 
