@@ -22,7 +22,6 @@ local function get_annotate(path, callback)
                 local cl, user, date, content = line:match("^(%d+):%s(%S+)%s(%d+/%d+/%d+)%s(.*)$")
                 table.insert(result, { cl = tonumber(cl), user = user, date = date, content = content })
             end
-            print(vim.inspect(result))
             callback(result)
         end,
     })
@@ -35,10 +34,10 @@ local function get_original(path, callback)
     vim.fn.jobstart(cmd, {
         stdout_buffered = true,
         on_stdout = function(_, data)
+            table.remove(data, #data) -- Remove the last line which is usually empty
             for _, line in ipairs(data) do
                 table.insert(lines, line)
             end
-            print(vim.inspect(lines))
             callback(lines)
         end,
     })
@@ -53,6 +52,7 @@ function M.blame_line()
     if not ensure_path(path) then return end
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    print(vim.inspect(curr_lines))
     get_original(path, function(original_lines)
         get_annotate(path, function(blame_lines)
             local line_map = utils.build_map(original_lines, curr_lines)
