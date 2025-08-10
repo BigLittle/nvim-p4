@@ -38,7 +38,7 @@ function M.clear_blame_line()
     if blame_bufnr == nil or blame_row == nil then return end
     local bufnr = vim.api.nvim_get_current_buf()
     if bufnr ~= blame_bufnr then return end
-    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local row = vim.api.nvim_win_get_cursor(0)[1]
     print("Clearing blame for row: " .. row .. ", current blame row: " .. blame_row)
     if row and row ~= blame_row then
         vim.api.nvim_buf_clear_namespace(blame_bufnr, ns_id, blame_row - 1, blame_row)
