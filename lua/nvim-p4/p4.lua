@@ -9,7 +9,62 @@ local function ensure_path(path)
     return true
 end
 
+
+local function get_annotate(path, callback)
+    if not ensure_path(path) then return end
+    local cmd = { "p4", "-c", "-q", "-u", "annotate", path }
+    local result = {}
+    vim.fn.jobstart(cmd, {
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+            for _, line in ipairs(data) do
+                local cl, user, date, content = line:match("^(%d+): (%S+) ($S+) (.*)$")
+                table.insert(result, {cl = tonumber(cl), user = user, date = date, content = content})
+            end
+            callback(result)
+        end,
+    })
+end
+
+local function get_original(path, callback)
+    if not ensure_path(path) then return end
+    local cmd = { "p4", "print", "-q", path }
+    local lines = {}
+    vim.fn.jobstart(cmd, {
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+            for _, line in ipairs(data) do
+                table.insert(lines, line)
+            end
+            callback(liens)
+        end,
+    })
+end
+
 local M = {}
+
+-- Use annotate to implement blame functionality
+function M.blame_line()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local path = vim.api.nvim_buf_get_name(bufnr)
+    if not ensure_path(path) then return end
+    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    get_original(path, function(original_lines)
+        get_annotate(path, function(blame_lines)
+            local line_map = utils.build_map(original_lines, curr_lines)
+            local orig_line = line_map[curr_line]
+            if not orig_line then
+                local info = blame_lines[orig_line]
+                utils.notify_info(
+                    string.format("Changelist %d: %s\nUser: %s\nDate: %s", info.cl, info.user, info.date)
+                )
+            else
+                utils.notify_info("Nothing")
+            end
+        end)
+    end)
+end
 
 -- Get all pending changelists for the current client
 function M.changes()

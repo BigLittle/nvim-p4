@@ -5,8 +5,27 @@ function M.notify_error(msg)
     vim.notify(msg, vim.log.levels.ERROR)
 end
 
+function M.notify_info(msg)
+    vim.notify(msg, vim.log.levels.INFO)
+end
+
 function M.notify_warning(msg)
     vim.notify(msg, vim.log.levels.WARN)
+end
+
+function M.build_map(original, current)
+    local map = {}
+    local o_idx, c_idx = 1, 1
+    while o_idx <= #original and c_idx <= #current do
+        if original[o_idx] == current[c_idx] then
+            map[c_idx] = o_idx
+            o_idx = o_idx + 1
+            c_idx = c_idx + 1
+        else
+            c_idx = c_idx + 1
+        end
+    end
+    return map
 end
 
 function M.loading()
@@ -32,7 +51,7 @@ M.loading_popup = M.loading()
 function M.split(input)
     local t = {}
     for word in input:gmatch("%S+") do
-        t[#t+1] = word
+        t[#t + 1] = word
     end
     return t
 end
@@ -57,7 +76,7 @@ function M.is_empty_unmodified_buffer(bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
     return vim.api.nvim_buf_is_loaded(bufnr)
         and vim.api.nvim_buf_get_name(bufnr) == ""
-        and vim.api.nvim_get_option_value("modifible", { buf = bufnr })
+        and vim.api.nvim_get_option_value("modifiable", { buf = bufnr })
         and not vim.api.nvim_get_option_value("modified", { buf = bufnr })
         and vim.api.nvim_buf_line_count(bufnr) == 1
         and vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)[1] == ""

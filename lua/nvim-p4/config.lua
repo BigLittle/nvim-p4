@@ -85,6 +85,13 @@ function M.setup(user_opts)
         end)
     end, { desc = "Revert file in a client." })
 
+    vim.api.nvim_create_user_command('P4BlameLine', function()
+        client.ensure_client(function()
+            if client.name == nil then return end
+            p4.blame_line()
+        end)
+    end, { desc = "Blame current line." })
+
     vim.api.nvim_create_user_command('P4Diff', function()
         client.ensure_client(function()
             if client.name == nil then return end
