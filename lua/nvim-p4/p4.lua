@@ -36,7 +36,7 @@ local function get_original(path, callback)
             for _, line in ipairs(data) do
                 table.insert(lines, line)
             end
-            callback(liens)
+            callback(lines)
         end,
     })
 end
