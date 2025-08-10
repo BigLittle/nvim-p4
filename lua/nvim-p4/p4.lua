@@ -53,10 +53,10 @@ function M.blame_line()
     local path = vim.api.nvim_buf_get_name(bufnr)
     if not ensure_path(path) then return end
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
     
     -- local original_lines = M.print(path):gsub("\n$", "")
-    -- local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     -- local blocks = vim.diff(original_lines, table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
     -- print(vim.inspect(blocks))
 
