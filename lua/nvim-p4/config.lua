@@ -50,7 +50,7 @@ function M.setup(user_opts)
     client.bootstrap()
 
     vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-        callback = p4.clear_blame,
+        callback = p4.clear_blame_line,
         desc = "Clear blame virtual text on cursor move",
     })
 
@@ -98,10 +98,10 @@ function M.setup(user_opts)
         end)
     end, { desc = "Revert file in a client." })
 
-    vim.api.nvim_create_user_command('P4BlameLine', function()
+    vim.api.nvim_create_user_command('P4Blame', function()
         client.ensure_client(function()
             if client.name == nil then return end
-            p4.blame_line()
+            p4.blame()
         end)
     end, { desc = "Blame current line." })
 
