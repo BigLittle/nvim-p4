@@ -36,7 +36,7 @@ function M.setup(user_opts)
     M.opts = vim.tbl_deep_extend("force", defalut, user_opts or {})
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-    vim.api.nvim_set_hl(0, "P4BlameLine", { fg = "#666666", bold = true })
+    vim.api.nvim_set_hl(0, "P4BlameLine", { fg = "#888888", bold = true })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg })
     vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" })
     vim.api.nvim_set_hl(0, "P4ClientHead", { fg = normal_hl.bg })
@@ -50,7 +50,7 @@ function M.setup(user_opts)
     client.bootstrap()
 
     vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-        callback = p4.clear_blame_line,
+        callback = p4.clear_blame,
         desc = "Clear blame virtual text on cursor move",
     })
 

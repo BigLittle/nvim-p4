@@ -39,6 +39,7 @@ function M.clear_blame_line()
     local bufnr = vim.api.nvim_get_current_buf()
     if bufnr ~= blame_bufnr then return end
     local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    print("Clearing blame for row: " .. row .. ", current blame row: " .. blame_row)
     if row and row ~= blame_row then
         vim.api.nvim_buf_clear_namespace(blame_bufnr, ns_id, blame_row - 1, blame_row)
         blame_bufnr = nil
@@ -47,7 +48,7 @@ function M.clear_blame_line()
 end
 
 -- Use annotate to implement blame functionality
-function M.blame_line()
+function M.blame()
     local bufnr = vim.api.nvim_get_current_buf()
     local path = vim.api.nvim_buf_get_name(bufnr)
     if not ensure_path(path) then return end
