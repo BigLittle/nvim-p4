@@ -17,8 +17,10 @@ function M.build_revert_map(orig_len, curr_len, diffs)
     local map = {}
     local i1, i2 = 1, 1
     local d = 1
+    print("Input diffs:" .. vim.inspect(diffs))
     while i1 <= orig_len and i2 <= curr_len do
         local diff = diffs[d]
+        print(vim.inspect(diff))
         if diff and i1 == diff[1] and i2 == diff[3] then
             print("Diff found: " .. vim.inspect(diff))
             local len1, len2 = diff[2], diff[4]
