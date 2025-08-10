@@ -1,6 +1,9 @@
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
+local blame_opts = require("nvim-p4.config").opts.blame
 local ns_id = vim.api.nvim_create_namespace("nvim-p4_blame")
+local blame_bufnr = nil
+local blame_row = nil
 
 local function ensure_path(path)
     if not path:match("^(" .. client.root .. ")") then
@@ -9,7 +12,6 @@ local function ensure_path(path)
     end
     return true
 end
-
 
 local function get_annotate(path, callback)
     if not ensure_path(path) then return end
@@ -32,6 +34,24 @@ end
 
 local M = {}
 
+function M.clear_virtual_text(bufnr, row)
+    if row then
+        vim.api.nvim_buf_clear_namespace(bufnr, ns_id, row, row + 1)
+    end
+end
+
+function M.clear_blame()
+    if blame_bufnr == nil or blame_row == nil then return end
+    local bufnr = vim.api.nvim_get_current_buf()
+    if bufnr ~= blame_bufnr then return end
+    local row = vim.api.nvim_win_get_cursor(0)[1] - 1
+    if row and row ~= blame_row then
+        vim.api.nvim_buf_clear_namespace(bufnr, ns_id, row, row + 1)
+        blame_bufnr = nil
+        blame_row = nil
+    end
+end
+
 -- Use annotate to implement blame functionality
 function M.blame_line()
     local bufnr = vim.api.nvim_get_current_buf()
@@ -51,17 +71,13 @@ function M.blame_line()
             utils.notify_warning("Current line does not match the annotated line.")
             return
         end
-        local virt_text = { { " Changelist: " .. info.cl .. " " .. info.user .. " " .. info.date } }
-        vim.api.nvim_buf_set_extmark(bufnr, ns_id, curr_line - 1, 0, {
+        blame_bufnr = bufnr
+        blame_row = curr_line
+        local virt_text = { { " "..blame_opts.icons.pointer.." Changelist: " .. info.cl .. " " .. info.user .. " " .. info.date } }
+        vim.api.nvim_buf_set_extmark(blame_bufnr, ns_id, blame_row - 1, 0, {
             virt_text = virt_text,
             virt_text_pos = "eol",
         })
-
-        print(vim.inspect(diffs))
-        print("Current line: " .. curr_line)
-        print("Original line: " .. orig_line)
-        print(" CL: " .. info.cl .. " " .. info.user .. " " .. info.date)
-        print(" content: " .. info.content)
     end)
 end
 

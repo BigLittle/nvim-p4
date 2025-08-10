@@ -1,4 +1,9 @@
 local defalut = {
+    blame = {
+        icons = {
+            pointer = "",
+        },
+    },
     client = {
     },
     changes = {
@@ -29,8 +34,9 @@ function M.setup(user_opts)
     M.opts = vim.tbl_deep_extend("force", defalut, user_opts or {})
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-    vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg } )
-    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" } )
+    vim.api.nvim_set_hl(0, "P4BlameLine", { fg = "#d3d3d3", bold = true })
+    vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg })
+    vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" })
     vim.api.nvim_set_hl(0, "P4ClientHead", { fg = normal_hl.bg })
     vim.api.nvim_set_hl(0, "P4ClientName", { bg = "#365a98", bold = true })
     vim.api.nvim_set_hl(0, "P4ClientIcon", { fg = "#ffaa00", bg = "#365a98", bold = true })
@@ -40,6 +46,11 @@ function M.setup(user_opts)
     local p4 = require("nvim-p4.p4")
     local changes = require("nvim-p4.changes")
     client.bootstrap()
+
+    vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
+        callback = p4.clear_blame,
+        desc = "Clear blame virtual text on cursor move",
+    })
 
     vim.api.nvim_create_user_command('P4Changes', function()
         client.ensure_client(function() changes.open() end)
