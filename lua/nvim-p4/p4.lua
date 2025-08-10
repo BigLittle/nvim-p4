@@ -58,6 +58,7 @@ function M.blame_line()
             local orig_line = line_map[curr_line]
             if not orig_line then
                 local info = blame_lines[orig_line]
+                print(vim.inspect(info))
                 utils.notify_info(
                     string.format("Changelist %d: %s\nUser: %s\nDate: %s", info.cl, info.user, info.date)
                 )
