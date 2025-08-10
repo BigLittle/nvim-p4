@@ -20,6 +20,7 @@ function M.build_revert_map(orig_len, curr_len, diffs)
     while i1 <= orig_len and i2 <= curr_len do
         local diff = diffs[d]
         if diff and i1 == diff[1] and i2 == diff[3] then
+            print("Diff found: " .. vim.inspect(diff))
             local len1, len2 = diff[2], diff[4]
             if len1 > 0 and len2 == 0 then
                 i1 = i1 + len1

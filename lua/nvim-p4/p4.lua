@@ -42,6 +42,7 @@ function M.blame_line()
     get_annotate(path, function(anno_lines, contents)
         local diffs = vim.diff(table.concat(contents,"\n"), table.concat(curr_lines, "\n"), { result_type = 'indices', algorithm = "patience" })
         local revert_map = utils.build_revert_map(#contents, #curr_lines, diffs)
+        print("Revert map: " .. vim.inspect(revert_map))
         local orig_line = revert_map[curr_line]
         if orig_line == nil then return end
         local info = anno_lines[orig_line]
