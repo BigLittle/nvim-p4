@@ -1,9 +1,9 @@
 local defalut = {
     blame = {
         icons = {
-            pointer = "",
-            user = "",
-            date = "",
+            date = "󰥔",
+            star = "",
+            user = "",
         },
     },
     client = {
@@ -36,7 +36,7 @@ function M.setup(user_opts)
     M.opts = vim.tbl_deep_extend("force", defalut, user_opts or {})
 
     local normal_hl = vim.api.nvim_get_hl(0, { name = "Normal" })
-    vim.api.nvim_set_hl(0, "P4BlameLine", { fg = "#888888", bold = true })
+    vim.api.nvim_set_hl(0, "P4BlameLine", { fg = "#aeaeae", bold = true })
     vim.api.nvim_set_hl(0, "P4ChangesHead", { fg = normal_hl.bg })
     vim.api.nvim_set_hl(0, "P4ChangesEdit", { fg = "#74c1fc" })
     vim.api.nvim_set_hl(0, "P4ClientHead", { fg = normal_hl.bg })
