@@ -1,5 +1,6 @@
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
+local ns_id = vim.api.nvim_create_namespace("nvim-p4_blame")
 
 local function ensure_path(path)
     if not path:match("^(" .. client.root .. ")") then
@@ -40,16 +41,26 @@ function M.blame_line()
     local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
     get_annotate(path, function(anno_lines, contents)
-        local diffs = vim.diff(table.concat(contents,"\n"), table.concat(curr_lines, "\n"), { result_type = 'indices', algorithm = "patience" })
+        local diffs = vim.diff(table.concat(contents, "\n"), table.concat(curr_lines, "\n"),
+            { result_type = 'indices', algorithm = "patience" })
         local revert_map = utils.build_revert_map(#contents, #curr_lines, diffs)
-        print("Revert map: " .. vim.inspect(revert_map))
         local orig_line = revert_map[curr_line]
         if orig_line == nil then return end
         local info = anno_lines[orig_line]
+        if info.content ~= curr_lines[curr_line] then
+            utils.notify_warning("Current line does not match the annotated line.")
+            return
+        end
+        local virt_text = { { " Changelist: " .. info.cl .. " " .. info.user .. " " .. info.date } }
+        vim.api.nvim_buf_set_extmark(bufnr, ns_id, curr_line - 1, 0, {
+            virt_text = virt_text,
+            virt_text_pos = "eol",
+        })
+
         print(vim.inspect(diffs))
         print("Current line: " .. curr_line)
         print("Original line: " .. orig_line)
-        print(" CL: ".. info.cl .. " ".. info.user.." ".. info.date)
+        print(" CL: " .. info.cl .. " " .. info.user .. " " .. info.date)
         print(" content: " .. info.content)
     end)
 end
