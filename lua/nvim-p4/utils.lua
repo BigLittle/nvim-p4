@@ -17,54 +17,36 @@ function M.build_revert_map(orig_len, curr_len, diffs)
     local map = {}
     local i1, i2 = 1, 1
     local d = 1
-    print("Input diffs:" .. vim.inspect(diffs))
+    local current_diff = diffs[d]
+    local start1, len1, start2, len2 = unpack(current_diff)
     while i1 <= orig_len and i2 <= curr_len do
-        local diff = diffs[d]
-        print(vim.inspect(diff))
-        if diff and i1 == diff[1] and i2 == diff[3] then
-            print("Diff found: " .. vim.inspect(diff))
-            local len1, len2 = diff[2], diff[4]
-            if len1 > 0 and len2 == 0 then
-                i1 = i1 + len1
-            elseif len1 == 0 and len2 > 0 then
-                for _ = 1, len2 do
-                    map[i2] = nil
-                    i2 = i2 + 1
-                end
-            elseif len1 > 0 and len2 > 0 then
-                for _ = 1, len2 do
-                    map[i2] = nil
-                    i2 = i2 + 1
-                end
-                i1 = i1 + len1
+        if current_diff and ((i1 >= start1 and i1 < start1 + len1) or (i2 >= start2 and i2 < start2 + len2)) then
+            if len1 == 0 and len2 > 0 and i2 >= start2 and i2 < start2 + len2 then
+                map[i2] = nil
+                i2 = i2 + 1
+            elseif len1 > 0 and len2 == 0 and i1 >= start1 and i1 < start1 + len1 then
+                i1 = i1 + 1
+            elseif len1 > 0 and len2 > 0 and
+                i1 >= start1 and i1 < start1 + len1 and
+                i2 >= start2 and i2 < start2 + len2 then
+                map[i2] = nil
+                i1 = i1 + 1
+                i2 = i2 + 1
+            else
+                i1 = i1 + 1
+                i2 = i2 + 1
             end
-            d = d + 1
+            if i1 >= start1 + len1 and i2 >= start2 + len2 then
+                d = d + 1
+                current_diff = diffs[d]
+                start1, len1, start2, len2 = unpack(current_diff)
+            end
         else
             map[i2] = i1
             i1 = i1 + 1
             i2 = i2 + 1
         end
     end
-
-
-    -- while i1 <= orig_len or i2 <= curr_len do
-    --     local diff = diffs[d]
-    --     if diff and i1 == diff.start1 and i2 == diff.start2 then
-    --         i1 = i1 + diff.len1
-    --         for _ = 1, diff.len2 do
-    --             map[i2] = nil
-    --             i2 = i2 + 1
-    --         end
-    --         i1 = i1 + diff.len1
-    --         d = d + 1
-    --     else
-    --         if i1 <= orig_len and i2 <= curr_len then
-    --             map[i2] = i1
-    --         end
-    --         i1 = i1 + 1
-    --         i2 = i2 + 1
-    --     end
-    -- end
     return map
 end
 
