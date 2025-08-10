@@ -69,7 +69,7 @@ function M.blame()
         blame_row = curr_line
         vim.api.nvim_buf_set_extmark(blame_bufnr, ns_id, blame_row - 1, 0, {
             virt_text = {
-                { "────── ".. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date .. " " .. blame_opts.icons.star .. info.cl, "P4BlameLine" }
+                { "────── ".. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date .. " " .. blame_opts.icons.star .. " " .. info.cl, "P4BlameLine" }
             },
             virt_text_pos = "eol",
         })
