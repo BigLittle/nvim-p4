@@ -12,7 +12,7 @@ end
 
 local function get_annotate(path, callback)
     if not ensure_path(path) then return end
-    local cmd = { "p4", "-c", "-q", "-u", "annotate", path }
+    local cmd = { "p4", "annotate", "-c", "-q", "-u", path }
     local result = {}
     vim.fn.jobstart(cmd, {
         stdout_buffered = true,
@@ -37,7 +37,6 @@ local function get_original(path, callback)
             for _, line in ipairs(data) do
                 table.insert(lines, line)
             end
-            print(vim.inspect(lines))
             callback(lines)
         end,
     })
