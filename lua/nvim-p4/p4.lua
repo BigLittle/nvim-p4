@@ -52,7 +52,7 @@ function M.blame_line()
     if not ensure_path(path) then return end
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    print(vim.inspect(curr_lines))
+    print(vim.inspect(curr_line))
     get_original(path, function(original_lines)
         get_annotate(path, function(blame_lines)
             local line_map = utils.build_map(original_lines, curr_lines)
