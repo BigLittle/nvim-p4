@@ -2,8 +2,8 @@ local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
 
 local function ensure_path(path)
-    if not path:match("^("..client.root..")") then
-        utils.notify_error("Current file: "..path.." does not in the client.")
+    if not path:match("^(" .. client.root .. ")") then
+        utils.notify_error("Current file: " .. path .. " does not in the client.")
         return false
     end
     return true
@@ -19,8 +19,9 @@ local function get_annotate(path, callback)
         on_stdout = function(_, data)
             for _, line in ipairs(data) do
                 local cl, user, date, content = line:match("^(%d+): (%S+) ($S+) (.*)$")
-                table.insert(result, {cl = tonumber(cl), user = user, date = date, content = content})
+                table.insert(result, { cl = tonumber(cl), user = user, date = date, content = content })
             end
+            print(vim.inspect(result))
             callback(result)
         end,
     })
@@ -36,6 +37,7 @@ local function get_original(path, callback)
             for _, line in ipairs(data) do
                 table.insert(lines, line)
             end
+            print(vim.inspect(lines))
             callback(lines)
         end,
     })
@@ -79,7 +81,7 @@ function M.changes()
     return changelists
 end
 
--- Get one line description of a changelist 
+-- Get one line description of a changelist
 function M.describe(num)
     local cmd = { "p4", "-Ztag", "-F", '%desc%', "describe", "-s", num }
     return utils.get_output(cmd)
@@ -105,7 +107,7 @@ end
 -- Dump file information for a depot file
 function M.fstat(depot_files)
     local fields = { "depotFile", "path", "headRev", "type", "workRev", "haveRev" }
-    local cmd = { "p4", "-c", client.name, "fstat", "-T", '"'..table.concat(fields, ",")..'"', "-Olhp" }
+    local cmd = { "p4", "-c", client.name, "fstat", "-T", '"' .. table.concat(fields, ",") .. '"', "-Olhp" }
     for _, depot_file in ipairs(depot_files) do table.insert(cmd, depot_file) end
     local out = utils.get_output(cmd)
     local files = {}
@@ -149,7 +151,7 @@ function M.opened(changelist_number)
     if #depot_files == 0 then return {} end
 
     local diff_table = {}
-    for i , paths in ipairs(utils.split(utils.get_output(cmd))) do
+    for i, paths in ipairs(utils.split(utils.get_output(cmd))) do
         diff_table[paths] = i
     end
 
@@ -174,9 +176,9 @@ end
 
 -- Revert opened file
 function M.revert(depot_file, unchanged_only)
-    local cmd = { "p4", "-c", client.name, "revert", depot_file}
+    local cmd = { "p4", "-c", client.name, "revert", depot_file }
     if unchanged_only then
-        cmd = { "p4", "-c", client.name, "revert", "-a", depot_file}
+        cmd = { "p4", "-c", client.name, "revert", "-a", depot_file }
     end
     return utils.get_output(cmd)
 end
