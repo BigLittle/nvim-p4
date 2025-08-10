@@ -34,19 +34,13 @@ end
 
 local M = {}
 
-function M.clear_virtual_text(bufnr, row)
-    if row then
-        vim.api.nvim_buf_clear_namespace(bufnr, ns_id, row, row + 1)
-    end
-end
-
-function M.clear_blame()
+function M.clear_blame_line()
     if blame_bufnr == nil or blame_row == nil then return end
     local bufnr = vim.api.nvim_get_current_buf()
     if bufnr ~= blame_bufnr then return end
     local row = vim.api.nvim_win_get_cursor(0)[1] - 1
     if row and row ~= blame_row then
-        vim.api.nvim_buf_clear_namespace(bufnr, ns_id, row, row + 1)
+        vim.api.nvim_buf_clear_namespace(blame_bufnr, ns_id, blame_row, blame_row + 1)
         blame_bufnr = nil
         blame_row = nil
     end
@@ -73,9 +67,10 @@ function M.blame_line()
         end
         blame_bufnr = bufnr
         blame_row = curr_line
-        local virt_text = { { " "..blame_opts.icons.pointer.." Changelist: " .. info.cl .. " " .. info.user .. " " .. info.date } }
         vim.api.nvim_buf_set_extmark(blame_bufnr, ns_id, blame_row - 1, 0, {
-            virt_text = virt_text,
+            virt_text = {
+                { " " .. blame_opts.icons.pointer .. " " .. info.cl .. " " .. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date, "P4BlameLine" }
+            },
             virt_text_pos = "eol",
         })
     end)

@@ -10,6 +10,7 @@ A Neovim plugin for intuitive and interactive Perforce changelist management.
 - 🚚 Move opened file bewteen changelists
 - 🔄 Revert opened file
 - 📊 Diff opened file against have / latest revision.
+- 👈 Blame line in opened file 
 
 ## 📃 Requirements
 
@@ -34,6 +35,8 @@ Install the plugin with lazy.nvim:
 ```
 
 ## 🧑‍💻 Usage
+
+`:P4BlameLine` to show the commit changelist, author, and timestamp that last modified the line. 
 
 `:P4Changes` to see the status of current active client. If no client is set, a popup menu will appear. 
 

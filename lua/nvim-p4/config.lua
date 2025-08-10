@@ -2,6 +2,8 @@ local defalut = {
     blame = {
         icons = {
             pointer = "",
+            user = "",
+            date = "",
         },
     },
     client = {
@@ -48,7 +50,7 @@ function M.setup(user_opts)
     client.bootstrap()
 
     vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-        callback = p4.clear_blame,
+        callback = p4.clear_blame_line,
         desc = "Clear blame virtual text on cursor move",
     })
 
