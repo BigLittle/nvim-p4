@@ -29,22 +29,6 @@ local function get_annotate(path, callback)
     })
 end
 
-local function get_original(path, callback)
-    if not ensure_path(path) then return end
-    local cmd = { "p4", "print", "-q", path }
-    local lines = {}
-    vim.fn.jobstart(cmd, {
-        stdout_buffered = true,
-        on_stdout = function(_, data)
-            table.remove(data, #data) -- Remove the last line which is usually empty
-            for _, line in ipairs(data) do
-                table.insert(lines, line)
-            end
-            callback(lines)
-        end,
-    })
-end
-
 local M = {}
 
 -- Use annotate to implement blame functionality
@@ -55,40 +39,18 @@ function M.blame_line()
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
-    
-    -- local original_lines = M.print(path):gsub("\n$", "")
-    -- local blocks = vim.diff(original_lines, table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
-    -- print(vim.inspect(blocks))
-
     get_annotate(path, function(anno_lines, contents)
         local diffs = vim.diff(table.concat(contents,"\n"), table.concat(curr_lines, "\n"), { result_type = 'indices', algorithm = "patience" })
         local revert_map = utils.build_revert_map(#contents, #curr_lines, diffs)
         local orig_line = revert_map[curr_line]
+        if orig_line == nil then return end
         print("Current line: " .. curr_line)
         print(vim.inspect(revert_map[curr_line]))
         print("Original line: " .. anno_lines[orig_line].content)
         print("Original line: " .. anno_lines[orig_line].user)
-        print("Original line: " .. anno_lines[orig_line].data)
+        print("Original line: " .. anno_lines[orig_line].date)
         print("Original line: " .. anno_lines[orig_line].cl)
     end)
-    --
-    -- print(vim.inspect(curr_lines))
-    -- get_original(path, function(original_lines)
-    --     get_annotate(path, function(blame_lines)
-    --         local line_map = utils.build_map(original_lines, curr_lines)
-    --         print(vim.inspect(line_map))
-    --         local orig_line = line_map[curr_line]
-    --         if not orig_line then
-    --             local info = blame_lines[orig_line]
-    --             print(vim.inspect(info))
-    --             utils.notify_info(
-    --                 string.format("Changelist %d: %s\nUser: %s\nDate: %s", info.cl, info.user, info.date)
-    --             )
-    --         else
-    --             utils.notify_info("Nothing")
-    --         end
-    --     end)
-    -- end)
 end
 
 -- Get all pending changelists for the current client
