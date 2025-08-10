@@ -61,7 +61,7 @@ function M.blame_line()
     -- print(vim.inspect(blocks))
 
     get_annotate(path, function(anno_lines, contents)
-        local blocks = vim.diff(table.concat(contents), table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
+        local blocks = vim.diff(table.concat(contents), table.concat(curr_lines), { result_type = 'indices', algorithm = "patience" })
         print(vim.inspect(blocks))
     end)
     --
