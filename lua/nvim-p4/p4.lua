@@ -44,12 +44,12 @@ function M.blame_line()
         local revert_map = utils.build_revert_map(#contents, #curr_lines, diffs)
         local orig_line = revert_map[curr_line]
         if orig_line == nil then return end
+        local info = anno_lines[orig_line]
+        print(vim.inspect(diffs))
         print("Current line: " .. curr_line)
-        print(vim.inspect(revert_map[curr_line]))
-        print("Original line: " .. anno_lines[orig_line].content)
-        print("Original line: " .. anno_lines[orig_line].user)
-        print("Original line: " .. anno_lines[orig_line].date)
-        print("Original line: " .. anno_lines[orig_line].cl)
+        print("Original line: " .. orig_line)
+        print(" CL: ".. info.cl .. " ".. info.user.." ".. info.date)
+        print(" content: " .. info.content)
     end)
 end
 

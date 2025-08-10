@@ -25,6 +25,7 @@ function M.build_revert_map(orig_len, curr_len, diffs)
                 map[i2] = nil
                 i2 = i2 + 1
             end
+            i1 = i1 + diff.len1
             d = d + 1
         else
             if i1 <= orig_len and i2 <= curr_len then
