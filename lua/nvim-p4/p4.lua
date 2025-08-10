@@ -14,6 +14,7 @@ local function get_annotate(path, callback)
     if not ensure_path(path) then return end
     local cmd = { "p4", "annotate", "-c", "-q", "-u", path }
     local result = {}
+    local contents = {}
     vim.fn.jobstart(cmd, {
         stdout_buffered = true,
         on_stdout = function(_, data)
@@ -21,8 +22,9 @@ local function get_annotate(path, callback)
             for _, line in ipairs(data) do
                 local cl, user, date, content = line:match("^(%d+):%s(%S+)%s(%d+/%d+/%d+)%s(.*)$")
                 table.insert(result, { cl = tonumber(cl), user = user, date = date, content = content })
+                table.insert(contents, content)
             end
-            callback(result)
+            callback(result, contents)
         end,
     })
 end
@@ -53,13 +55,15 @@ function M.blame_line()
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
 
     
-    local original_lines = p4.print(path):gsub("\n$", "")
-    local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    local blocks = vim.diff(original_lines, table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
-    print(vim.inspect(blocks))
+    -- local original_lines = M.print(path):gsub("\n$", "")
+    -- local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    -- local blocks = vim.diff(original_lines, table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
+    -- print(vim.inspect(blocks))
 
-
-
+    get_annotate(path, function(anno_lines, contents)
+        local blocks = vim.diff(table.concat(contents), table.concat(curr_lines), { result_type = 'indices', algorithms = "patience" })
+        print(vim.inspect(blocks))
+    end)
     --
     -- print(vim.inspect(curr_lines))
     -- get_original(path, function(original_lines)
