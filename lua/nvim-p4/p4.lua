@@ -56,6 +56,7 @@ function M.blame_line()
     get_original(path, function(original_lines)
         get_annotate(path, function(blame_lines)
             local line_map = utils.build_map(original_lines, curr_lines)
+            print(vim.inspect(line_map))
             local orig_line = line_map[curr_line]
             if not orig_line then
                 local info = blame_lines[orig_line]
