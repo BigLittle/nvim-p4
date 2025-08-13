@@ -2,7 +2,7 @@ local defalut = {
     blame = {
         icons = {
             date = "󰥔",
-            star = "",
+            changelist = "",
             user = "",
         },
     },

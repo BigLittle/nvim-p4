@@ -1,4 +1,3 @@
-local config = require("nvim-p4.config")
 local Popup = require("nui.popup")
 local M = {}
 

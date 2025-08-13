@@ -4,6 +4,7 @@ local Tree = require("nui.tree")
 local Line = require("nui.line")
 local event = require("nui.utils.autocmd").event
 local Icons = require("mini.icons")
+local config = require("nvim-p4.config")
 local Opts = require("nvim-p4.config").opts.changes
 local utils = require("nvim-p4.utils")
 local client = require("nvim-p4.client")
@@ -70,8 +71,10 @@ function M.diff_opened_file(haveRev, latestRev, callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
+            -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ChangesHead"})
+            -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { hl_group = "Visual"})
         end,
 
         -- Set the selected client
@@ -109,8 +112,8 @@ function M.revert_opened_file(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ChangesHead"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { hl_group = "Visual"})
         end,
 
         -- Set the selected client
@@ -153,8 +156,8 @@ function M.move_opened_file(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
-            vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ChangesHead"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { hl_group = "Visual"})
         end,
 
         -- Set the selected client
@@ -287,7 +290,7 @@ function M.open()
     --Auto-resize the popup when the window is resized
     M.popup:on(event.VimResized, function()
         if M.popup == nil then return end
-        local config = {
+        local _config = {
             relative = "editor",
             size = {
                 width = math.min(120, math.floor(vim.o.columns * 0.8)),
@@ -295,7 +298,7 @@ function M.open()
             },
             position = "50%",
         }
-        M.popup:update_layout(config)
+        M.popup:update_layout(_config)
         M.tree:render()
     end)
 
