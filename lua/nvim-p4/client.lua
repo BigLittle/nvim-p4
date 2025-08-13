@@ -1,4 +1,5 @@
 local utils = require("nvim-p4.utils")
+local config = require("nvim-p4.config")
 local Menu = require("nui.menu")
 local event = require("nui.utils.autocmd").event
 local M = { name = nil, root = nil }
@@ -70,9 +71,9 @@ function M.select_client(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_set_extmark(menu.bufnr, 0, item.index, 0, { end_col = 1, hl_group = "P4ClientHead"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, 0, item.index, 1, { end_col = 3, hl_group = "P4ClientIcon"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, 0, item.index, 3, { end_col = #item.value + 5, hl_group = "P4ClientName"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ClientHead"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { end_col = 3, hl_group = "P4ClientIcon"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 3, { end_col = #item.value + 5, hl_group = "P4ClientName"})
         end,
 
         -- Set the selected client
