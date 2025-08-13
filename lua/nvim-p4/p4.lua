@@ -1,7 +1,7 @@
 local client = require("nvim-p4.client")
 local utils = require("nvim-p4.utils")
+local config = require("nvim-p4.config")
 local blame_opts = require("nvim-p4.config").opts.blame
-local ns_id = vim.api.nvim_create_namespace("nvim-p4_blame")
 local blame_bufnr = nil
 local blame_row = nil
 
@@ -37,10 +37,9 @@ local M = {}
 function M.clear_blame_line()
     if blame_bufnr == nil or blame_row == nil then return end
     local bufnr = vim.api.nvim_get_current_buf()
-    if bufnr ~= blame_bufnr then return end
     local row = vim.api.nvim_win_get_cursor(0)[1]
-    if row and row ~= blame_row then
-        vim.api.nvim_buf_clear_namespace(blame_bufnr, ns_id, blame_row - 1, blame_row)
+    if (bufnr ~= blame_bufnr) or (row and row ~= blame_row) then
+        vim.api.nvim_buf_clear_namespace(blame_bufnr, config.ns_id, blame_row - 1, blame_row)
         blame_bufnr = nil
         blame_row = nil
     end
@@ -67,9 +66,9 @@ function M.blame()
         end
         blame_bufnr = bufnr
         blame_row = curr_line
-        vim.api.nvim_buf_set_extmark(blame_bufnr, ns_id, blame_row - 1, 0, {
+        vim.api.nvim_buf_set_extmark(blame_bufnr, config.ns_id, blame_row - 1, 0, {
             virt_text = {
-                { "────── ".. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date .. " " .. blame_opts.icons.star .. " " .. info.cl, "P4BlameLine" }
+                { "────── ".. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date .. " " .. blame_opts.icons.star .. " " .. info.cl .. " ", "P4BlameLine" }
             },
             virt_text_pos = "eol",
         })

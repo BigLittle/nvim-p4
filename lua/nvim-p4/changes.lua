@@ -204,7 +204,6 @@ function M.open()
         },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
-        ns_id = "nvim_p4_changes",
     })
     M.popup:mount()
 
