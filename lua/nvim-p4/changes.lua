@@ -45,7 +45,7 @@ end
 local function refresh_tree()
     M.tree:set_nodes(prepare_nodes())
     M.tree:render()
-    M.popup.border:set_text("top", "[  "..client.name.." ]", "center")
+    M.popup.border:set_text("top", "[  " .. client.name .. " ]", "center")
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
 end
 
@@ -58,7 +58,7 @@ function M.diff_opened_file(haveRev, latestRev, callback)
     local menu = Menu({
         relative = "editor",
         position = "50%",
-        size = { width = math.max(#label1, #label2) + 1 , height = #items },
+        size = { width = math.max(#label1, #label2) + 1, height = #items },
         border = {
             style = "double",
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
@@ -71,10 +71,10 @@ function M.diff_opened_file(haveRev, latestRev, callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "P4ChangesHead", item.index, 0, 1)
-            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ChangesHead"})
-            -- vim.api.nvim_buf_add_highlight(menu.bufnr, -1, "Visual", item.index, 1, -1)
-            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { hl_group = "Visual"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0,
+                { end_col = 1, hl_group = "P4ChangesHead" })
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1,
+                { end_row = item.index + 1, hl_group = "Visual" })
         end,
 
         -- Set the selected client
@@ -112,8 +112,10 @@ function M.revert_opened_file(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ChangesHead"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { hl_group = "Visual"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0,
+                { end_col = 1, hl_group = "P4ChangesHead" })
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1,
+                { end_row = item.index + 1, hl_group = "Visual" })
         end,
 
         -- Set the selected client
@@ -135,7 +137,7 @@ function M.move_opened_file(callback)
     local items = {}
     local max_width = 0
     for _, changelist in ipairs(M.changlists) do
-        table.insert(items, Menu.item("  "..changelist.." ", { value = changelist, index = _ - 1}))
+        table.insert(items, Menu.item("  " .. changelist .. " ", { value = changelist, index = _ - 1 }))
         local len = vim.fn.strdisplaywidth(changelist)
         if len > max_width then max_width = len end
     end
@@ -156,8 +158,10 @@ function M.move_opened_file(callback)
         -- Highlight the selected item
         on_change = function(item, menu)
             vim.api.nvim_buf_clear_namespace(menu.bufnr, -1, 0, -1)
-            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0, { end_col = 1, hl_group = "P4ChangesHead"})
-            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1, { hl_group = "Visual"})
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 0,
+                { end_col = 1, hl_group = "P4ChangesHead" })
+            vim.api.nvim_buf_set_extmark(menu.bufnr, config.ns_id, item.index, 1,
+                { end_row = item.index + 1, hl_group = "Visual" })
         end,
 
         -- Set the selected client
@@ -193,7 +197,7 @@ function M.open()
         border = {
             style = "rounded",
             text = {
-                top = "[ ".. Opts.icons.client .." "..client.name.." ]",
+                top = "[ " .. Opts.icons.client .. " " .. client.name .. " ]",
                 top_align = "center",
                 bottom = " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ",
                 bottom_align = "center",
@@ -256,8 +260,9 @@ function M.open()
                     icon = Opts.icons.unknown_ft -- Default icon if not found
                     hl = "MiniIconsCyan"
                 end
-                line:append(icon.." ", hl)
-                line:append(node.depotFile.. " #" .. node.workRev .. "/" .. node.headRev .. " <" .. node.type .. ">", text_hl)
+                line:append(icon .. " ", hl)
+                line:append(node.depotFile .. " #" .. node.workRev .. "/" .. node.headRev .. " <" .. node.type .. ">",
+                    text_hl)
             end
             return line
         end,
@@ -385,7 +390,7 @@ function M.open()
             -- update winbar --
             vim.api.nvim_set_option_value("winbar", " " .. node.path, { win = 0 })
             vim.cmd("wincmd h")
-            vim.api.nvim_set_option_value("winbar", " ".. depot_file, { win = 0 })
+            vim.api.nvim_set_option_value("winbar", " " .. depot_file, { win = 0 })
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
@@ -408,6 +413,6 @@ function M.open()
     -- Hide the popup with 'q' or 'Esc'
     vim.keymap.set("n", "q", function() M.popup:hide() end, { buffer = M.popup.bufnr, nowait = true })
     vim.keymap.set("n", "<Esc>", function() M.popup:hide() end, { buffer = M.popup.bufnr, nowait = true })
-
 end
+
 return M
