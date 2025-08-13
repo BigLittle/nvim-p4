@@ -122,6 +122,10 @@ function M.setup(user_opts)
             local cleaned = p4.print(depot_file):gsub("\n$", "")
             local depot_file_contents = vim.split(cleaned, "\n", { plain = true })
             utils.diff_file(depot_file_contents, path)
+            -- update winbar --
+            vim.api.nvim_set_option_value("winbar", " " .. path, { win = 0 })
+            vim.cmd("wincmd h")
+            vim.api.nvim_set_option_value("winbar", " ".. depot_file, { win = 0 })
         end)
     end, { desc = "Diff file in a client." })
 

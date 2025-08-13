@@ -380,9 +380,9 @@ function M.open()
             M.popup:hide()
             utils.diff_file(depot_file_contents, node.path)
             -- update winbar --
-            vim.api.nvim_win_set_option(0, "winbar", " " .. node.path)
+            vim.api.nvim_set_option_value("winbar", " " .. node.path, { win = 0 })
             vim.cmd("wincmd h")
-            vim.api.nvim_win_set_option(0, "winbar", " ".. depot_file)
+            vim.api.nvim_set_option_value("winbar", " ".. depot_file, { win = 0 })
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 

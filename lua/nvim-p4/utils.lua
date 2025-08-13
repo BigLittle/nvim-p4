@@ -1,3 +1,4 @@
+local config = require("nvim-p4.config")
 local Popup = require("nui.popup")
 local M = {}
 
@@ -23,7 +24,7 @@ function M.build_revert_map(orig_len, curr_len, diffs)
                 (i1 >= current_diff[1] and i1 < current_diff[1] + current_diff[2]) or
                 (i2 >= current_diff[3] and i2 < current_diff[3] + current_diff[4])
             ) then
-            local start1, len1, start2, len2 = unpack(current_diff)
+            local start1, len1, start2, len2 = table.unpack(current_diff)
 
             if len1 == 0 and len2 > 0 and i2 >= start2 and i2 < start2 + len2 then
                 map[i2] = nil
