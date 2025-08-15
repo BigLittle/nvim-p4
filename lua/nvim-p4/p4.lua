@@ -49,7 +49,7 @@ function M.blame()
     local bufnr = vim.api.nvim_get_current_buf()
     local path = vim.api.nvim_buf_get_name(bufnr)
     if not ensure_path(path) then return end
-    local depot_path = utils.where(path, "depot")
+    local depot_path = M.where(path, "depot")
     if depot_path == "" then
         utils.notify_error("File not found in depot: " .. path)
         return
