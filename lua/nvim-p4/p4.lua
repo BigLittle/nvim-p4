@@ -13,9 +13,8 @@ local function ensure_path(path)
     return true
 end
 
-local function get_annotate(path, callback)
-    if not ensure_path(path) then return end
-    local cmd = { "p4", "annotate", "-c", "-q", "-u", path }
+local function get_annotate(depot_path, callback)
+    local cmd = { "p4", "annotate", "-c", "-q", "-u", depot_path }
     local result = {}
     local contents = {}
     vim.fn.jobstart(cmd, {
@@ -50,10 +49,15 @@ function M.blame()
     local bufnr = vim.api.nvim_get_current_buf()
     local path = vim.api.nvim_buf_get_name(bufnr)
     if not ensure_path(path) then return end
+    local depot_path = utils.where(path, "depot")
+    if depot_path == "" then
+        utils.notify_error("File not found in depot: " .. path)
+        return
+    end
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
-    get_annotate(path, function(anno_lines, contents)
+    get_annotate(depot_path, function(anno_lines, contents)
         local diffs = vim.diff(table.concat(contents, "\n"), table.concat(curr_lines, "\n"),
             { result_type = 'indices', algorithm = "patience" })
         local revert_map = utils.build_revert_map(#contents, #curr_lines, diffs)
