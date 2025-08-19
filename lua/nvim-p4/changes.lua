@@ -11,6 +11,8 @@ local client = require("nvim-p4.client")
 local p4 = require("nvim-p4.p4")
 
 local M = {}
+M.timer = vim.loop.new_timer()
+
 M.popup = nil
 M.tree = nil
 M.select_node = nil
@@ -47,6 +49,20 @@ local function refresh_tree()
     M.tree:render()
     M.popup.border:set_text("top", "[  " .. client.name .. " ]", "center")
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+end
+
+local function stop_timer()
+    if M.timer:is_active() then M.timer:stop() end
+end
+
+local function start_timer()
+    if Opts.auto_refresh.enabled == false then return end
+    stop_timer()
+    M.timer:start(0, Opts.auto_refresh.interval, vim.schedule_wrap(function()
+        if M.popup and (vim.fn.bufwinid(M.popup.bufnr) == -1 or vim.api.nvim_get_current_win() == M.popup.winid) then
+            refresh_tree()
+        end
+    end))
 end
 
 function M.diff_opened_file(haveRev, latestRev, callback)
@@ -188,6 +204,7 @@ function M.open()
         end
         return
     end
+    start_timer()
     local nodes = prepare_nodes()
 
     M.popup = Popup({
