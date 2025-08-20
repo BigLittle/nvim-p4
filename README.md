@@ -9,8 +9,9 @@ A Neovim plugin for intuitive and interactive Perforce changelist management.
 - 📂 Easily to edit opened file(s)
 - 🚚 Move opened file bewteen changelists
 - 🔄 Revert opened file
-- 📊 Diff opened file against have / latest revision.
+- 📊 Diff opened file against have / latest revision
 - 🔍 Blame current line in opened file 
+- 🕒 Refresh changelists automatically 
 
 ## 📃 Requirements
 
@@ -30,7 +31,47 @@ Install the plugin with lazy.nvim:
     "MunifTanjim/nui.nvim",
     "echasnovski/mini.icons",
   },
-  opts = {}
+  opts = {
+    -- your options here
+    -- leave empty for defaults
+  },
+}
+```
+
+## ⚙️ Configuration
+```lua
+{
+  blame = {
+    icons = {
+      date = "󰥔",
+      changelist = "",
+      user = "",
+    },
+  },
+  changes = {
+    auto_refresh = {
+      enabled = true,
+      interval = 300000, -- in milliseconds
+    },
+    keymaps = {
+      diff = "d",
+      edit = "e",
+      move = "m",
+      refresh = "<F5>",
+      revert = "r",
+      switch_client = "c",
+      toggle_changelist = "<Space>",
+    },
+    icons = {
+      client = "",
+      edited = "󰷈",
+      opened = "󰈔",
+      synced = "󱍸",
+      unknown_ft = "",
+      unresolved = "󰷊",
+      unsynced = "",
+    },
+  },
 }
 ```
 

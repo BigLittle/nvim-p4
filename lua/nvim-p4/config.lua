@@ -6,9 +6,11 @@ local defalut = {
             user = "",
         },
     },
-    client = {
-    },
     changes = {
+        auto_refresh = {
+            enabled = true,
+            interval = 300000, -- in milliseconds
+        },
         keymaps = {
             diff = "d",
             edit = "e",
@@ -27,7 +29,7 @@ local defalut = {
             unresolved = "󰷊",
             unsynced = "",
         },
-    }
+    },
 }
 
 local M = {}
