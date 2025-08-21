@@ -51,6 +51,20 @@ local function refresh_tree()
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
 end
 
+local function resize_popup()
+    if M.popup == nil then return end
+    local _config = {
+        relative = "editor",
+        size = {
+            width = math.min(120, math.floor(vim.o.columns * 0.8)),
+            height = math.min(20, math.floor(vim.o.lines * 0.5)),
+        },
+        position = "50%",
+    }
+    M.popup:update_layout(_config)
+    M.tree:render()
+end
+
 local function stop_timer()
     if M.timer:is_active() then M.timer:stop() end
 end
@@ -198,6 +212,7 @@ end
 function M.open()
     if M.popup ~= nil then
         if vim.fn.bufwinid(M.popup.bufnr) == -1 then
+            resize_popup()
             M.popup:show()
         else
             M.popup:hide()
@@ -310,19 +325,7 @@ function M.open()
     end)
 
     --Auto-resize the popup when the window is resized
-    M.popup:on(event.VimResized, function()
-        if M.popup == nil then return end
-        local _config = {
-            relative = "editor",
-            size = {
-                width = math.min(120, math.floor(vim.o.columns * 0.8)),
-                height = math.min(20, math.floor(vim.o.lines * 0.5)),
-            },
-            position = "50%",
-        }
-        M.popup:update_layout(_config)
-        M.tree:render()
-    end)
+    M.popup:on(event.VimResized, resize_popup)
 
     -- Refresh
     vim.keymap.set("n", Opts.keymaps.refresh, function() refresh_tree() end, { buffer = M.popup.bufnr })
