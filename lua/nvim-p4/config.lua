@@ -8,7 +8,7 @@ local defalut = {
     },
     changes = {
         auto_refresh = {
-            enabled = true,
+            enabled = false,
             interval = 300000, -- in milliseconds
         },
         keymaps = {
