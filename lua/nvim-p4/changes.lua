@@ -11,7 +11,7 @@ local client = require("nvim-p4.client")
 local p4 = require("nvim-p4.p4")
 
 local M = {}
-M.timer = vim.loop.new_timer()
+M.timer = vim.uv.new_timer()
 
 M.popup = nil
 M.tree = nil
