@@ -12,6 +12,7 @@ local p4 = require("nvim-p4.p4")
 
 local M = {}
 M.timer = vim.uv.new_timer()
+M.refresh_time = nil
 
 M.popup = nil
 M.tree = nil
@@ -49,6 +50,7 @@ local function refresh_tree()
     M.tree:render()
     M.popup.border:set_text("top", "[  " .. client.name .. " ]", "center")
     M.popup.border:set_text("bottom", " Last updated: " .. os.date("%Y-%m-%d %H:%M:%S") .. " ", "center")
+    M.refresh_time = os.time()
 end
 
 local function resize_popup()
@@ -213,7 +215,12 @@ function M.open()
     if M.popup ~= nil then
         if vim.fn.bufwinid(M.popup.bufnr) == -1 then
             resize_popup()
-            if Opts.refresh_on_open then refresh_tree() end
+            if Opts.refresh_on_open.enabled then
+                local threshold = Opts.refresh_on_open.threshold * 60
+                if threshold <= 0 or (os.time() - M.refresh_time) >= threshold then
+                    refresh_tree()
+                end
+            end
             M.popup:show()
         else
             M.popup:hide()

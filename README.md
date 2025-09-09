@@ -49,7 +49,9 @@ Install the plugin with lazy.nvim:
     },
   },
   changes = {
-    refresh_on_open = true,
+    refresh_on_open = {
+      enabled = true,
+      threshold = 30, -- in minutes
     auto_refresh = {
       enabled = false,
       interval = 300000, -- in milliseconds
