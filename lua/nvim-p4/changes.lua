@@ -309,6 +309,7 @@ function M.open()
     })
 
     M.tree:render()
+    M.refresh_time = os.time()
 
     -- Hide the popup when leaving the buffer
     M.popup:on(event.BufLeave, function()
