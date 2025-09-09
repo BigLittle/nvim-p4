@@ -213,6 +213,7 @@ function M.open()
     if M.popup ~= nil then
         if vim.fn.bufwinid(M.popup.bufnr) == -1 then
             resize_popup()
+            if Opts.refresh_on_open then refresh_tree() end
             M.popup:show()
         else
             M.popup:hide()

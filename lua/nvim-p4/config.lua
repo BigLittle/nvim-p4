@@ -7,6 +7,7 @@ local defalut = {
         },
     },
     changes = {
+        refresh_on_open = true,
         auto_refresh = {
             enabled = false,
             interval = 300000, -- in milliseconds
