@@ -83,7 +83,7 @@ end
 
 function M.create_or_edit_changelist(changelist, callback)
     local popup = Popup({
-        relative = "cursor",
+        relative = "buf",
         enter = true,
         focusable = true,
         border = {
