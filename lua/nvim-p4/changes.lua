@@ -99,10 +99,7 @@ function M.create_or_edit_changelist(changelist, callback)
         position = "50%",
         size = { width = 60, height = 8 },
         buf_options = { modifiable = true, readonly = false },
-        win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:MiniIconsOrange",
-            wrap = false,
-        },
+        win_options = { wrap = false },
     })
     popup:mount()
 
