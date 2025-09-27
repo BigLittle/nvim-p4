@@ -8,8 +8,8 @@ local defalut = {
     },
     changes = {
         description_window_size = {
-            width = 50,
-            height = 10 
+            width = 70,
+            height = 10,
         },
         refresh_on_open = {
             enabled = true,

@@ -89,6 +89,7 @@ function M.create_or_edit_changelist(changelist, callback)
         relative = "editor",
         enter = true,
         focusable = true,
+        zindex = 51,
         border = {
             style = "double",
             text = {
@@ -97,7 +98,7 @@ function M.create_or_edit_changelist(changelist, callback)
                 bottom = " Press <q> to cancel / Press <Alt + s> to submit ",
                 bottom_align = "center",
             },
-            padding = { top = 1, bottom = 1, left = 1, right = 1 },
+            padding = { top = 0, bottom = 0, left = 1, right = 1 },
         },
         position = "50%",
         size = { width = Opts.description_window_size.width, height = Opts.description_window_size.height },
@@ -107,7 +108,7 @@ function M.create_or_edit_changelist(changelist, callback)
     popup:mount()
 
     if changelist ~= "default" then
-        local desc = p4.describe(changelist)
+        local desc = p4.describe(changelist):gsub("\n+$", "")
         if desc and desc ~= "" then
             vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, vim.split(desc, "\n", { plain = true }))
             vim.api.nvim_win_set_cursor(popup.winid, { vim.api.nvim_buf_line_count(popup.bufnr), 0 })
@@ -417,13 +418,14 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl ~= "default" then return end
-        M.popup:hide()
+        -- M.popup:hide()
+        vim.g.__focused = true
         M.create_or_edit_changelist(cl, function(value)
-            if value ~= "" then
-                p4.change(cl, value)
-                refresh_tree()
-            end
-            M.popup:show()
+            vim.g.__focused = false
+            if value == "" then return end
+            p4.change(cl, value)
+            refresh_tree()
+            -- M.popup:show()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
