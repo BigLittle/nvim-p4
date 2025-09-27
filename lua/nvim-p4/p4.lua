@@ -72,7 +72,7 @@ function M.blame()
         blame_row = curr_line
         vim.api.nvim_buf_set_extmark(blame_bufnr, config.ns_id, blame_row - 1, 0, {
             virt_text = {
-                { "────── ".. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date .. " " .. blame_opts.icons.changelist .. " " .. info.cl .. " ", "P4BlameLine" }
+                { "────── " .. blame_opts.icons.user .. " " .. info.user .. " " .. blame_opts.icons.date .. " " .. info.date .. " " .. blame_opts.icons.changelist .. " " .. info.cl .. " ", "P4BlameLine" }
             },
             virt_text_pos = "eol",
         })
@@ -86,27 +86,53 @@ function M.change(changelist, description)
             utils.notify_error("Description is required for default changelist.")
             return
         end
-        local handle = io.popen("p4 change -i", "w")
-        if handle == nil then
-            utils.notify_error("Failed to run p4 change -i")
-            return
-        end
-        handle:write("Change: new\n")
-        handle:write("Client: " .. client.name .. "\n")
-        handle:write("Description:\n")
+
+        local uv = vim.loop
+        local stdin = uv.new_pipe(false)
+        local stdout = uv.new_pipe(false)
+
+        local handle
+        handle = uv.spawn("p4", {
+            args = { "change", "-c", client.name, "-i" },
+            stdio = { stdin, stdout, nil },
+        }, function(code, signal)
+            stdin:close()
+            stdout:close()
+            handle:close()
+        end)
         local lines = description
         if type(description) == "string" then
             lines = vim.split(description, "\n", { plain = true })
         end
         for _, line in ipairs(lines) do
-            handle:write("\t" .. line .. "\n")
+            stdin:write("\t" .. line .. "\n")
         end
-        local status, _, code = handle:close()
-        if not status or code ~= 0 then
-            utils.notify_error("Failed to create new changelist.")
-            return
-        end
-        utils.notify_info("New changelist created.")
+        stdin:shutdown()
+
+
+
+
+        -- local handle = io.popen("p4 change -i", "w")
+        -- if handle == nil then
+        --     utils.notify_error("Failed to run p4 change -i")
+        --     return
+        -- end
+        -- handle:write("Change: new\n")
+        -- handle:write("Client: " .. client.name .. "\n")
+        -- handle:write("Description:\n")
+        -- local lines = description
+        -- if type(description) == "string" then
+        --     lines = vim.split(description, "\n", { plain = true })
+        -- end
+        -- for _, line in ipairs(lines) do
+        --     handle:write("\t" .. line .. "\n")
+        -- end
+        -- local status, _, code = handle:close()
+        -- if not status or code ~= 0 then
+        --     utils.notify_error("Failed to create new changelist.")
+        --     return
+        -- end
+        -- utils.notify_info("New changelist created.")
     else
         -- existing changelist
         utils.notify_info("Changelist update is not implemented yet.")

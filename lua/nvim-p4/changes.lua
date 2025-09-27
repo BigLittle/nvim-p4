@@ -123,7 +123,7 @@ function M.create_or_edit_changelist(changelist, callback)
         popup:unmount()
     end)
 
-    vim.keymap.set({ "i", "n" }, "<M-s>", function()
+    vim.keymap.set("n", "<M-s>", function()
         callback(vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false))
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
