@@ -83,7 +83,7 @@ end
 
 function M.create_or_edit_changelist(changelist, callback)
     local popup = Popup({
-        relative = "win",
+        relative = "cursor",
         enter = true,
         focusable = true,
         border = {
@@ -97,13 +97,12 @@ function M.create_or_edit_changelist(changelist, callback)
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
         position = "50%",
-        size = { width = 60, height = 80 },
+        size = { width = 60, height = 10 },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
     })
     popup:mount()
     print(vim.inspect(popup.border))
-    print(vim.inspect(popup.winid))
 
     if changelist ~= "default" then
         local desc = p4.describe(changelist)
