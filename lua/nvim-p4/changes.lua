@@ -126,12 +126,19 @@ function M.create_or_edit_changelist(changelist, callback)
 
     local layout = Layout(
         {
-            relative = "editor",
             position = "50%",
-            size = { width = 62, height = 12 },
+            size = {
+                width = 80,
+                height = "60%",
+            },
         },
-        Layout.Box(Layout.Box(popup, { size = "100%" }))
+        Layout.Box({
+            Layout.Box(popup, { size = "100%" }), 
+        }, { dir = "row" })
     )
+
+
+
 
     layout:mount()
 end
