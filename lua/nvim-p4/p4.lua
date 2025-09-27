@@ -93,13 +93,16 @@ function M.change(changelist, description)
 
         local handle
         handle = uv.spawn("p4", {
-            args = { "change", "-c", client.name, "-i" },
+            args = { "change", "-i" },
             stdio = { stdin, stdout, nil },
         }, function(code, signal)
             stdin:close()
             stdout:close()
             handle:close()
         end)
+        stdin:write("Change: new\n")
+        stdin:write("Client: " .. client.name .. "\n")
+        stdin:write("Description:\n")
         local lines = description
         if type(description) == "string" then
             lines = vim.split(description, "\n", { plain = true })
@@ -108,9 +111,6 @@ function M.change(changelist, description)
             stdin:write("\t" .. line .. "\n")
         end
         stdin:shutdown()
-
-
-
 
         -- local handle = io.popen("p4 change -i", "w")
         -- if handle == nil then
