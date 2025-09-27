@@ -103,7 +103,10 @@ function M.create_or_edit_changelist(changelist, callback)
         position = "50%",
         size = { width = Opts.description_window_size.width, height = Opts.description_window_size.height },
         buf_options = { modifiable = true, readonly = false },
-        win_options = { wrap = false },
+        win_options = {
+            wrap = false,
+            winhighlight = "Normal:Normal,FloatBorder:MiniIconsBlue"
+        },
     })
     popup:mount()
 
@@ -418,14 +421,12 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl ~= "default" then return end
-        -- M.popup:hide()
         vim.g.__focused = true
         M.create_or_edit_changelist(cl, function(value)
             vim.g.__focused = false
             if value == "" then return end
             p4.change(cl, value)
             refresh_tree()
-            -- M.popup:show()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
@@ -436,13 +437,12 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl == "default" then return end
-        M.popup:hide()
+        vim.g.__focused = true
         M.create_or_edit_changelist(cl, function(value)
-            if value ~= "" then
-                p4.change(cl, value)
-                refresh_tree()
-            end
-            M.popup:show()
+            vim.g.__focused = false
+            if value == "" then return end
+            p4.change(cl, value)
+            refresh_tree()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
