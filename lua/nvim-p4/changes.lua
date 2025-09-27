@@ -433,10 +433,10 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl ~= "default" then return end
-        -- vim.g.__focused = true
-        M.popup:hide()
+        vim.g.__focused = true
+        -- M.popup:hide()
         M.create_or_edit_changelist(cl, function(value)
-            -- vim.g.__focused = false
+            vim.g.__focused = false
             if value == "" then return end
             p4.change(cl, value)
             refresh_tree()
