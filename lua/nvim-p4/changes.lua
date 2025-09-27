@@ -2,6 +2,7 @@ local Popup = require("nui.popup")
 local Menu = require("nui.menu")
 local Tree = require("nui.tree")
 local Line = require("nui.line")
+local Layout = require("nui.layout")
 local event = require("nui.utils.autocmd").event
 local Icons = require("mini.icons")
 local config = require("nvim-p4.config")
@@ -91,7 +92,7 @@ function M.create_or_edit_changelist(changelist, callback)
             text = {
                 top = "[ Description ]",
                 top_align = "center",
-                bottom = " Press 'Alt+s' to submit ",
+                bottom = " Press 'Alt + s' to submit ",
                 bottom_align = "center",
             },
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
@@ -101,7 +102,7 @@ function M.create_or_edit_changelist(changelist, callback)
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
     })
-    popup:mount()
+    -- popup:mount()
 
     if changelist ~= "default" then
         local desc = p4.describe(changelist)
@@ -116,12 +117,22 @@ function M.create_or_edit_changelist(changelist, callback)
         popup:unmount()
     end)
 
-    vim.keymap.set( {"i", "n"}, "<M-s>", function()
+    vim.keymap.set({ "i", "n" }, "<M-s>", function()
         callback(vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false))
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
+
+    local layout = Layout({
+            relative = "editor",
+            position = "50%",
+            size = { width = 62, height = 12 },
+        },
+        Layout.Box(popup, { size = "100%" })
+    )
+
+    layout:mount()
 end
 
 function M.diff_opened_file(haveRev, latestRev, callback)
