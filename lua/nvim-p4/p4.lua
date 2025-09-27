@@ -79,10 +79,6 @@ function M.blame()
     end)
 end
 
-function M.edit_changelist(number, description)
-    utils.notify_warning("Editing changelists is not implemented yet.")
-end
-
 function M.delete_changelist(number)
     if number == nil or number == "default" then
         utils.notify_error("Cannot delete default changelist.")
@@ -93,7 +89,7 @@ function M.delete_changelist(number)
     utils.notify_info(out)
 end
 
-function M.create_changelist(description, files)
+function M.create_or_edit_changelist(number, description, files)
     if description == nil then
         utils.notify_error("Description is required for default changelist.")
         return
@@ -119,7 +115,11 @@ function M.create_changelist(description, files)
         end
     end)
 
-    stdin:write("Change: new\n")
+    if number == "default" then
+        stdin:write("Change: new\n")
+    else
+        stdin:write("Change: " .. number .. "\n")
+    end
     stdin:write("Client: " .. client.name .. "\n")
     stdin:write("Description:\n")
     local lines = description
@@ -145,7 +145,7 @@ function M.create_changelist(description, files)
     handle:close()
     local result = table.concat(output)
     if not done then
-        utils.notify_error("Failed to create new changelist: timeout.")
+        utils.notify_error("Failed to create/edit changelist: timeout.")
     else
         utils.notify_info(result)
     end
