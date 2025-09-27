@@ -91,15 +91,22 @@ function M.change(changelist, description)
         local stdin = uv.new_pipe(false)
         local stdout = uv.new_pipe(false)
 
-        local handle
-        handle = uv.spawn("p4", {
+        local output = {}
+        local done = false
+
+        local handle = uv.spawn("p4", {
             args = { "change", "-i" },
             stdio = { stdin, stdout, nil },
         }, function(code, signal)
-            stdin:close()
-            stdout:close()
-            handle:close()
+            done = true
         end)
+
+        uv.read_start(stdout, function(_, data)
+            if data then
+                table.insert(output, data)
+            end
+        end)
+
         stdin:write("Change: new\n")
         stdin:write("Client: " .. client.name .. "\n")
         stdin:write("Description:\n")
@@ -111,6 +118,18 @@ function M.change(changelist, description)
             stdin:write("\t" .. line .. "\n")
         end
         stdin:shutdown()
+
+        vim.wait(60000, function() return done end, 500)
+
+        stdin:close()
+        stdout:close()
+        handle:close()
+        local result = table.concat(output)
+        if not done then
+            utils.notify_error("Failed to create new changelist: timeout.")
+        else
+            utils.notify_info(result)
+        end
 
         -- local handle = io.popen("p4 change -i", "w")
         -- if handle == nil then
