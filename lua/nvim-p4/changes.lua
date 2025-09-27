@@ -83,7 +83,7 @@ end
 
 function M.create_or_edit_changelist(changelist, callback)
     local popup = Popup({
-        relative = "editor",
+        relative = "win",
         enter = true,
         focusable = true,
         border = {
@@ -101,7 +101,6 @@ function M.create_or_edit_changelist(changelist, callback)
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
     })
-    popup.border:set_style("double")
     popup:mount()
     print(vim.inspect(popup.border))
     print(vim.inspect(popup.winid))
