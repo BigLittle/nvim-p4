@@ -97,11 +97,12 @@ function M.create_or_edit_changelist(changelist, callback)
             padding = { top = 0, bottom = 0, left = 0, right = 0 },
         },
         position = "50%",
-        size = { width = 60, height = 8 },
+        size = { width = 60, height = 80 },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
     })
     popup:mount()
+    popup.border:set_highlight("Normal")
     print(vim.inspect(popup.border))
     print(vim.inspect(popup.winid))
 
