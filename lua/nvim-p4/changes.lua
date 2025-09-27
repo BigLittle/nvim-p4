@@ -120,7 +120,7 @@ function M.create_or_edit_changelist(changelist, callback)
         callback(vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false))
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
-    
+
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
 end
 
@@ -415,6 +415,7 @@ function M.open()
         local cl = node.id
         if cl ~= "default" then return end
         -- vim.g.__focused = true
+        M.popup:hide()
         M.create_or_edit_changelist(cl, function(value)
             -- vim.g.__focused = false
             if value == "" then return end
