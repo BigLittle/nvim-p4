@@ -120,7 +120,8 @@ function M.create_or_edit_changelist(changelist, callback)
         callback(vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false))
         popup:unmount()
     end, { buffer = popup.bufnr, nowait = true })
-
+    
+    vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
 end
 
 function M.diff_opened_file(haveRev, latestRev, callback)
