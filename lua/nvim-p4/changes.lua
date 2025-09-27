@@ -2,7 +2,6 @@ local Popup = require("nui.popup")
 local Menu = require("nui.menu")
 local Tree = require("nui.tree")
 local Line = require("nui.line")
-local Layout = require("nui.layout")
 local event = require("nui.utils.autocmd").event
 local Icons = require("mini.icons")
 local config = require("nvim-p4.config")
@@ -83,26 +82,29 @@ local function start_timer()
 end
 
 function M.create_or_edit_changelist(changelist, callback)
+    local title = "[ Description of New Changelist ]"
+    if changelist ~= "default" then title = "[ Description of Changelist " .. changelist .. " ]" end
+
     local popup = Popup({
         relative = "editor",
         enter = true,
         focusable = true,
         border = {
-            style = "rounded",
+            style = "double",
             text = {
-                top = "[ Description ]",
+                top = title,
                 top_align = "center",
-                bottom = " Press 'Alt + s' to submit ",
+                bottom = " Press <q> to cancel / Press <Alt + s> to submit ",
                 bottom_align = "center",
             },
-            padding = { top = 0, bottom = 0, left = 0, right = 0 },
+            padding = { top = 1, bottom = 1, left = 1, right = 1 },
         },
         position = "50%",
-        size = { width = 60, height = 10 },
+        size = { width = Opts.description_window_size.width, height = Opts.description_window_size.height },
         buf_options = { modifiable = true, readonly = false },
         win_options = { wrap = false },
     })
-    -- popup:mount()
+    popup:mount()
 
     if changelist ~= "default" then
         local desc = p4.describe(changelist)
@@ -123,24 +125,6 @@ function M.create_or_edit_changelist(changelist, callback)
     end, { buffer = popup.bufnr, nowait = true })
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
-
-    local layout = Layout(
-        {
-            position = "50%",
-            size = {
-                width = 80,
-                height = "60%",
-            },
-        },
-        Layout.Box({
-            Layout.Box(popup, { size = "100%" }), 
-        }, { dir = "row" })
-    )
-
-
-
-
-    layout:mount()
 end
 
 function M.diff_opened_file(haveRev, latestRev, callback)
@@ -433,13 +417,13 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl ~= "default" then return end
-        vim.g.__focused = true
-        -- M.popup:hide()
+        M.popup:hide()
         M.create_or_edit_changelist(cl, function(value)
-            vim.g.__focused = false
-            if value == "" then return end
-            p4.change(cl, value)
-            refresh_tree()
+            if value ~= "" then
+                p4.change(cl, value)
+                refresh_tree()
+            end
+            M.popup:show()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
@@ -450,12 +434,13 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl == "default" then return end
-        vim.g.__focused = true
+        M.popup:hide()
         M.create_or_edit_changelist(cl, function(value)
-            vim.g.__focused = false
-            if value == "" then return end
-            p4.change(cl, value)
-            refresh_tree()
+            if value ~= "" then
+                p4.change(cl, value)
+                refresh_tree()
+            end
+            M.popup:show()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 

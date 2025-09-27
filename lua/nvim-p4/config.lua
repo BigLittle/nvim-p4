@@ -7,6 +7,10 @@ local defalut = {
         },
     },
     changes = {
+        description_window_size = {
+            width = 50,
+            height = 10 
+        },
         refresh_on_open = {
             enabled = true,
             threshold = 30, -- in minutes

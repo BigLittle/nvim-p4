@@ -101,7 +101,12 @@ function M.change(changelist, description)
         for _, line in ipairs(lines) do
             handle:write("\t" .. line .. "\n")
         end
-        handle:close()
+        local status, _, code = handle:close()
+        if not status or code ~= 0 then
+            utils.notify_error("Failed to create new changelist.")
+            return
+        end
+        utils.notify_info("New changelist created.")
     else
         -- existing changelist
         utils.notify_info("Changelist update is not implemented yet.")
