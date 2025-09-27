@@ -20,9 +20,10 @@ local defalut = {
             interval = 300000, -- in milliseconds
         },
         keymaps = {
-            create_changelist = "c",
+            create_changelist = "C",
+            delete_changelist = "D",
             diff = "d",
-            edit_changelist = "e",
+            edit_changelist = "E",
             move = "m",
             open = "o",
             refresh = "<F5>",

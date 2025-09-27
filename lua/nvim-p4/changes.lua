@@ -430,6 +430,21 @@ function M.open()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
 
+    -- Delete an empty changelist
+    vim.keymap.set("n", Opts.keymaps.delete_changelist, function()
+        local node = M.tree:get_node()
+        if not node then return end
+        if not node.changelist then return end
+        local cl = node.id
+        if cl == "default" then return end
+        if not node.empty then
+            utils.notify_warning("Changelist " .. cl .. " is not empty.")
+            return
+        end
+        p4.delete_changelist(cl)
+        refresh_tree()
+    end, { buffer = M.popup.bufnr, nowait = true })
+
     -- Edit an existing changelist
     vim.keymap.set("n", Opts.keymaps.edit_changelist, function()
         local node = M.tree:get_node()

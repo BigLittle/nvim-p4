@@ -79,6 +79,16 @@ function M.blame()
     end)
 end
 
+function M.delete_changelist(number)
+    if number == nil or number == "default" then
+        utils.notify_error("Cannot delete default changelist.")
+        return
+    end
+    local cmd = { "p4", "-c", client.name, "change", "-d", number }
+    local out = utils.get_output(cmd)
+    utils.notify_info(out)
+end
+
 function M.change(changelist, description)
     if changelist == "default" then
         -- create a new changelist
@@ -130,28 +140,6 @@ function M.change(changelist, description)
         else
             utils.notify_info(result)
         end
-
-        -- local handle = io.popen("p4 change -i", "w")
-        -- if handle == nil then
-        --     utils.notify_error("Failed to run p4 change -i")
-        --     return
-        -- end
-        -- handle:write("Change: new\n")
-        -- handle:write("Client: " .. client.name .. "\n")
-        -- handle:write("Description:\n")
-        -- local lines = description
-        -- if type(description) == "string" then
-        --     lines = vim.split(description, "\n", { plain = true })
-        -- end
-        -- for _, line in ipairs(lines) do
-        --     handle:write("\t" .. line .. "\n")
-        -- end
-        -- local status, _, code = handle:close()
-        -- if not status or code ~= 0 then
-        --     utils.notify_error("Failed to create new changelist.")
-        --     return
-        -- end
-        -- utils.notify_info("New changelist created.")
     else
         -- existing changelist
         utils.notify_info("Changelist update is not implemented yet.")

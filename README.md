@@ -61,9 +61,10 @@ Install the plugin with lazy.nvim:
       interval = 300000, -- in milliseconds
     },
     keymaps = {
-      create_changelist = "c",
+      create_changelist = "C",
+      delete_changelist = "D",
       diff = "d",
-      edit_changelist = "e",
+      edit_changelist = "E",
       move = "m",
       open = "o",
       refresh = "<F5>",
@@ -94,9 +95,10 @@ Install the plugin with lazy.nvim:
    | ------- | -------------------------------------- |
    | Esc / q | Hide window                            |
    | F5      | Refresh current status                 |
+   | C       | Create a new pending changelist        |
+   | D       | Delete an empty pending changelist     |
+   | E       | Edit a pending changelist              |
    | Space   | Expand / Collapse a changelist         |
-   | c       | Create a new pending changelist        |
-   | e       | Edit a pending changelist              |
    | d       | Diff opened file                       |
    | j / k   | Navigation                             |
    | m       | Move opened file to another changelist |
