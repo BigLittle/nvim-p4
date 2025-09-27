@@ -79,6 +79,10 @@ function M.blame()
     end)
 end
 
+function M.edit_changelist(number, description)
+    utils.notify_warning("Editing changelists is not implemented yet.")
+end
+
 function M.delete_changelist(number)
     if number == nil or number == "default" then
         utils.notify_error("Cannot delete default changelist.")
@@ -89,65 +93,61 @@ function M.delete_changelist(number)
     utils.notify_info(out)
 end
 
-function M.change(changelist, description)
-    if changelist == "default" then
-        -- create a new changelist
-        if description == nil then
-            utils.notify_error("Description is required for default changelist.")
-            return
+function M.create_changelist(description, files)
+    if description == nil then
+        utils.notify_error("Description is required for default changelist.")
+        return
+    end
+
+    local uv = vim.loop
+    local stdin = uv.new_pipe(false)
+    local stdout = uv.new_pipe(false)
+
+    local output = {}
+    local done = false
+
+    local handle = uv.spawn("p4", {
+        args = { "change", "-i" },
+        stdio = { stdin, stdout, nil },
+    }, function(code, signal)
+        done = true
+    end)
+
+    uv.read_start(stdout, function(_, data)
+        if data then
+            table.insert(output, data)
         end
+    end)
 
-        local uv = vim.loop
-        local stdin = uv.new_pipe(false)
-        local stdout = uv.new_pipe(false)
-
-        local output = {}
-        local done = false
-
-        local handle = uv.spawn("p4", {
-            args = { "change", "-i" },
-            stdio = { stdin, stdout, nil },
-        }, function(code, signal)
-            done = true
-        end)
-
-        uv.read_start(stdout, function(_, data)
-            if data then
-                table.insert(output, data)
-            end
-        end)
-
-        stdin:write("Change: new\n")
-        stdin:write("Client: " .. client.name .. "\n")
-        stdin:write("Description:\n")
-        local lines = description
-        if type(description) == "string" then
-            lines = vim.split(description, "\n", { plain = true })
+    stdin:write("Change: new\n")
+    stdin:write("Client: " .. client.name .. "\n")
+    stdin:write("Description:\n")
+    local lines = description
+    if type(description) == "string" then
+        lines = vim.split(description, "\n", { plain = true })
+    end
+    for _, line in ipairs(lines) do
+        stdin:write("\t" .. line .. "\n")
+    end
+    if files ~= nil and #files > 0 then
+        stdin:write("Files:\n")
+        for _, file in ipairs(files) do
+            stdin:write("\t" .. file .. "\n")
         end
-        for _, line in ipairs(lines) do
-            stdin:write("\t" .. line .. "\n")
-        end
-        stdin:shutdown()
+    end
 
-        vim.wait(60000, function() return done end, 500)
+    stdin:shutdown()
 
-        stdin:close()
-        stdout:close()
-        handle:close()
-        local result = table.concat(output)
-        if not done then
-            utils.notify_error("Failed to create new changelist: timeout.")
-        else
-            utils.notify_info(result)
-        end
+    vim.wait(60000, function() return done end, 500)
+
+    stdin:close()
+    stdout:close()
+    handle:close()
+    local result = table.concat(output)
+    if not done then
+        utils.notify_error("Failed to create new changelist: timeout.")
     else
-        -- existing changelist
-        utils.notify_info("Changelist update is not implemented yet.")
-        if description ~= nil then
-            -- show current changelist status
-        else
-            -- update changelist description
-        end
+        utils.notify_info(result)
     end
 end
 

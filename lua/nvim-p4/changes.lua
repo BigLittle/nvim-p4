@@ -422,10 +422,15 @@ function M.open()
         local cl = node.id
         if cl ~= "default" then return end
         vim.g.__focused = true
-        M.create_or_edit_changelist(cl, function(value)
+        M.create_or_edit_changelist(cl, function(description)
             vim.g.__focused = false
-            if value == "" then return end
-            p4.change(cl, value)
+            if description == "" then return end
+            local files = {}
+            local children = M.tree:get_nodes(node:get_id())
+            for _, child in ipairs(children) do
+                table.insert(files, child.depotFile)
+            end
+            p4.create_changelist(description, files)
             refresh_tree()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
@@ -453,10 +458,10 @@ function M.open()
         local cl = node.id
         if cl == "default" then return end
         vim.g.__focused = true
-        M.create_or_edit_changelist(cl, function(value)
+        M.create_or_edit_changelist(cl, function(description)
             vim.g.__focused = false
-            if value == "" then return end
-            p4.change(cl, value)
+            if description == "" then return end
+            p4.edit_changelist(cl, description)
             refresh_tree()
         end)
     end, { buffer = M.popup.bufnr, nowait = true })
