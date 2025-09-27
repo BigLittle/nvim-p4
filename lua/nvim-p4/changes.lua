@@ -83,7 +83,7 @@ end
 
 function M.create_or_edit_changelist(changelist, callback)
     local popup = Popup({
-        relative = "buf",
+        relative = "editor",
         enter = true,
         focusable = true,
         border = {
@@ -102,7 +102,6 @@ function M.create_or_edit_changelist(changelist, callback)
         win_options = { wrap = false },
     })
     popup:mount()
-    print(vim.inspect(popup.border))
 
     if changelist ~= "default" then
         local desc = p4.describe(changelist)
@@ -415,9 +414,9 @@ function M.open()
         if not node.changelist then return end
         local cl = node.id
         if cl ~= "default" then return end
-        vim.g.__focused = true
+        -- vim.g.__focused = true
         M.create_or_edit_changelist(cl, function(value)
-            vim.g.__focused = false
+            -- vim.g.__focused = false
             if value == "" then return end
             p4.change(cl, value)
             refresh_tree()
