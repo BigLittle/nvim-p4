@@ -102,7 +102,7 @@ function M.create_or_edit_changelist(changelist, callback)
         win_options = { wrap = false },
     })
     popup:mount()
-    popup.border:set_highlight("Normal")
+    popup.border:set_highlight("Normal", "FloatBorder")
     print(vim.inspect(popup.border))
     print(vim.inspect(popup.winid))
 
