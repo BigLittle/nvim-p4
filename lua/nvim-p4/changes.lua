@@ -124,12 +124,13 @@ function M.create_or_edit_changelist(changelist, callback)
 
     vim.keymap.set("n", "q", function() popup:unmount() end, { buffer = popup.bufnr, nowait = true })
 
-    local layout = Layout({
+    local layout = Layout(
+        {
             relative = "editor",
             position = "50%",
             size = { width = 62, height = 12 },
         },
-        Layout.Box(popup, { size = "100%" })
+        Layout.Box(Layout.Box(popup, { size = "100%" }))
     )
 
     layout:mount()
