@@ -414,7 +414,7 @@ function M.open()
         local node = M.tree:get_node()
         if not node then return end
         if not node.changelist then return end
-        local cl = node.changelist.number
+        local cl = node.id
         if cl ~= "default" then return end
         vim.g.__focused = true
         M.create_or_edit_changelist(cl, function(value)
@@ -430,7 +430,7 @@ function M.open()
         local node = M.tree:get_node()
         if not node then return end
         if not node.changelist then return end
-        local cl = node.changelist.number
+        local cl = node.id
         if cl == "default" then return end
         vim.g.__focused = true
         M.create_or_edit_changelist(cl, function(value)
