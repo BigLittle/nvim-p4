@@ -57,12 +57,14 @@ Install the plugin with lazy.nvim:
       interval = 300000, -- in milliseconds
     },
     keymaps = {
+      create_changelist = "c",
       diff = "d",
-      edit = "e",
+      edit_changelist = "e",
       move = "m",
+      open = "o",
       refresh = "<F5>",
       revert = "r",
-      switch_client = "c",
+      switch_client = "s",
       toggle_changelist = "<Space>",
     },
     icons = {
@@ -89,12 +91,14 @@ Install the plugin with lazy.nvim:
    | Esc / q | Hide window                            |
    | F5      | Refresh current status                 |
    | Space   | Expand / Collapse a changelist         |
-   | c       | Switch to another client               |
+   | c       | Create a new pending changelist        |
+   | e       | Edit a pending changelist              |
    | d       | Diff opened file                       |
-   | e       | Edit file(s) in a new buffer           |
    | j / k   | Navigation                             |
    | m       | Move opened file to another changelist |
+   | o       | Open file(s) in a new buffer           |
    | r       | Revert opened file                     |
+   | s       | Switch to another client               |
 
 `:P4Clients` to select an active client from all your Perforce workspaces.
 

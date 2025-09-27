@@ -79,6 +79,40 @@ function M.blame()
     end)
 end
 
+function M.change(changelist, description)
+    if changelist == "default" then
+        -- create a new changelist
+        if description == nil then
+            utils.notify_error("Description is required for default changelist.")
+            return
+        end
+        local handle = io.popen("p4 change -i", "w")
+        if handle == nil then
+            utils.notify_error("Failed to run p4 change -i")
+            return
+        end
+        handle:write("Change: new\n")
+        handle:write("Client: " .. client.name .. "\n")
+        handle:write("Description:\n")
+        local lines = description
+        if type(description) == "string" then
+            lines = vim.split(description, "\n", { plain = true })
+        end
+        for _, line in ipairs(lines) do
+            handle:write("\t" .. line .. "\n")
+        end
+        handle:close()
+    else
+        -- existing changelist
+        utils.notify_info("Changelist update is not implemented yet.")
+        if description ~= nil then
+            -- show current changelist status
+        else
+            -- update changelist description
+        end
+    end
+end
+
 -- Get all pending changelists for the current client
 function M.changes()
     local cmd = { "p4", "changes", "-c", client.name, "-s", "pending", "--me" }

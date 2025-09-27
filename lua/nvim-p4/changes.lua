@@ -17,19 +17,19 @@ M.refresh_time = nil
 M.popup = nil
 M.tree = nil
 M.select_node = nil
-M.changlists = {}
+M.changelists = {}
 
 -- Prepare nodes for the tree view
 local function prepare_nodes()
     M.select_node = nil
-    M.changlists = {}
+    M.changelists = {}
     local nodes = {}
     for _, changelist in ipairs(p4.changes()) do
-        table.insert(M.changlists, changelist.number)
+        table.insert(M.changelists, changelist.number)
         local cl_data = {}
         cl_data["id"] = changelist.number
         cl_data["text"] = changelist.number .. "   " .. changelist.description:gsub("%s+", " ")
-        cl_data["changlist"] = true
+        cl_data["changelist"] = true
         cl_data["empty"] = false
         local opened_files = p4.opened(changelist.number)
         if not opened_files or #opened_files == 0 then cl_data["empty"] = true end
@@ -79,6 +79,51 @@ local function start_timer()
             refresh_tree()
         end
     end))
+end
+
+function M.create_or_edit_changelist(changelist, callback)
+    local popup = Popup({
+        relative = "editor",
+        enter = true,
+        focusable = true,
+        border = {
+            style = "rounded",
+            text = {
+                top = "[ Description ]",
+                top_align = "center",
+                bottom = " Press 'Alt+s' to submit ",
+                bottom_align = "center",
+            },
+            padding = { top = 0, bottom = 0, left = 0, right = 0 },
+        },
+        position = "50%",
+        size = { width = 60, height = 8 },
+        buf_options = { modifiable = true, readonly = false },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:MiniIconsOrange",
+            wrap = false,
+        },
+    })
+    popup:mount()
+
+    if changelist ~= "default" then
+        local desc = p4.describe(changelist)
+        if desc and desc ~= "" then
+            vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, vim.split(desc, "\n", { plain = true }))
+            vim.api.nvim_win_set_cursor(popup.winid, { vim.api.nvim_buf_line_count(popup.bufnr), 0 })
+        end
+    end
+
+    popup:on(event.BufLeave, function()
+        callback("")
+        popup:unmount()
+    end)
+
+    vim.keymap.set( {"i", "n"}, "<M-s>", function()
+        callback(vim.api.nvim_buf_get_lines(popup.bufnr, 0, -1, false))
+        popup:unmount()
+    end, { buffer = popup.bufnr, nowait = true })
+
 end
 
 function M.diff_opened_file(haveRev, latestRev, callback)
@@ -168,7 +213,7 @@ end
 function M.move_opened_file(callback)
     local items = {}
     local max_width = 0
-    for _, changelist in ipairs(M.changlists) do
+    for _, changelist in ipairs(M.changelists) do
         table.insert(items, Menu.item("  " .. changelist .. " ", { value = changelist, index = _ - 1 }))
         local len = vim.fn.strdisplaywidth(changelist)
         if len > max_width then max_width = len end
@@ -266,7 +311,7 @@ function M.open()
             line:append(" ", "P4ChangesHead")
 
             line:append(string.rep("  ", node:get_depth() - 1))
-            if node.changlist then
+            if node.changelist then
                 if node.empty then
                     line:append("  ", "P4ChangesHead")
                     line:append("󰔶 ", "MiniIconsBlue")
@@ -352,7 +397,7 @@ function M.open()
     vim.keymap.set("n", Opts.keymaps.move, function()
         local node = M.tree:get_node()
         if not node then return end
-        if node.changlist then return end
+        if node.changelist then return end
         local current_changelist = node:get_parent_id()
         local depot_file = node.depotFile
         vim.g.__focused = true
@@ -364,11 +409,43 @@ function M.open()
         end)
     end, { buffer = M.popup.bufnr })
 
+    -- Create a new changelist
+    vim.keymap.set("n", Opts.keymaps.create_changelist, function()
+        local node = M.tree:get_node()
+        if not node then return end
+        if not node.changelist then return end
+        local cl = node.changelist.number
+        if cl ~= "default" then return end
+        vim.g.__focused = true
+        M.create_or_edit_changelist(cl, function(value)
+            vim.g.__focused = false
+            if value == "" then return end
+            p4.change(cl, value)
+            refresh_tree()
+        end)
+    end, { buffer = M.popup.bufnr, nowait = true })
+
+    -- Edit an existing changelist
+    vim.keymap.set("n", Opts.keymaps.edit_changelist, function()
+        local node = M.tree:get_node()
+        if not node then return end
+        if not node.changelist then return end
+        local cl = node.changelist.number
+        if cl == "default" then return end
+        vim.g.__focused = true
+        M.create_or_edit_changelist(cl, function(value)
+            vim.g.__focused = false
+            if value == "" then return end
+            p4.change(cl, value)
+            refresh_tree()
+        end)
+    end, { buffer = M.popup.bufnr, nowait = true })
+
     -- Toggle the expansion of the current node if it is a changelist
     vim.keymap.set("n", Opts.keymaps.toggle_changelist, function()
         local node = M.tree:get_node()
         if not node then return end
-        if not node.changlist then return end
+        if not node.changelist then return end
         if node.empty then return end
         if node:is_expanded() then
             node:collapse()
@@ -379,10 +456,10 @@ function M.open()
     end, { buffer = M.popup.bufnr, nowait = true })
 
     -- Open the selected file in the editor
-    vim.keymap.set("n", Opts.keymaps.edit, function()
+    vim.keymap.set("n", Opts.keymaps.open, function()
         local node = M.tree:get_node()
         if not node then return end
-        if node.changlist then
+        if node.changelist then
             if node.empty then return end
             local children = M.tree:get_nodes(node:get_id())
             M.popup:hide()
@@ -399,7 +476,7 @@ function M.open()
     vim.keymap.set("n", Opts.keymaps.diff, function()
         local node = M.tree:get_node()
         if not node then return end
-        if node.changlist then return end
+        if node.changelist then return end
         vim.g.__focused = true
         M.diff_opened_file(node.haveRev, node.headRev, function(value)
             vim.g.__focused = false
@@ -427,7 +504,7 @@ function M.open()
     vim.keymap.set("n", Opts.keymaps.revert, function()
         local node = M.tree:get_node()
         if not node then return end
-        if node.changlist then return end
+        if node.changelist then return end
         local depot_file = node.depotFile
         vim.g.__focused = true
         M.revert_opened_file(function(value)

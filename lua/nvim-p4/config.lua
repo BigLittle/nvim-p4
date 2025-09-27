@@ -16,12 +16,14 @@ local defalut = {
             interval = 300000, -- in milliseconds
         },
         keymaps = {
+            create_changelist = "c",
             diff = "d",
-            edit = "e",
+            edit_changelist = "e",
             move = "m",
+            open = "o",
             refresh = "<F5>",
             revert = "r",
-            switch_client = "c",
+            switch_client = "s",
             toggle_changelist = "<Space>",
         },
         icons = {
