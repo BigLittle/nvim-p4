@@ -102,6 +102,8 @@ function M.create_or_edit_changelist(changelist, callback)
         win_options = { wrap = false },
     })
     popup:mount()
+    print(vim.inspect(popup.border))
+    print(vim.inspect(popup.winid))
 
     if changelist ~= "default" then
         local desc = p4.describe(changelist)
