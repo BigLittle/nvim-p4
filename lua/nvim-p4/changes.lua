@@ -344,6 +344,8 @@ function M.open()
                 if node.headRev == nil then
                     if node.action == "branch" then
                         line:append(" ", "MiniIconsRed")
+                    else
+                        line:append("  ", "MiniIconsRed")
                     end
                 else
                     if node.workRev == node.headRev then
