@@ -351,8 +351,11 @@ function M.open()
                     hl = "MiniIconsCyan"
                 end
                 line:append(icon .. " ", hl)
-                line:append(node.depotFile .. " #" .. node.workRev .. "/" .. node.headRev .. " <" .. node.type .. ">",
-                    text_hl)
+                if node.headRev == nil then
+                    line:append(node.depotFile .. " <" .. node.type .. ">", text_hl)
+                else
+                    line:append(node.depotFile .. " #" .. node.workRev .. "/" .. node.headRev .. " <" .. node.type .. ">", text_hl)
+                end
             end
             return line
         end,
