@@ -189,7 +189,7 @@ end
 
 -- Dump file information for a depot file
 function M.fstat(depot_files)
-    local fields = { "depotFile", "path", "headRev", "type", "workRev", "haveRev" }
+    local fields = { "depotFile", "path", "headRev", "type", "workRev", "haveRev", "action" }
     local cmd = { "p4", "-c", client.name, "fstat", "-T", '"' .. table.concat(fields, ",") .. '"', "-Olhp" }
     for _, depot_file in ipairs(depot_files) do table.insert(cmd, depot_file) end
     local out = utils.get_output(cmd)

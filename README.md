@@ -74,6 +74,7 @@ Install the plugin with lazy.nvim:
       toggle_changelist = "<Space>",
     },
     icons = {
+      added = "󰝒",
       client = "",
       edited = "󰷈",
       opened = "󰈔",

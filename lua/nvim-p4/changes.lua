@@ -327,6 +327,7 @@ function M.open()
                 line:append(utils.rstrip(node.text), text_hl)
             else
                 line:append("  ", "P4ChangesHead")
+                -- TODO: Read node.action --> one of add, edit, delete, branch, move/add, move/delete, integrate, import, purge, or archive.
                 if node.differ_from_head then
                     if node.unresolved then
                         line:append(Opts.icons.unresolved, "WarningMsg")
@@ -334,10 +335,16 @@ function M.open()
                         line:append(Opts.icons.edited, "P4ChangesEdit")
                     end
                 else
-                    line:append(Opts.icons.opened, "Normal")
+                    if node.action == "add" then
+                        line:append(Opts.icons.added, "P4ChangesEdit")
+                    else
+                        line:append(Opts.icons.opened, "Normal")
+                    end
                 end
                 if node.headRev == nil then
-                    line:append(" ", "MiniIconsRed")
+                    if node.action == "branch" then
+                        line:append(" ", "MiniIconsRed")
+                    end
                 else
                     if node.workRev == node.headRev then
                         line:append(Opts.icons.synced .. " ", "MiniIconsGreen")

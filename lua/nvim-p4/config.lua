@@ -32,6 +32,7 @@ local defalut = {
             toggle_changelist = "<Space>",
         },
         icons = {
+            added = "󰝒",
             client = "",
             edited = "󰷈",
             opened = "󰈔",
